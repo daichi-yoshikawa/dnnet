@@ -62,15 +62,15 @@ class DropoutLayer(Layer):
         self.parent.backward(self.backfire)
 
     def predict_to_eval(self, x):
-        self.fire = self.drop_ratio * x
+        self.fire = (1. - self.drop_ratio) * x
         return self.child.predict_to_eval(self.fire)
 
     def predict(self, x):
-        self.fire = self.drop_ratio * x
+        self.fire = (1. - self.drop_ratio) * x
         return self.child.predict(self.fire)
 
     def finalize_training(self, x):
-        self.fire = self.drop_ratio * x
+        self.fire = (1. - self.drop_ratio) * x
         self.child.finalize_training(self.fire)
 
 

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[19]:
+# In[1]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -28,7 +28,7 @@ from dnn.layers.dropout import DropoutLayer
 from dnn.layers.batch_norm import BatchNormLayer
 
 
-# In[27]:
+# In[2]:
 
 def get_mnist():
     x = np.load('input1.npy')
@@ -46,17 +46,17 @@ def get_mnist():
     return x, y
 
 
-# In[52]:
+# In[6]:
 
 dtype = np.float32
 neuralnet = NeuralNetwork(dtype=dtype)
 neuralnet.add(InputLayer(shape=784))
-#neuralnet.add(DropoutLayer(drop_ratio=0.2))
-neuralnet.add(AffineLayer(shape=(784, 100), random_weight=RandomWeight.Type.he))
+neuralnet.add(DropoutLayer(drop_ratio=0.2))
+neuralnet.add(AffineLayer(shape=(784, 400), random_weight=RandomWeight.Type.he))
 neuralnet.add(BatchNormLayer())
 neuralnet.add(ActivationLayer(activation=Activation.Type.relu))
-#neuralnet.add(DropoutLayer(drop_ratio=0.5))
-neuralnet.add(AffineLayer(shape=(100, 10), random_weight=RandomWeight.Type.xavier))
+neuralnet.add(DropoutLayer(drop_ratio=0.5))
+neuralnet.add(AffineLayer(shape=(400, 10), random_weight=RandomWeight.Type.xavier))
 neuralnet.add(BatchNormLayer())
 neuralnet.add(ActivationLayer(activation=Activation.Type.softmax))
 neuralnet.add(OutputLayer(shape=10))
@@ -70,7 +70,7 @@ optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
 neuralnet.fit(
         x=x,
         y=y,
-        epochs=10,
+        epochs=20,
         batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[1]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -12,12 +12,14 @@ import numpy as np
 from .layer import Layer
 
 
-# In[3]:
+# In[2]:
 
 class DropoutLayer(Layer):
     """Implement Dropout.
 
     Derived class of Layer.
+    Mask to drop out some neurons is made by shuffling 1d array.
+    Number of neurons dropped out is always constant.
 
     Parameters
     ----------
@@ -42,7 +44,6 @@ class DropoutLayer(Layer):
     def set_dtype(self, dtype):
         self.dtype = dtype
         self.drop_ratio = dtype(self.drop_ratio)
-        self.mask = self.mask.astype(dtype)
 
     def get_type(self):
         return 'dropout'
@@ -50,15 +51,15 @@ class DropoutLayer(Layer):
     def set_parent(self, parent):
         Layer.set_parent(self, parent)
         self.shape = parent.shape
-        self.mask = np.ones(self.shape, dtype=self.dtype)
+        self.mask = np.arange(np.prod(self.shape)).reshape(self.shape)
 
     def forward(self, x):
-        self.mask = np.random.rand(self.mask.shape[0]) <= (1. - self.drop_ratio)
-        self.fire = self.mask * x
+        np.random.shuffle(self.mask.reshape(self.mask.size))
+        self.fire = (self.mask >= int(self.drop_ratio*self.mask.size)) * x
         self.child.forward(self.fire)
 
     def backward(self, dy):
-        self.backfire = self.mask * dy
+        self.backfire = (self.mask >= int(self.drop_ratio*self.mask.size)) * dy
         self.parent.backward(self.backfire)
 
     def predict_to_eval(self, x):
@@ -72,9 +73,4 @@ class DropoutLayer(Layer):
     def finalize_training(self, x):
         self.fire = (1. - self.drop_ratio) * x
         self.child.finalize_training(self.fire)
-
-
-# In[ ]:
-
-
 

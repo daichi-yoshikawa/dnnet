@@ -52,11 +52,11 @@ dtype = np.float32
 neuralnet = NeuralNetwork(dtype=dtype)
 neuralnet.add(InputLayer(shape=784))
 neuralnet.add(DropoutLayer(drop_ratio=0.2))
-neuralnet.add(AffineLayer(shape=(784, 400), random_weight=RandomWeight.Type.he))
+neuralnet.add(AffineLayer(shape=(784, 200), random_weight=RandomWeight.Type.he))
 neuralnet.add(BatchNormLayer())
 neuralnet.add(ActivationLayer(activation=Activation.Type.relu))
 neuralnet.add(DropoutLayer(drop_ratio=0.5))
-neuralnet.add(AffineLayer(shape=(400, 10), random_weight=RandomWeight.Type.xavier))
+neuralnet.add(AffineLayer(shape=(200, 10), random_weight=RandomWeight.Type.xavier))
 neuralnet.add(BatchNormLayer())
 neuralnet.add(ActivationLayer(activation=Activation.Type.softmax))
 neuralnet.add(OutputLayer(shape=10))
@@ -70,7 +70,7 @@ optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
 neuralnet.fit(
         x=x,
         y=y,
-        epochs=20,
+        epochs=15,
         batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,

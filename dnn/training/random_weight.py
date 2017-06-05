@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[4]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -10,9 +10,6 @@ from __future__ import absolute_import
 
 import numpy as np
 from enum import Enum
-
-
-# In[4]:
 
 class RandomWeight:
     """Base class for random initialization of weight.
@@ -140,9 +137,4 @@ class RandomWeightFactory:
             Instance of selected random initialization.
         """
         return cls.__random_weight[random_weight]
-
-
-# In[ ]:
-
-
 

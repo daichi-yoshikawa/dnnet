@@ -10,9 +10,6 @@ from __future__ import absolute_import
 
 import numpy as np
 
-
-# In[2]:
-
 class Monitor:
     """Implements feature to print out evaluation results.
     
@@ -60,9 +57,4 @@ class Monitor:
             print('epoch: %4d, loss: %2.6f, test loss: %2.6f'                  % (epoch + 1, loss_train, loss_test))
         else:
             print('epoch: %4d, loss: %2.6f, acc: %3.3f,                  test loss: %2.6f, test acc: %3.3f'                  % (epoch + 1, loss_train, acc_train, loss_test, acc_test))
-
-
-# In[ ]:
-
-
 

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -12,9 +12,6 @@ import numpy as np
 from enum import Enum
 
 from ..utils.nn_utils import get_kwarg
-
-
-# In[2]:
 
 class Optimizer:
     """
@@ -219,9 +216,4 @@ class SMORMS3(Optimizer):
         dw /= np.sqrt(self.r) + self.ep
         w -= dw
         self.s = 1. + (1. - self.x) * self.s
-
-
-# In[ ]:
-
-
 

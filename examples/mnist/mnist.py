@@ -28,9 +28,6 @@ from dnn.layers.activation import Activation, ActivationLayer
 from dnn.layers.dropout import DropoutLayer
 from dnn.layers.batch_norm import BatchNormLayer
 
-
-# In[4]:
-
 def get_mnist():
     x = np.load('input1.npy')
     x = np.r_[x, np.load('input2.npy')]
@@ -45,9 +42,6 @@ def get_mnist():
     y = y.astype(float)
     
     return x, y
-
-
-# In[5]:
 
 dtype = np.float32
 model = NeuralNetwork(dtype=dtype)
@@ -67,7 +61,6 @@ x, y = get_mnist()
 scale_normalization(x)
 
 optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
-
 model.fit(
         x=x,
         y=y,
@@ -80,9 +73,4 @@ model.fit(
         shuffle_per_epoch=True,
         test_data_ratio=0.142857
 )
-
-
-# In[ ]:
-
-
 

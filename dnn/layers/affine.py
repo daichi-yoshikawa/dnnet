@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[17]:
+# In[12]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -13,9 +13,6 @@ import numpy as np
 from .layer import Layer
 from ..training.random_weight import RandomWeight, RandomWeightFactory
 from ..training.random_weight import DefaultRandomWeight, Xavier, He
-
-
-# In[12]:
 
 class AffineLayer(Layer):
     """Implement affine transform of matrix.
@@ -80,9 +77,4 @@ class AffineLayer(Layer):
         # Add bias terms.
         self.x = np.c_[np.ones((x.shape[0], 1), dtype=self.dtype), x]
         self.fire = np.dot(self.x, self.w)
-
-
-# In[ ]:
-
-
 

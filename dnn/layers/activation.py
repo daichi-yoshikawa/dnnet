@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[10]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -12,9 +12,6 @@ import numpy as np
 from enum import Enum
 
 from .layer import Layer
-
-
-# In[10]:
 
 class ActivationLayer(Layer):
     """Implements layer which convert values by activation function.
@@ -62,9 +59,7 @@ class ActivationLayer(Layer):
         self.fire = self.activation.activate(x)
         self.child.finalize_training(self.fire)
 
-
-# In[11]:
-
+# Implement Activation Functions
 class Activation:
     """Base class for activation functions.
 
@@ -192,9 +187,4 @@ class ActivationFactory:
             Instance of selected activation function.
         """
         return cls.__activation[activation]
-
-
-# In[ ]:
-
-
 

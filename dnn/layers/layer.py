@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -9,9 +9,6 @@
 from __future__ import absolute_import
 
 import numpy as np
-
-
-# In[2]:
 
 class Layer:
     """Base class for layers.
@@ -190,9 +187,4 @@ class OutputLayer(Layer):
 
     def finalize_training(self, x):
         self.fire = x
-
-
-# In[ ]:
-
-
 

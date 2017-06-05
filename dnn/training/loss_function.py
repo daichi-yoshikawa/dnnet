@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[4]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -10,9 +10,6 @@ from __future__ import absolute_import
 
 import numpy as np
 from enum import Enum
-
-
-# In[4]:
 
 class LossFunction:
     """Base class for loss functions.
@@ -105,9 +102,4 @@ class LossFunctionFactory:
             Instance of selected loss function.
         """
         return cls.__loss_function[loss_function]
-
-
-# In[ ]:
-
-
 

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[5]:
+# In[7]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -18,9 +18,6 @@ from .loss_function import BinomialCrossEntropy
 from .loss_function import SquaredError
 from ..utils.nn_utils import shuffle_data
 from ..utils.debug_utils import Monitor
-
-
-# In[7]:
 
 class BackPropagation:
     """Back propagation algorithm to update weights of neural network.
@@ -279,9 +276,4 @@ class BackPropagation:
         """
         consistency = np.argmax(y, axis=1) == np.argmax(y_pred, axis=1)
         return consistency.sum().astype(self.dtype) / consistency.shape[0]
-
-
-# In[ ]:
-
-
 

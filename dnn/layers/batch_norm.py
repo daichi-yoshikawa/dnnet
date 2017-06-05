@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -11,9 +11,6 @@ from __future__ import absolute_import
 import numpy as np
 
 from .layer import Layer
-
-
-# In[2]:
 
 class BatchNormLayer(Layer):
     """Implementation of Batch Normalization.
@@ -132,9 +129,4 @@ class BatchNormLayer(Layer):
     def finalize_training(self, x):
         self.fire = self.gamma * (x - self.miu) / np.sqrt(self.var + self.ep) + self.beta
         self.child.finalize_training(self.fire)
-
-
-# In[ ]:
-
-
 

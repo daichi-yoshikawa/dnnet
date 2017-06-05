@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[4]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -9,9 +9,6 @@
 from __future__ import absolute_import
 
 import numpy as np
-
-
-# In[4]:
 
 def get_kwarg(key, dtype, default_value, **kwargs):
     """Get value which is specified through kwargs.
@@ -107,8 +104,6 @@ def split_data(x, y, test_data_ratio):
     return x_train, y_train, x_test, y_test
 
 
-# In[14]:
-
 def gaussian_normalization(x, ep=1e-5):
     """Normalize 2d matrix to have mean ==0 and standard deviation == 0
     w.r.t each feature.
@@ -124,6 +119,7 @@ def gaussian_normalization(x, ep=1e-5):
     """
     x -= x.mean(axis=0).T
     x /= np.sqrt(x.var(axis=0).T) + ep
+
 
 def scale_normalization(x, ep=1e-5):
     """Normalize 2d matrix to have values' range from 0.0 to 1.0
@@ -142,9 +138,4 @@ def scale_normalization(x, ep=1e-5):
     amp = x.max(axis=0) - x.min(axis=0)
     amp = amp.reshape(amp.size, -1)
     x /= (amp.T + ep)
-
-
-# In[ ]:
-
-
 

@@ -107,7 +107,7 @@ class NeuralNetwork:
         -------
         This method assumes that x and y include all data you use.
         If your data set is so large that all data cannot be stored in memory,
-        you cannot use this method. Use fit_gen instead.
+        you cannot use this method. Use fit_genenerator instead.
         """
         epochs = get_kwarg(
                 key='epochs',
@@ -148,7 +148,7 @@ class NeuralNetwork:
         back_prop = BackPropagation(epochs, batch_size, optimizer, loss_function, monitor, self.dtype)
         back_prop.fit(self.layers, x_train, y_train, x_test, y_test, shuffle_per_epoch)
 
-    def fit_gen(self, x, y, optimizer, loss_function, **kwargs):
+    def fit_generator(self, x, y, optimizer, loss_function, **kwargs):
         """Train model for large size data set by using generator.
         TODO
         """

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[14]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -11,6 +11,7 @@ from __future__ import absolute_import
 import sys
 sys.path.append('../../')
 
+import pickle
 import numpy as np
 import dnn
 from dnn.neuralnet import NeuralNetwork
@@ -28,7 +29,7 @@ from dnn.layers.dropout import DropoutLayer
 from dnn.layers.batch_norm import BatchNormLayer
 
 
-# In[2]:
+# In[4]:
 
 def get_mnist():
     x = np.load('input1.npy')
@@ -46,31 +47,31 @@ def get_mnist():
     return x, y
 
 
-# In[6]:
+# In[5]:
 
 dtype = np.float32
-neuralnet = NeuralNetwork(dtype=dtype)
-neuralnet.add(InputLayer(shape=784))
-neuralnet.add(DropoutLayer(drop_ratio=0.2))
-neuralnet.add(AffineLayer(shape=(784, 200), random_weight=RandomWeight.Type.he))
-neuralnet.add(BatchNormLayer())
-neuralnet.add(ActivationLayer(activation=Activation.Type.relu))
-neuralnet.add(DropoutLayer(drop_ratio=0.5))
-neuralnet.add(AffineLayer(shape=(200, 10), random_weight=RandomWeight.Type.xavier))
-neuralnet.add(BatchNormLayer())
-neuralnet.add(ActivationLayer(activation=Activation.Type.softmax))
-neuralnet.add(OutputLayer(shape=10))
-neuralnet.compile()
+model = NeuralNetwork(dtype=dtype)
+model.add(InputLayer(shape=784))
+model.add(DropoutLayer(drop_ratio=0.2))
+model.add(AffineLayer(shape=(784, 200), random_weight=RandomWeight.Type.he))
+model.add(BatchNormLayer())
+model.add(ActivationLayer(activation=Activation.Type.relu))
+model.add(DropoutLayer(drop_ratio=0.5))
+model.add(AffineLayer(shape=(200, 10), random_weight=RandomWeight.Type.xavier))
+model.add(BatchNormLayer())
+model.add(ActivationLayer(activation=Activation.Type.softmax))
+model.add(OutputLayer(shape=10))
+model.compile()
 
 x, y = get_mnist()
 scale_normalization(x)
 
 optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
 
-neuralnet.fit(
+model.fit(
         x=x,
         y=y,
-        epochs=15,
+        epochs=1,
         batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,

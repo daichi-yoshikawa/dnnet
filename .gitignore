@@ -12,3 +12,5 @@ dnn/utils/.ipynb_checkpoints/
 examples/mnist/.ipynb_checkpoints/
 
 *.pyc
+*.txt
+*.dnn

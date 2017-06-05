@@ -1,13 +1,15 @@
 
 # coding: utf-8
 
-# In[3]:
+# In[2]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
 from __future__ import absolute_import
 
+import os
+import pickle
 import numpy as np
 
 from .utils.nn_utils import get_kwarg, shuffle_data, split_data
@@ -32,6 +34,35 @@ class NeuralNetwork:
     dtype : type
         Data type selected through constructor.
     """
+    @classmethod
+    def load(self, name, path=None):
+        """Load model from storage.
+
+        Arguments
+        ---------
+        name : str or None, default None
+            Name of the desired file. Doesn't include path.
+        path : str or None, default None
+            Full path to the directory where the desired file is contained.
+            If None, file is loaded from a directory where script runs.
+
+        Returns
+        -------
+        NeuralNetwork
+            Returns model.
+        """
+        if path is None:
+            path = '.'
+        if path[0] == '~':
+            path = os.getenv("HOME") + path[1:]
+
+        try:
+            with open(path + '/' + name, 'rb') as f:
+                return pickle.load(f)
+        except IOError as e:
+            msg = str(e) + '\nNeuralNetwork.load failed.'
+            print(msg)
+
     def __init__(self, dtype=np.float32):
         """
         Arguments
@@ -181,9 +212,43 @@ class NeuralNetwork:
             layer = layer.child
             i += 1
 
+    def save(self, name, path=None):
+        """Save model to storage.
+
+        Arguments
+        ---------
+        name : str or None, default None
+            Name of the resulting file. Doesn't include path.
+        path : str or None, default None
+            Full path to the directory where the resulting file is generated.
+            If None, file is saved in a directory where script runs.
+
+        Returns
+        -------
+        bool
+            Returns true when succeeded.
+        """
+        if path is None:
+            path = '.'
+        if path[0] == '~':
+            path = os.getenv("HOME") + path[1:]
+
+        try:
+            with open(path + '/' + name, 'wb') as f:
+                pickle.dump(self, f)
+        except IOError as e:
+            msg = str(e) + '\nNeuralNetwork.save failed.'
+            print(msg)
+
     def __convert_dtype(self, x, y):
         """Convert data type of features into selected one in constructor."""
         return x.astype(self.dtype), y.astype(self.dtype)
+
+
+# In[4]:
+
+path = '~'
+path[1:]
 
 
 # In[ ]:

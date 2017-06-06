@@ -8,6 +8,7 @@
 
 from __future__ import absolute_import
 
+import sys
 import copy
 import numpy as np
 from collections import OrderedDict
@@ -150,6 +151,8 @@ class BackPropagation:
                 end = data_num
 
             self.__train_one_batch(layers, x_train[i:end,:], y_train[i:end,:])
+            sys.stdout.write('\r%2.2f%% ' % (100. * i / data_num))
+        sys.stdout.write('\r100.00% ')
 
     def __train_one_batch(self, layers, x_train, y_train):
         """Implements one update of weights of neural network.

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[4]:
+# In[ ]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -44,11 +44,11 @@ def get_mnist():
 dtype = np.float32
 model = NeuralNetwork(input_shape=(784), dtype=dtype)
 model.add(DropoutLayer(drop_ratio=0.2))
-model.add(AffineLayer(shape=(784, 200), random_weight=RandomWeight.Type.he))
+model.add(AffineLayer(shape=(784, 392), random_weight=RandomWeight.Type.he))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
 model.add(DropoutLayer(drop_ratio=0.5))
-model.add(AffineLayer(shape=(200, 10), random_weight=RandomWeight.Type.xavier))
+model.add(AffineLayer(shape=(392, 10), random_weight=RandomWeight.Type.xavier))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.softmax))
 model.compile()
@@ -61,7 +61,7 @@ optimizer = AdaGrad(learning_rate=5e-2, weight_decay=1e-3, dtype=dtype)
 lc = model.fit(
         x=x,
         y=y,
-        epochs=10,
+        epochs=20,
         batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,

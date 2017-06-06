@@ -36,7 +36,6 @@ class DropoutLayer(Layer):
     Dropout: A Simple Way to Prevent Neural Networks from Overfitting
     https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf
     """
-
     def __init__(self, drop_ratio):
         self.drop_ratio = drop_ratio
         self.mask = np.array([])

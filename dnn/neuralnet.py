@@ -15,7 +15,7 @@ import numpy as np
 from .utils.nn_utils import get_kwarg, shuffle_data, split_data
 from .training.random_weight import RandomWeight
 from .training.back_propagation import BackPropagation
-from .layers.layer import Layer
+from .layers.layer import Layer, InputLayer, OutputLayer
 
 
 # In[2]:
@@ -63,7 +63,7 @@ class NeuralNetwork:
             msg = str(e) + '\nNeuralNetwork.load failed.'
             print(msg)
 
-    def __init__(self, dtype=np.float32):
+    def __init__(self, input_shape, dtype=np.float32):
         """
         Arguments
         ---------
@@ -72,6 +72,8 @@ class NeuralNetwork:
         """
         self.layers = np.array([], dtype=Layer)
         self.dtype = dtype
+
+        self.add(InputLayer(shape=input_shape))
 
     def add(self, layer):
         """Add instance of derived class of layer.
@@ -104,6 +106,10 @@ class NeuralNetwork:
             layer.set_parent(parent)
             parent = layer
 
+        output_layer = OutputLayer(shape=self.layers[-1].shape)
+        output_layer.set_parent(self.layers[-1])
+        self.add(output_layer)
+
     def fit(self, x, y, optimizer, loss_function, **kwargs):
         """Train model.
 
@@ -125,14 +131,21 @@ class NeuralNetwork:
         batch_size : int, default 100
             Dataset is splitted into multiple mini batches
             whose size is this.
-        monitor : bool, default True
-            Print out evaluation results of ongoing training.
+        learning_curve : bool, default True
+            Prints out evaluation results of ongoing training.
+            Also, returns learning curve after completion of training.
         shuffle : bool, default True
             Shuffle dataset one time before training.
         shuffle_per_epoch : bool, default False
             Shuffle training data every epoch.
         test_data_ratio : float, default 0
             Ratio of test data. If 0, all data is used for training.
+
+        Returns
+        -------
+        LearningCurve
+            Instance of LearningCurve, which contains
+            losses and accuracies for train and test data.
 
         Warning
         -------
@@ -150,8 +163,8 @@ class NeuralNetwork:
                 dtype=int,
                 default_value=100,
                 **kwargs)
-        monitor = get_kwarg(
-                key='monitor',
+        learning_curve = get_kwarg(
+                key='learning_curve',
                 dtype=bool,
                 default_value=True,
                 **kwargs)
@@ -176,8 +189,17 @@ class NeuralNetwork:
         x, y = self.__convert_dtype(x, y)
         x_train, y_train, x_test, y_test = split_data(x, y, test_data_ratio)
 
-        back_prop = BackPropagation(epochs, batch_size, optimizer, loss_function, monitor, self.dtype)
-        back_prop.fit(self.layers, x_train, y_train, x_test, y_test, shuffle_per_epoch)
+        back_prop = BackPropagation(
+                epochs,
+                batch_size,
+                optimizer,
+                loss_function,
+                learning_curve,
+                self.dtype
+        )
+        lc = back_prop.fit(self.layers, x_train, y_train, x_test, y_test, shuffle_per_epoch)
+
+        return lc
 
     def fit_generator(self, x, y, optimizer, loss_function, **kwargs):
         """Train model for large size data set by using generator.
@@ -243,15 +265,4 @@ class NeuralNetwork:
     def __convert_dtype(self, x, y):
         """Convert data type of features into selected one in constructor."""
         return x.astype(self.dtype), y.astype(self.dtype)
-
-
-# In[4]:
-
-path = '~'
-path[1:]
-
-
-# In[ ]:
-
-
 

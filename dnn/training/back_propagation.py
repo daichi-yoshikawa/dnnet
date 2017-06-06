@@ -16,8 +16,8 @@ from .loss_function import LossFunctionFactory
 from .loss_function import MultinomialCrossEntropy
 from .loss_function import BinomialCrossEntropy
 from .loss_function import SquaredError
+from .learning_curve import LearningCurve
 from ..utils.nn_utils import shuffle_data
-from ..utils.debug_utils import Monitor
 
 class BackPropagation:
     """Back propagation algorithm to update weights of neural network.
@@ -37,12 +37,13 @@ class BackPropagation:
         which has weight parameter, like affine layer.
     loss_function : Derived class of LossFunction
         Used to calculate loss.
-    monitor : Monitor
-        Used to display evaluation results.
+    lc : LearningCurve
+        Used to display evaluation results and
+        plot learning curve. Returned by fit method.
     dtype : type
         Data type of variables. Generally float64 or float32.
     """
-    def __init__(self, epochs, batch_size, optimizer, loss_function, monitor, dtype):
+    def __init__(self, epochs, batch_size, optimizer, loss_function, learning_curve, dtype):
         """
         Arguments
         ---------
@@ -57,8 +58,9 @@ class BackPropagation:
             Type of loss function.
             Generally, cross entropy is used for classification and
             squared error is used for regression.
-        monitor : bool
-            If true, display intermediate results of training.
+        learning_curve : bool
+            Prints out evaluation results of ongoing training.
+            Also, returns learning curve after completion of training.
         dtype : type
             Data type of variables. Generally float64 or float32.
         """
@@ -67,7 +69,7 @@ class BackPropagation:
         self.optimizer = optimizer
         self.optimizers = OrderedDict()
         self.loss_function = LossFunctionFactory.get(loss_function=loss_function)
-        self.monitor = Monitor() if monitor else None
+        self.lc = LearningCurve(dtype=dtype) if learning_curve else None
         self.dtype = dtype
 
     def fit(self, layers, x_train, y_train, x_test, y_test, shuffle_per_epoch):
@@ -103,13 +105,7 @@ class BackPropagation:
 
         self.__finalize_training(layers, x_train)
 
-        y_pred = layers[0].predict(x_train)
-        consistency = np.argmax(y_train, axis=1) == np.argmax(y_pred, axis=1)
-        print(consistency.sum().astype(self.dtype) / consistency.shape[0])
-
-        y_pred = layers[0].predict(x_test)
-        consistency = np.argmax(y_test, axis=1) == np.argmax(y_pred, axis=1)
-        print(consistency.sum().astype(self.dtype) / consistency.shape[0])
+        return self.lc
 
     def __finalize_training(self, layers, x):
         """This method is called after completion of training.
@@ -252,8 +248,9 @@ class BackPropagation:
             if y_test_pred.size != 0:
                 acc_test = self.__get_accuracy(y=y_test, y_pred=y_test_pred)
 
-        if self.monitor is not None:
-            self.monitor.print_loss(loss_train, loss_test, acc_train, acc_test, epoch)
+        if self.lc is not None:
+            self.lc.add(loss_train, loss_test, acc_train, acc_test)
+            self.lc.stdout(epoch)
 
     def __get_accuracy(self, y, y_pred):
         """Calculate accuracy and return it.

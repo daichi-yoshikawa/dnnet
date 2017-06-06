@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[8]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -72,9 +72,4 @@ lc = model.fit(
 )
 
 lc.plot(figsize=(8,10), fontsize=12)
-
-
-# In[ ]:
-
-
 

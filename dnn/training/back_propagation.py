@@ -245,7 +245,7 @@ class BackPropagation:
             y_test_pred = layers[0].predict_to_eval(x_test)
             loss_test = self.loss_function.get(y=y_test_pred, t=y_test)
 
-        if self.loss_function is not SquaredError:
+        if not isinstance(self.loss_function, SquaredError):
             acc_train = self.__get_accuracy(y=y_train, y_pred=y_train_pred)
 
             if y_test_pred.size != 0:

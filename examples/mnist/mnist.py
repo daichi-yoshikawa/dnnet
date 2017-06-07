@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[38]:
+# In[1]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -89,7 +89,7 @@ lc.plot(figsize=(8,10), fontsize=12)
 model.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
 
 
-# In[37]:
+# In[8]:
 
 # Auto Encoder
 ae = NeuralNetwork(input_shape=(784), dtype=dtype)
@@ -105,20 +105,22 @@ ae.add(AffineLayer(shape=(100, 784), random_weight=RandomWeight.Type.he))
 #ae.add(ActivationLayer(activation=Activation.Type.srrelu))
 ae.compile()
 
+optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
+
 lc2 = ae.fit(
         x=x,
         y=x,
-        epochs=5,
+        epochs=10,
         batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.squared_error,
         learning_curve=True,
         shuffle=True,
         shuffle_per_epoch=True,
-        test_data_ratio=0.142857
+        test_data_ratio=0.
 )
 
-lc2.plot(figsize=(8,10), fontsize=12)
+lc2.plot(figsize=(8, 6), fontsize=12)
 ae.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
 
 

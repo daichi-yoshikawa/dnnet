@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[4]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -67,12 +67,11 @@ x, y = get_mnist()
 scale_normalization(x)
 
 optimizer = AdaGrad(learning_rate=5e-2, weight_decay=1e-3, dtype=dtype)
-#optimizer = Momentum(learning_rate=7e-2, weight_decay=1e-3, dtype=dtype)
 
 lc = model.fit(
         x=x,
         y=y,
-        epochs=10,
+        epochs=5,
         batch_size=80,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,

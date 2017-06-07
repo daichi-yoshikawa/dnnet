@@ -216,15 +216,6 @@ class ActivationFactory:
     -------
     Get activation's instance through this class.
     """
-    __activation = {
-            Activation.Type.sigmoid : Sigmoid(),
-            Activation.Type.relu : ReLU(),
-            Activation.Type.elu : ELU(),
-            Activation.Type.srrelu : SRReLU(),
-            Activation.Type.tanh : Tanh(),
-            Activation.Type.softmax : Softmax(),
-    }
-
     @classmethod
     def get(cls, activation):
         """Returns instance of selected activation function.
@@ -239,5 +230,16 @@ class ActivationFactory:
         Derived class of Activation
             Instance of selected activation function.
         """
-        return cls.__activation[activation]
+        if activation is Activation.Type.sigmoid:
+            return Sigmoid()
+        elif activation is Activation.Type.relu:
+            return ReLU()
+        elif activation is Activation.Type.elu:
+            return ELU()
+        elif activation is Activation.Type.srrelu:
+            return SRReLU()
+        elif activation is Activation.Type.tanh:
+            return Tanh()
+        elif activation is Activation.Type.softmax:
+            return Softmax()
 

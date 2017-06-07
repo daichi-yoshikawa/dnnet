@@ -23,12 +23,16 @@ $ sudo apt-get install git gcc make openssl libssl-dev libbz2-dev libreadline-de
    $ mkdir -p ./pyenv/versions ./pyenv/shims
 ```
 * Set paths
+Add the following description in ~/.bashrc
 ```
-   $ echo 'export PYENV_ROOT="${HOME}/pyenv"' >> ~/.bashrc
-   $ echo 'if [ -d "${PYENV_ROOT}" ]; then' >> ~/.bashrc
-   $ echo '    export PATH=${PYENV_ROOT}/bin:$PATH' >> ~/.bashrc
-   $ echo '    eval "$(pyenv init -)"' >> ~/.bashrc
-   $ echo 'fi' >> ~/.bashrc
+export PYENV_ROOT="${HOME}/Documents/pyenv"
+if [ -d "${PYENV_ROOT}" ]; then
+    export PATH=${PYENV_ROOT}/bin:$PATH
+    eval "$(pyenv init -)"
+fi
+```
+And then execute the follows.
+```
    $ exec $SHELL -l
    $ . ~/.bashrc
 ```

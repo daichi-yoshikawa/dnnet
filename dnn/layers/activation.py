@@ -68,7 +68,7 @@ class Activation:
     This class should not be used directly.
     Use derived classes instead. 
     """
-    Type = Enum('Type', 'sigmoid, relu, tanh, softmax')
+    Type = Enum('Type', 'sigmoid, relu, elu, srrelu, tanh, softmax')
 
     def get_type(self):
         """Interface to get type of activation in string."""
@@ -123,6 +123,57 @@ class ReLU(Activation):
         return self.__mask
 
 
+class ELU(Activation):
+    """Exponential Linear Units.
+
+    Parameters
+    ----------
+    alpha : float, default 1.0
+        Controls the value to which an ELU saturates for negative net inputs.
+    __mask : np.array
+        2d matrix whose entry(i, j) is 
+        1 when x(i, j) > 0 and 0 when x(i, j) == 0.
+
+    References
+    ----------
+    Fast and Accurate Deep Network Learning by Exponential Linear Units (ELUs)
+    https://arxiv.org/pdf/1511.07289.pdf
+    """
+    def get_type(self):
+        return 'elu'
+
+    def activate(self, x):
+        self.__mask = (x > 0.)
+        return self.__mask * x + ~(self.__mask) * (np.exp(x) - 1)
+
+    def grad(self, x):
+        return self.__mask + ~(self.__mask) * (x + 1)
+
+
+class SRReLU(Activation):
+    """Square Root version of Rectified Linear.
+
+    This is an activation function the author, Daichi Yoshikawa, proposes.
+    To reduce bias shift and enhance nonlinearity, use square root of input
+    instead of original value.
+
+    Parameters
+    ----------
+    __mask : np.array
+        2d matrix whose entry(i, j) is 
+        1 when x(i, j) > 0 and 0 when x(i, j) == 0.
+    """
+    def get_type(self):
+        return 'selu'
+
+    def activate(self, x):
+        self.__mask = (x > 0.)
+        return (np.sqrt(self.__mask * x + 1) - 1)# + ~self.__mask * self.alpha * (np.exp(x) - 1)
+
+    def grad(self, x):
+        return self.__mask * 0.5 / (x + 1)# + ~self.__mask * (x + self.alpha)
+
+
 class Tanh(Activation):
     """Tanh function.
 
@@ -168,6 +219,8 @@ class ActivationFactory:
     __activation = {
             Activation.Type.sigmoid : Sigmoid(),
             Activation.Type.relu : ReLU(),
+            Activation.Type.elu : ELU(),
+            Activation.Type.srrelu : SRReLU(),
             Activation.Type.tanh : Tanh(),
             Activation.Type.softmax : Softmax(),
     }

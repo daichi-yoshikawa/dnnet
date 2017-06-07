@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[4]:
+# In[1]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -72,7 +72,7 @@ lc = model.fit(
         x=x,
         y=y,
         epochs=5,
-        batch_size=80,
+        batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,
         learning_curve=True,
@@ -82,6 +82,38 @@ lc = model.fit(
 )
 
 lc.plot(figsize=(8,10), fontsize=12)
+model.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
+
+
+# In[5]:
+
+# Auto Encoder
+ae = NeuralNetwork(input_shape=(784), dtype=dtype)
+ae.add(DropoutLayer(drop_ratio=0.2))
+ae.add(AffineLayer(shape=(784, 100), random_weight=RandomWeight.Type.he))
+ae.add(BatchNormLayer())
+ae.add(ActivationLayer(activation=Activation.Type.srrelu))
+ae.add(DropoutLayer(drop_ratio=0.5))
+ae.add(AffineLayer(shape=(100, 784), random_weight=RandomWeight.Type.default))
+#ae.add(BatchNormLayer())
+#ae.add(ActivationLayer(activation=Activation.Type.srrelu))
+ae.compile()
+
+lc = ae.fit(
+        x=x,
+        y=x,
+        epochs=5,
+        batch_size=100,
+        optimizer=optimizer,
+        loss_function=LossFunction.Type.squared_error,
+        learning_curve=True,
+        shuffle=True,
+        shuffle_per_epoch=True,
+        test_data_ratio=0.142857
+)
+
+lc.plot(figsize=(8,10), fontsize=12)
+ae.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
 
 
 # In[ ]:

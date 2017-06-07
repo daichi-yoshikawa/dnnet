@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[4]:
+# In[182]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -138,4 +138,31 @@ def scale_normalization(x, ep=1e-5):
     amp = x.max(axis=0) - x.min(axis=0)
     amp = amp.reshape(amp.size, -1)
     x /= (amp.T + ep)
+
+def w2im(w, shape, layout):
+    """Reshape 2d weight matrix to 2d image matrix which represents well aligned filters.
+
+    Arguments
+    ---------
+    w : np.array
+        Weight matrix in 2d array.
+    shape : tuple (rows, cols)
+        Shape of filter. In the case of multi-channel,
+        filters are taken as single channel by taking average over channels.
+    layout : tuple (rows, cols)
+        Number of filter to display in direction of rows and cols respectively.
+    """
+    if (w.shape[0] - 1) != np.prod(shape):
+        msg = '(w.shape[0] - 1) != np.prod(shape)\n'            + '  w.shape[0] : ' + str(w.shape[0]) + '\n'            + '  shape.size : ' + str(np.prod(shape))
+        raise RuntimeError(msg)
+
+    if w.shape[1] < np.prod(layout):
+        msg = 'w.shape[1] != np.prod(shape)\n'            + '  w.shape[1] : ' + str(w.shape[1]) + '\n'            + '  shape.size : ' + str(np.prod(layout))
+        raise RuntimeError(msg)
+
+    img = w[1:, :np.prod(layout)].T
+    img = img.reshape(layout[0], layout[1], shape[0], shape[1])
+    img = img.transpose(0, 2, 1, 3).reshape(layout[0]*shape[0], layout[1]*shape[1])
+
+    return img
 

@@ -11,8 +11,9 @@ from __future__ import absolute_import
 import os
 import pickle
 import numpy as np
+import matplotlib.pyplot as plt
 
-from .utils.nn_utils import get_kwarg, shuffle_data, split_data
+from .utils.nn_utils import get_kwarg, shuffle_data, split_data, w2im
 from .training.random_weight import RandomWeight
 from .training.back_propagation import BackPropagation
 from .layers.layer import Layer, InputLayer, OutputLayer
@@ -261,6 +262,46 @@ class NeuralNetwork:
         except IOError as e:
             msg = str(e) + '\nNeuralNetwork.save failed.'
             print(msg)
+
+    def show_filters(self, index, shape, layout, figsize=(8, 8)):
+        """Visualize filters.
+
+        Weight matrix in affine layer or convolution layer
+        can be shown as image.
+        If weight matrix is so big that all filters cannot be displayed,
+        displayed filters are randomly selected.
+
+        Arguments
+        ---------
+        index : int
+            index-th affine/convolution layer's weight matrix is visualized.
+            This index starts from 0, that is, the first layer with weight matrix is 0-th.
+            If this value is out of range, raise RuntimeError.
+        shape : tuple (rows, cols)
+            Shape of filter. In the case of multi-channel,
+            filters are taken as single channel by taking average over channels.
+        layout : tuple (rows, cols)
+            Number of filter to display in direction of rows and cols respectively.
+        """
+        # Get index of layer which is index-th layer with weight matrix.
+        num_of_layer_with_filter = 0
+        tgt_index = None
+
+        for i, layer in enumerate(self.layers, 0):
+            if layer.has_weight():
+                if num_of_layer_with_filter == index:
+                    tgt_index = i
+                    break
+                num_of_layer_with_filter += 1
+
+        if tgt_index is None:
+            msg = str(index) + '-th layer with weight matrix doesn\'t exist.'
+            raise RuntimeError(msg)
+
+        img = w2im(self.layers[tgt_index].w, shape, layout)
+        plt.figure(figsize=figsize)
+        plt.imshow(img)
+        plt.show()
 
     def __convert_dtype(self, x, y):
         """Convert data type of features into selected one in constructor."""

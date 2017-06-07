@@ -227,13 +227,8 @@ class NeuralNetwork:
 
     def print_config(self):
         """Display configuration of layers."""
-        i = 1
-        layer = self.layers[0]
-
-        while layer is not None:
-            print(str(i) + '-th layer : ' + layer.get_type())
-            layer = layer.child
-            i += 1
+        for i, layer in enumerate(self.layers):
+            print(('%2d-th layer, shape : ' + str(layer.shape)                  + ', ' + layer.get_type()) % (i))
 
     def save(self, name, path=None):
         """Save model to storage.

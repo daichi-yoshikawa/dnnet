@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[4]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -11,15 +11,64 @@ from __future__ import absolute_import
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
-'''
-Implement im2col, col2im, flatten.
-im2col : Support mini-batch, multi-channels, padding.
-col2im : Revert matrix from im2col into images
-flatten : Support mini-batch, multi-channels.
-'''
+
+# In[5]:
+
+def pad_img2d(img, pad_rows, pad_cols):
+    """Returns padded matrix which represents image.
+
+    1d matrix is not supported.
+    Shape must be in forms of (***, ***, ... , ***, rows, cols),
+    such as (rows, cols), (channels, rows, cols),
+    or (batch size, channels, rows, cols), etc.
+
+    Arguments
+    ---------
+    img : np.array
+        Image matrix in 2 or more dimensional array.
+        This array is not exposed to side effect.
+    pad_rows : int or tuple (pad_upper, pad_lower)
+        Number of pad in direction of rows.
+        If tuple, the first entry is a number of pad in upper side
+        and the second one is that in lower side.
+    pad_cols : int or tuple (pad_left, pad_right)
+        Number of pad in direction of cols.
+        If tuple, the first entry is a number of pad in left side
+        and the second one is that in right side.
+
+    Returns
+    -------
+    np.array
+        The resulting matrix, that is, padded matrix.
+    """
+    if (img.ndim < 2):
+        msg = '1d array is not supported.'
+        raise RuntimeError(msg)
+
+    npad = ()
+    for i in range(img.ndim - 2):
+        npad = npad + ((0, 0),)
+
+    if isinstance(pad_rows, tuple):
+        npad = npad + ((pad_rows[0], pad_rows[1]),)
+    else:
+        npad = npad + ((pad_rows, pad_rows),)
+
+    if isinstance(pad_cols, tuple):
+        npad = npad + ((pad_cols[0], pad_cols[1]),)
+    elif pad_cols:
+        npad = npad + ((pad_cols, pad_cols),)
+
+    return np.pad(img, pad_width=npad, mode='constant', constant_values=0)
 
 
-# In[1]:
+# In[6]:
+
+img = np.arange(72).reshape(2, 3, 3, 4)
+img
+
+
+# In[ ]:
 
 """
 a = np.array([

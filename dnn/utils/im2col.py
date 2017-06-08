@@ -1,20 +1,23 @@
 
 # coding: utf-8
 
-# In[4]:
+# In[30]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
+# This file is going to be merged with nn_utils module.
+
 from __future__ import absolute_import
 
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
 
-# In[5]:
+# In[78]:
 
-def pad_img2d(img, pad_rows, pad_cols):
+def pad_img(img, pad_rows, pad_cols):
     """Returns padded matrix which represents image.
 
     1d matrix is not supported.
@@ -45,6 +48,9 @@ def pad_img2d(img, pad_rows, pad_cols):
         msg = '1d array is not supported.'
         raise RuntimeError(msg)
 
+    if np.prod(pad) == 0:
+        return img
+
     npad = ()
     for i in range(img.ndim - 2):
         npad = npad + ((0, 0),)
@@ -62,10 +68,223 @@ def pad_img2d(img, pad_rows, pad_cols):
     return np.pad(img, pad_width=npad, mode='constant', constant_values=0)
 
 
-# In[6]:
+# In[126]:
 
-img = np.arange(72).reshape(2, 3, 3, 4)
-img
+def reshape_img(img):
+    """Returns reshaped 4d matrix.
+
+    im2col function assumes that input matrix is 4d (bathes, channels, rows, cols).
+    This function helps im2col by reshaping the matrix properly.
+    If matrix's dimension is more than 4, this throws exception.
+
+    Arguments
+    ---------
+    img : np.array
+        Matrix in 1-4d array.
+
+    Returns
+    -------
+    np.array
+        Matrix in 4d array.
+    """
+    if len(img.shape) == 1:
+        return img.reshape(1, 1, 1, img.shape[0])
+    elif len(img.shape) == 2:
+        return img.reshape(1, 1, img.shape[0], img.shape[1])
+    elif len(img.shape) == 3:
+        return img.reshape(1, img.shape[0], img.shape[1], img.shape[2])
+    elif len(img.shape) > 4:
+        msg = 'len(img.shape) must be <= 4.'
+        raise RuntimeError(msg)
+    return img
+
+
+def get_remainders_of_filtering(rows, cols, f_rows, f_cols, strides):
+    """Get remainders which resulted from applying filter.
+
+    Combination of image size, filter size and stride size should be proper.
+    If it is unproper, remainders appear when filtering, that is,
+    filter can't be applied to all pixels.
+    The resulting remainders can be used to detect applicability of filter,
+    or pad image to enable filtering.
+
+    Arguments
+    ---------
+    img 
+    """
+    rem_r = (rows - f_rows) % strides[0]
+    rem_c = (cols - f_cols) % strides[1]
+    return rem_r, rem_c
+
+
+def extend_img_for_filtering(img, rem_r, rem_c):
+    """Extend(Pad) image matrix to enable it to be filtered properly.
+
+    Based on remainders of filtering, pad image with 0s.
+    This remainders are supposed to be gained through
+    get_remainders_of_filtering function.
+
+    Arguments
+    ---------
+    img : np.array
+        Matrix in 2-4d array, whose shape is (rows, cols), (channels, rows, cols),
+        or (batches, channels, rows, cols).
+    rem_r : int
+        Remainder in rows direction, which is derived from
+        get_remainders_of_filtering function.
+    rem_c : int
+        Remainder in cols direction, which is derived from
+        get_remainders_of_filtering function.
+
+    Returns
+    -------
+    np.array
+        Padded image in 2-4d array.
+    """
+    pad_r = (gap_r//2, gap_r - (gap_r//2))
+    pad_c = (gap_c//2, gap_c - (gap_c//2))
+    return pad_img(img, pad_r, pad_c)
+
+
+def im2col(img, f_shape, pad, strides, force=False):
+    """Convert 2-4d image matrix into a form which is proper for convolution.
+
+    Convolutional neural network requires convolution and convolution requires
+    filtering to 2d images.
+    To do it with matrix computation, we have to convert original matrix,
+    whose shape would be (rows, cols), (channels, rows, cols)
+    or (batches, channels, rows, cols), into different form.
+
+    Arguments
+    ---------
+    img : np.array
+
+    f_shape : tuple (rows, cols)
+
+    pad : tuple (rows, cols)
+
+    strides : tuple (rows, cols)
+
+    force : bool, default False
+
+    """
+    pimg = pad_img(reshape_img(img), pad[0], pad[1])
+
+    batches, chs, rows, cols = pimg.shape
+    f_rows, f_cols = f_shape
+    gap_r, gap_c = get_remainders_of_filtering(rows, cols, f_rows, f_cols, strides)
+
+    if (gap_r > 0) or (gap_c > 0):
+        if force:
+            pimg = extend_img_for_filtering(pimg, gap_r, gap_c)
+            batches, chs, rows, cols = pimg.shape
+        else:
+            msg = 'Filter cannot be applied to image with the strides.\n'                + 'Image shape (with pad) : ' + str((rows, cols)) + '\n'                + 'Filter shape : ' + str((f_rows, f_cols)) + '\n'                + 'Strides : ' + str(strides)
+            raise RuntimeError(msg)
+
+    st_batch, st_ch, st_r, st_c = pimg.strides
+    f_st_r = st_r * strides[0]
+    f_st_c = st_c * strides[1]
+    dst_strides = (st_batch, st_ch, f_st_r, f_st_c, st_r, st_c)
+
+    dst_rows = (rows - f_rows) // strides[0] + 1
+    dst_cols = (cols - f_cols) // strides[1] + 1
+    dst_shape = (batches, chs, dst_rows, dst_cols, f_rows, f_cols)
+
+    dst_img = as_strided(pimg, shape=dst_shape, strides=dst_strides)
+    dst_img = dst_img.transpose(0, 2, 3, 1, 4, 5).reshape(batches, dst_rows*dst_cols, chs*f_rows*f_cols)
+
+    return dst_img
+
+
+# In[129]:
+
+img = np.arange(216).reshape(2, 3, 6, 6).astype(np.float32)
+
+# Arguments
+f_shape = (3, 3)
+pad = (0, 0)
+strides = (1, 1)
+force = True
+
+conv_img = im2col(img, f_shape, pad, strides, force)
+conv_img.shape, conv_img
+
+
+# In[112]:
+
+img = np.arange(216).reshape(2, 3, 6, 6).astype(np.float32)
+
+
+
+# im2col
+img = reshape_img(img)
+pimg = pad_img(img, pad[0], pad[1])
+
+batches, chs, rows, cols = pimg.shape
+f_rows, f_cols = f_shape
+gap_r, gap_c = get_remainders_of_filtering(rows, cols, f_rows, f_cols, strides)
+
+if (gap_r > 0) or (gap_c > 0):
+    if force:
+        pimg = extend_img_for_filtering(pimg, gap_r, gap_c)
+        batches, chs, rows, cols = pimg.shape
+    else:
+        msg = 'Filter cannot be applied to image with the strides.\n'            + 'Image shape (with pad) : ' + str((rows, cols)) + '\n'            + 'Filter shape : ' + str((f_rows, f_cols)) + '\n'            + 'Strides : ' + str(strides)
+        raise RuntimeError(msg)
+
+print(img.shape, img.strides)
+print(img)
+print('')
+print(pimg.shape, pimg.strides)
+print(pimg)
+plt.imshow(img[0][0])
+plt.show()
+plt.imshow(pimg[0][0])
+plt.show()
+
+
+# In[118]:
+
+f_st_r = st_r * strides[0]
+f_st_c = st_c * strides[1]
+
+dst_rows = (rows - f_rows) // strides[0] + 1
+dst_cols = (cols - f_cols) // strides[1] + 1
+dst_shape = (batches, chs, dst_rows, dst_cols, f_rows, f_cols)
+
+st_batch, st_ch, st_r, st_c = pimg.strides
+
+dst_strides = (st_batch, st_ch, f_st_r, f_st_c, st_r, st_c)
+dst_img = as_strided(pimg, shape=dst_shape, strides=dst_strides)
+dst_img = dst_img.transpose(0, 2, 3, 1, 4, 5).reshape(batches, dst_rows*dst_cols, chs*f_rows*f_cols)
+
+
+# In[119]:
+
+plt.imshow(dst_img[0])
+plt.show()
+
+
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+def im2col(img, window_, pad=(0, 0), strides=(1, 1)):
+    if len(img.shape) == 2:
+        img = img.reshape(1, 1, img.shape[0], img.shape[1])
+    elif len(img.shape) == 3:
+        img = img.reshape(1, img.shape[0], img.shape[1], img.shape[2])
+
+    return img
 
 
 # In[ ]:

@@ -68,7 +68,7 @@ def pad_img(img, pad_rows, pad_cols):
     return np.pad(img, pad_width=npad, mode='constant', constant_values=0)
 
 
-# In[126]:
+# In[145]:
 
 def reshape_img(img):
     """Returns reshaped 4d matrix.
@@ -210,14 +210,16 @@ def im2col(img, f_shape, pad, strides, force=False):
     dst_shape = (batches, chs, dst_rows, dst_cols, f_rows, f_cols)
 
     dst_img = as_strided(pimg, shape=dst_shape, strides=dst_strides)
-    dst_img = dst_img.transpose(0, 2, 3, 1, 4, 5).reshape(batches, dst_rows*dst_cols, chs*f_rows*f_cols)
+    dst_rows = batches * dst_rows * dst_cols
+    dst_cols = chs * f_rows * f_cols
+    dst_img = dst_img.transpose(0, 2, 3, 1, 4, 5).reshape(dst_rows, dst_cols)
 
     return dst_img
 
 
-# In[129]:
+# In[146]:
 
-img = np.arange(216).reshape(2, 3, 6, 6).astype(np.float32)
+img = np.arange(144).reshape(2, 2, 6, 6).astype(np.float32)
 
 # Arguments
 f_shape = (3, 3)
@@ -226,7 +228,11 @@ strides = (1, 1)
 force = True
 
 conv_img = im2col(img, f_shape, pad, strides, force)
-conv_img.shape, conv_img
+print(img.shape)
+print(img)
+print('')
+print(conv_img.shape)
+print(conv_img)
 
 
 # In[112]:

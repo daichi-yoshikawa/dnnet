@@ -103,7 +103,7 @@ def get_remainders_of_filtering(rows, cols, f_rows, f_cols, strides):
     """Get remainders which resulted from applying filter.
 
     Combination of image size, filter size and stride size should be proper.
-    If it is unproper, remainders appear when filtering, that is,
+    If it is improper, remainders appear when filtering, that is,
     filter can't be applied to all pixels.
     The resulting remainders can be used to detect applicability of filter,
     or pad image to enable filtering.
@@ -158,15 +158,33 @@ def im2col(img, f_shape, pad, strides, force=False):
     Arguments
     ---------
     img : np.array
-
+        Image matrix in 2-4d array, whose shape is (rows, cols),
+        (channels, rows, cols), or (batches, channels, rows, cols).
     f_shape : tuple (rows, cols)
-
+        Filter's shape.
     pad : tuple (rows, cols)
-
+        Number of pad, which consists of 0s. If rows/cols shape is
+        tuple (upper/left, lower/right), you can specify number of pad
+        in upper/left or lower/right part of img.
+        Eg. 
+        img : 1, 2, 3
+              4, 5, 6
+        In case of pad=(1, 1) :
+              0, 0, 0, 0, 0
+              0, 1, 2, 3, 0
+              0, 4, 5, 6, 0
+              0, 0, 0, 0, 0
+        In case of pad=((1, 2), (3, 2))
+              0, 0, 0, 0, 0, 0, 0, 0
+              0, 0, 0, 1, 2, 3, 0, 0
+              0, 0, 0, 4, 5, 6, 0, 0
+              0, 0, 0, 0, 0, 0, 0, 0
+              0, 0, 0, 0, 0, 0, 0, 0
     strides : tuple (rows, cols)
-
+        Stride size of filter in rows and cols direction.
     force : bool, default False
-
+        Force conversion by padding in case of that
+        combination of image shape, filter shape and strides is improper.
     """
     pimg = pad_img(reshape_img(img), pad[0], pad[1])
 

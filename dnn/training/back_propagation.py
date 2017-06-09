@@ -150,7 +150,7 @@ class BackPropagation:
             if end > data_num:
                 end = data_num
 
-            self.__train_one_batch(layers, x_train[i:end,:], y_train[i:end,:])
+            self.__train_one_batch(layers, x_train[i:end], y_train[i:end])
             sys.stdout.write('\r%2.2f%% ' % (100. * i / data_num))
         sys.stdout.write('\r100.00% ')
 

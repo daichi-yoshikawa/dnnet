@@ -40,24 +40,43 @@ class ActivationLayer(Layer):
         self.output_shape = self.input_shape
 
     def forward(self, x):
-        self.fire = self.activation.activate(x)
+        self.__forward(x)
         self.child.forward(self.fire)
 
     def backward(self, dy):
-        self.backfire = dy * self.activation.grad(self.fire)
+        self.__backward(dy)
         self.parent.backward(self.backfire)
 
     def predict_to_eval(self, x):
-        self.fire = self.activation.activate(x)
+        self.__forward(x)
         return self.child.predict_to_eval(self.fire)
 
     def predict(self, x):
-        self.fire = self.activation.activate(x)
+        self.__forward(x)
         return self.child.predict(self.fire)
 
     def finalize_training(self, x):
-        self.fire = self.activation.activate(x)
+        self.__forward(x)
         self.child.finalize_training(self.fire)
+
+    def __forward(self, x):
+        if is_multi_channels_image(self.input_shape):
+            x = flatten(x, self.input_shape)
+
+        self.fire = self.activation.activate(x)
+
+        if is_multi_channels_image(self.output_shape):
+            self.fire = unflatten(self.fire, self.input_shape)
+
+    def __backward(self, dy):
+        if is_multi_channels_image(self.output_shape):
+            dy = flatten(dy, self.input_shape)
+
+        self.backfire = dy * self.activation.grad(self.fire)
+
+        if is_multi_channels_image(self.input_shape):
+            self.backfire = unflatten(self.backfire, self.input_shape)
+
 
 # Implement Activation Functions
 class Activation:

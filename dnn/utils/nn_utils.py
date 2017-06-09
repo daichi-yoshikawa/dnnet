@@ -178,18 +178,26 @@ def is_multi_channels_image(shape):
         return True
     return False
 
-def flatten(m):
-    batches, chs, rows, cols = m.shape
+def flatten(m, im_shape):
+    batches = m.shape[0]
+    chs, rows, cols = im_shape
     return m.reshape(batches, chs*rows*cols)
 
-def unflatten(m, shape_org):
-    batches, chs, rows, cols = shape_org
+def unflatten(m, im_shape):
+    batches = m.shape[0]
+    chs, rows, cols = im_shape
     return m.reshape(batches, chs, rows, cols)
 
 
-# In[30]:
+# In[42]:
 
-np.prod(4)
+a = np.arange(216).reshape(3, 2, 6, 6)
+a[1:]
+
+
+# In[41]:
+
+a[1:2]
 
 
 # In[ ]:

@@ -14,6 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from .utils.nn_utils import get_kwarg, shuffle_data, split_data, w2im
+from .utils.nn_utils import is_multi_channels_image, flatten, unflatten
 from .training.random_weight import RandomWeight
 from .training.back_propagation import BackPropagation
 from .layers.layer import Layer, InputLayer, OutputLayer
@@ -186,6 +187,8 @@ class NeuralNetwork:
                 **kwargs)
 
         if shuffle:
+            if is_multi_channels_image(x.shape):
+                pass
             x, y = shuffle_data(x, y)
         x, y = self.__convert_dtype(x, y)
         x_train, y_train, x_test, y_test = split_data(x, y, test_data_ratio)

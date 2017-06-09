@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[12]:
+# In[1]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -56,21 +56,11 @@ class AffineLayer(Layer):
         return True
 
     def forward(self, x):
-        if is_multi_channels_image(self.input_shape):
-            x = flatten(x)
         self.__forward(x)
-
-        if is_multi_channels_image(self.output_shape):
-            self.fire = unflatten(self.fire)
         self.child.forward(self.fire)
 
     def backward(self, dy):
-        if is_multi_channels_image(self.output_shape):
-            dy = unflatten(dy)
         self.__backward(dy)
-
-        if is_multi_channels_image(self.input_shape):
-            self.backfire = flatten(self.backfire)
         self.parent.backward(self.backfire)
 
     def predict_to_eval(self, x):
@@ -86,12 +76,29 @@ class AffineLayer(Layer):
         self.child.finalize_training(self.fire)
 
     def __forward(self, x):
+        if is_multi_channels_image(self.input_shape):
+            x = flatten(x, self.input_shape)
+
         # Add bias terms.
         self.x = np.c_[np.ones((x.shape[0], 1), dtype=self.dtype), x]
         self.fire = np.dot(self.x, self.w)
 
+        if is_multi_channels_image(self.output_shape):
+            self.fire = unflatten(self.fire, self.input_shape)
+
     def __backward(self, dy):
+        if is_multi_channels_image(self.output_shape):
+            dy = flatten(dy, self.input_shape)
+
         batch_size = self.x.shape[0]
         self.dw = self.dtype(1.) / batch_size * np.dot(self.x.T, dy)        
         self.backfire = np.dot(dy, self.w[1:, :].T)
+
+        if is_multi_channels_image(self.input_shape):
+            self.backfire = unflatten(self.backfire, self.input_shape)
+
+
+# In[ ]:
+
+
 

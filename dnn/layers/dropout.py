@@ -54,26 +54,53 @@ class DropoutLayer(Layer):
         self.output_shape = self.input_shape
 
         input_size = np.prod(self.input_shape)
-        self.mask = np.arange(input_size).reshape(self.input_shape)
+        self.mask = np.arange(input_size).reshape(input_size)
 
     def forward(self, x):
-        np.random.shuffle(self.mask.reshape(self.mask.size))
-        self.fire = (self.mask >= int(self.drop_ratio*self.mask.size)) * x
+        self.__forward(x)
         self.child.forward(self.fire)
 
     def backward(self, dy):
-        self.backfire = (self.mask >= int(self.drop_ratio*self.mask.size)) * dy
+        self.__backward(dy)
         self.parent.backward(self.backfire)
 
     def predict_to_eval(self, x):
-        self.fire = (1. - self.drop_ratio) * x
+        self.__predict(x)
         return self.child.predict_to_eval(self.fire)
 
     def predict(self, x):
-        self.fire = (1. - self.drop_ratio) * x
+        self.__predict(x)
         return self.child.predict(self.fire)
 
     def finalize_training(self, x):
-        self.fire = (1. - self.drop_ratio) * x
+        self.__predict(x)
         self.child.finalize_training(self.fire)
+
+    def __forward(self, x):
+        if is_multi_channels_image(self.input_shape):
+            x = flatten(x, self.input_shape)
+
+        np.random.shuffle(self.mask.reshape(self.mask.size))
+        self.fire = (self.mask >= int(self.drop_ratio*self.mask.size)) * x
+
+        if is_multi_channels_image(self.output_shape):
+            self.fire = unflatten(self.fire, self.input_shape)
+
+    def __backward(self, dy):
+        if is_multi_channels_image(self.output_shape):
+            dy = flatten(dy, self.input_shape)
+
+        self.backfire = (self.mask >= int(self.drop_ratio*self.mask.size)) * dy
+
+        if is_multi_channels_image(self.input_shape):
+            self.backfire = unflatten(self.backfire, self.input_shape)
+
+    def __predict(self, x):
+        if is_multi_channels_image(self.input_shape):
+            x = flatten(x, self.input_shape)        
+
+        self.fire = (1. - self.drop_ratio) * x
+
+        if is_multi_channels_image(self.output_shape):
+            self.fire = unflatten(self.fire, self.input_shape)
 

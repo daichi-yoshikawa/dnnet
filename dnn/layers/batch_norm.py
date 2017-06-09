@@ -77,6 +77,29 @@ class BatchNormLayer(Layer):
         self.output_shape = self.input_shape
 
     def forward(self, x):
+        self.__forward(x)
+        self.child.forward(self.fire)
+
+    def backward(self, dy):
+        self.__backward(dy)
+        self.parent.backward(self.backfire)
+
+    def predict_to_eval(self, x):
+        self.__predict(x)
+        return self.child.predict_to_eval(self.fire)
+
+    def predict(self, x):
+        self.__predict(x)
+        return self.child.predict(self.fire)
+
+    def finalize_training(self, x):
+        self.__predict(x)
+        self.child.finalize_training(self.fire)
+
+    def __forward(self, x):
+        if is_multi_channels_image(self.input_shape):
+            x = flatten(x, self.input_shape)
+
         miu = np.mean(x, axis=0)
         self.xmiu = x - miu
 
@@ -101,9 +124,13 @@ class BatchNormLayer(Layer):
         self.var *= self.momentum
         self.var += (1. - self.momentum) * var
 
-        self.child.forward(self.fire)
+        if is_multi_channels_image(self.output_shape):
+            self.fire = unflatten(self.fire, self.input_shape)
 
-    def backward(self, dy):
+    def __backward(self, dy):
+        if is_multi_channels_image(self.output_shape):
+            dy = flatten(dy, self.input_shape)
+
         batch_size = dy.shape[0]
 
         dbeta = dy.sum(axis=0)
@@ -118,17 +145,15 @@ class BatchNormLayer(Layer):
         self.beta -= dbeta / batch_size
         self.gamma -= dgamma / batch_size
 
-        self.parent.backward(self.backfire)
+        if is_multi_channels_image(self.input_shape):
+            self.backfire = unflatten(self.backfire, self.input_shape)
 
-    def predict_to_eval(self, x):
-        self.fire = self.gamma * (x - self.miu) / np.sqrt(self.var + self.ep) + self.beta
-        return self.child.predict_to_eval(self.fire)
+    def __predict(self, x):
+        if is_multi_channels_image(self.input_shape):
+            x = flatten(x, self.input_shape)
 
-    def predict(self, x):
         self.fire = self.gamma * (x - self.miu) / np.sqrt(self.var + self.ep) + self.beta
-        return self.child.predict(self.fire)
 
-    def finalize_training(self, x):
-        self.fire = self.gamma * (x - self.miu) / np.sqrt(self.var + self.ep) + self.beta
-        self.child.finalize_training(self.fire)
+        if is_multi_channels_image(self.output_shape):
+            self.fire = unflatten(self.fire, self.input_shape)
 

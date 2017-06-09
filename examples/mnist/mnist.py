@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[7]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -52,7 +52,8 @@ def get_mnist():
     return x, y
 
 dtype = np.float32
-model = NeuralNetwork(input_shape=784, dtype=dtype)
+model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
+#model = NeuralNetwork(input_shape=784, dtype=dtype)
 model.add(DropoutLayer(drop_ratio=0.2))
 
 model.add(AffineLayer(output_shape=400, random_weight=RandomWeight.Type.he))
@@ -69,14 +70,14 @@ model.print_config()
 
 x, y = get_mnist()
 scale_normalization(x)
-#x = x.reshape(-1, 1, 28, 28)
+x = x.reshape(-1, 1, 28, 28)
 
 optimizer = AdaGrad(learning_rate=5e-2, weight_decay=1e-3, dtype=dtype)
 
 lc = model.fit(
         x=x,
         y=y,
-        epochs=3,
+        epochs=10,
         batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,

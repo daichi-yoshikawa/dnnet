@@ -11,6 +11,7 @@ from __future__ import absolute_import
 import sys
 sys.path.append('../../')
 
+import matplotlib.pyplot as plt
 import pickle
 import numpy as np
 import dnn
@@ -22,6 +23,7 @@ from dnn.training.random_weight import RandomWeight
 from dnn.training.loss_function import LossFunction
 
 from dnn.layers.affine import AffineLayer
+from dnn.layers.convolution import ConvolutionalLayer
 from dnn.layers.activation import Activation, ActivationLayer
 from dnn.layers.dropout import DropoutLayer
 from dnn.layers.batch_norm import BatchNormLayer
@@ -52,16 +54,12 @@ def get_mnist():
     return x, y
 
 dtype = np.float32
-model = NeuralNetwork(input_shape=784, dtype=dtype)
-model.add(DropoutLayer(drop_ratio=0.2))
-
-model.add(AffineLayer(output_shape=400, random_weight=RandomWeight.Type.he))
-model.add(BatchNormLayer())
+model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
+model.add(ConvolutionalLayer(shape=(1, 28, 28), f_shape=(1, 3, 3)))
+#model.add(AffineLayer(shape=(784, 400), random_weight=RandomWeight.Type.he))
 model.add(ActivationLayer(activation=Activation.Type.srrelu))
-model.add(DropoutLayer(drop_ratio=0.5))
 
-model.add(AffineLayer(output_shape=10, random_weight=RandomWeight.Type.default))
-model.add(BatchNormLayer())
+model.add(AffineLayer(shape=(400, 10), random_weight=RandomWeight.Type.default))
 model.add(ActivationLayer(activation=Activation.Type.softmax))
 model.compile()
 
@@ -69,14 +67,18 @@ model.print_config()
 
 x, y = get_mnist()
 scale_normalization(x)
-#x = x.reshape(-1, 1, 28, 28)
+
+x = x.reshape(-1, 1, 28, 28)
+plt.imshow(x[20000][0])
+plt.show()
 
 optimizer = AdaGrad(learning_rate=5e-2, weight_decay=1e-3, dtype=dtype)
 
+"""
 lc = model.fit(
         x=x,
         y=y,
-        epochs=3,
+        epochs=10,
         batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,
@@ -88,41 +90,8 @@ lc = model.fit(
 
 lc.plot(figsize=(8,10), fontsize=12)
 model.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
-
-
-# In[3]:
-
-# Auto Encoder
-ae = NeuralNetwork(input_shape=(784), dtype=dtype)
-ae.add(DropoutLayer(drop_ratio=0.2))
-
-ae.add(AffineLayer(output_shape=100, random_weight=RandomWeight.Type.he))
-ae.add(BatchNormLayer())
-ae.add(ActivationLayer(activation=Activation.Type.srrelu))
-ae.add(DropoutLayer(drop_ratio=0.5))
-
-ae.add(AffineLayer(output_shape=784, random_weight=RandomWeight.Type.he))
-#ae.add(BatchNormLayer())
-#ae.add(ActivationLayer(activation=Activation.Type.srrelu))
-ae.compile()
-
-optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
-
-lc2 = ae.fit(
-        x=x,
-        y=x,
-        epochs=10,
-        batch_size=100,
-        optimizer=optimizer,
-        loss_function=LossFunction.Type.squared_error,
-        learning_curve=True,
-        shuffle=True,
-        shuffle_per_epoch=True,
-        test_data_ratio=0.
-)
-
-lc2.plot(figsize=(8, 6), fontsize=12)
-ae.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
+"""
+print('')
 
 
 # In[ ]:

@@ -188,19 +188,3 @@ def unflatten(m, im_shape):
     chs, rows, cols = im_shape
     return m.reshape(batches, chs, rows, cols)
 
-
-# In[42]:
-
-a = np.arange(216).reshape(3, 2, 6, 6)
-a[1:]
-
-
-# In[41]:
-
-a[1:2]
-
-
-# In[ ]:
-
-
-

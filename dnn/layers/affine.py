@@ -33,6 +33,7 @@ class AffineLayer(Layer):
     """
     def __init__(self, output_shape, random_weight=RandomWeight.Type.default):
         self.output_shape = output_shape
+        self.random_weight = RandomWeightFactory().get(random_weight)
         self.x = None
         self.multi_channels_image = False
 
@@ -47,7 +48,7 @@ class AffineLayer(Layer):
 
         w_rows = np.prod(self.input_shape)
         w_cols = np.prod(self.output_shape)
-        self.w = DefaultRandomWeight().get(w_rows, w_cols)
+        self.w = self.random_weight.get(w_rows, w_cols)#DefaultRandomWeight().get(w_rows, w_cols)
         self.w = np.r_[np.zeros((1, w_cols)), self.w]
         self.w = self.w.astype(self.dtype)
         self.dw = np.zeros_like(self.w, dtype=self.w.dtype)

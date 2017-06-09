@@ -11,18 +11,20 @@ from __future__ import absolute_import
 import numpy as np
 
 from .layer import Layer
-from ..utils.im2col import im2col
-from ..training.random_weight import RandomWeight, RandomWeightFactory
-from ..training.random_weight import DefaultRandomWeight, Xavier, He
+from ..utils.conv_utils import im2col
+from ..training.random_weight import RandomWeight
 
 
 # In[4]:
 
-class ConvolutionLayer(Layer):
-    def __init__(self, shape, pad, stride):
+class ConvolutionalLayer(Layer):
+    def __init__(self, shape, f_shape, pad=(0, 0), strides=(1, 1), force=False):
         self.shape = shape
+        self.f_shape = f_shape
         self.pad = pad
-        self.stride = stride
+        self.strides = strides
+        self.force = force
+
 
         #self.w = DefaultRandomWeight().get(self.parent_shape, self.shape)
         #self.w = np.r_[np.zeros((1, self.shape)), self.w]
@@ -53,18 +55,7 @@ class ConvolutionLayer(Layer):
         pass
     
     def __init_weight(self, parent):
-        channels, h, w = parent.shape
-        filter_num, hf, wf = self.shape
-        p0, p1 = self.pad
-        s0, s1 = self.stride
-
-        self.dst_h = (h + 2*p0 - hf) // s0 + 1
-        self.dst_w = (w + 2*p1 - wf) // s1 + 1
-
-        hw = self.dst_h * self.dst_w
-        ww = channels * hf * wf
-
-        self.w = DefaultRandomWeight().get()
+        pass
 
 
 # In[ ]:

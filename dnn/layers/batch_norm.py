@@ -11,6 +11,8 @@ from __future__ import absolute_import
 import numpy as np
 
 from .layer import Layer
+from ..utils import is_multi_channels_image
+from ..utils import flatten, unflatten
 
 class BatchNormLayer(Layer):
     """Implementation of Batch Normalization.
@@ -72,7 +74,7 @@ class BatchNormLayer(Layer):
 
     def set_parent(self, parent):
         Layer.set_parent(self, parent)
-        self.shape = parent.shape
+        self.output_shape = self.input_shape
 
     def forward(self, x):
         miu = np.mean(x, axis=0)
@@ -82,9 +84,9 @@ class BatchNormLayer(Layer):
         self.std_inv = 1. / (np.sqrt(var + self.ep))
 
         if self.gamma is None:
-            self.gamma = np.ones(self.shape, dtype=self.dtype)
+            self.gamma = np.ones(self.input_shape, dtype=self.dtype)
         if self.beta is None:
-            self.beta = np.zeros(self.shape, dtype=self.dtype)
+            self.beta = np.zeros(self.input_shape, dtype=self.dtype)
 
         self.xhat = self.xmiu * self.std_inv
         self.fire = self.gamma * self.xhat + self.beta

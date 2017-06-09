@@ -10,6 +10,8 @@ from __future__ import absolute_import
 
 import numpy as np
 from .layer import Layer
+from ..utils import is_multi_channels_image
+from ..utils import flatten, unflatten
 
 
 # In[2]:
@@ -49,8 +51,10 @@ class DropoutLayer(Layer):
 
     def set_parent(self, parent):
         Layer.set_parent(self, parent)
-        self.shape = parent.shape
-        self.mask = np.arange(np.prod(self.shape)).reshape(self.shape)
+        self.output_shape = self.input_shape
+
+        input_size = np.prod(self.input_shape)
+        self.mask = np.arange(input_size).reshape(self.input_shape)
 
     def forward(self, x):
         np.random.shuffle(self.mask.reshape(self.mask.size))

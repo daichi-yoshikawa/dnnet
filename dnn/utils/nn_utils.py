@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[182]:
+# In[1]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -139,6 +139,7 @@ def scale_normalization(x, ep=1e-5):
     amp = amp.reshape(amp.size, -1)
     x /= (amp.T + ep)
 
+
 def w2im(w, shape, layout):
     """Reshape 2d weight matrix to 2d image matrix which represents well aligned filters.
 
@@ -165,4 +166,33 @@ def w2im(w, shape, layout):
     img = img.transpose(0, 2, 1, 3).reshape(layout[0]*shape[0], layout[1]*shape[1])
 
     return img
+
+
+# In[28]:
+
+def is_multi_channels_image(shape):
+    if not isinstance(shape, tuple):
+        return False
+
+    if len(shape) == 3:
+        return True
+    return False
+
+def flatten(m):
+    batches, chs, rows, cols = m.shape
+    return m.reshape(batches, chs*rows*cols)
+
+def unflatten(m, shape_org):
+    batches, chs, rows, cols = shape_org
+    return m.reshape(batches, chs, rows, cols)
+
+
+# In[30]:
+
+np.prod(4)
+
+
+# In[ ]:
+
+
 

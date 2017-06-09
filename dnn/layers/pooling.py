@@ -11,7 +11,7 @@ from __future__ import absolute_import
 import numpy as np
 
 from .layer import Layer
-from ..utils.im2col import im2col
+from ..utils.conv_utils import im2col
 
 
 # In[ ]:

@@ -25,6 +25,10 @@ class Layer:
         Parent layer of this layer.
     child : Derived class of Layer
         Child layer of this layer.
+    input_shape : int or tuple
+        Number of neurons of parent's layer.
+    output_shape : int or tuple
+        Number of neurons of this layer.
 
     Warning
     -------
@@ -34,6 +38,8 @@ class Layer:
     dtype = np.float64
 
     def __init__(self):
+        self.input_shape = None
+        self.output_shape = None
         self.fire = None
         self.backfire = None
 
@@ -57,6 +63,8 @@ class Layer:
         """
         self.parent = parent
         parent.child = self
+
+        self.input_shape = parent.output_shape
 
     def forward(self, x):
         """Forward calculation called in training phase.
@@ -118,20 +126,11 @@ class Layer:
 class InputLayer(Layer):
     """Implement the first layer of neural network.
 
-    Derived class of Layer
-    shape : tuple
-        Shape of this layer's neurons.
-        Eg. If you have descriptive feature matrix in form of
-        (num of data, num of feature) such as
-        [[x1-1, x1-2, ... , x1-100],
-         [x2-1, x2-2, ... , x2-100],
-         ...
-         [xm-1, xm-2, ... , xm-100],
-        ]
-        Shape will be (100).
+    Derived class of Layer.
     """
-    def __init__(self, shape):
-        self.shape = shape
+    def __init__(self, input_shape):
+        self.input_shape = input_shape
+        self.output_shape = self.input_shape
 
     def get_type(self):
         return 'input'
@@ -157,17 +156,13 @@ class OutputLayer(Layer):
     """Implements the last layer of neural network.
 
     Derived class of Layer.
-
-    Parameters
-    ----------
-    shape : tuple
-        Shape of this layer's neurons.
     """
-    def __init__(self, shape):
-        self.shape = shape
-
     def get_type(self):
         return 'output'
+
+    def set_parent(self, parent):
+        Layer.set_parent(self, parent)
+        self.output_shape = self.input_shape
 
     def forward(self, x):
         self.fire = x

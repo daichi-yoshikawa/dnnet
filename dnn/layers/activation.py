@@ -12,6 +12,8 @@ import numpy as np
 from enum import Enum
 
 from .layer import Layer
+from ..utils import is_multi_channels_image
+from ..utils import flatten, unflatten
 
 class ActivationLayer(Layer):
     """Implements layer which convert values by activation function.
@@ -20,8 +22,6 @@ class ActivationLayer(Layer):
     ----------
     activation : Derived class of Activation
         Activation function to use.
-    shape : tuple
-        Shape of this layer's neurons.
     """
     def __init__(self, activation):
         """
@@ -37,7 +37,7 @@ class ActivationLayer(Layer):
 
     def set_parent(self, parent):
         Layer.set_parent(self, parent)
-        self.shape = parent.shape
+        self.output_shape = self.input_shape
 
     def forward(self, x):
         self.fire = self.activation.activate(x)

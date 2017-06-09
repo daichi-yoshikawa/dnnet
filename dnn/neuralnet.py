@@ -74,7 +74,7 @@ class NeuralNetwork:
         self.layers = np.array([], dtype=Layer)
         self.dtype = dtype
 
-        self.add(InputLayer(shape=input_shape))
+        self.add(InputLayer(input_shape=input_shape))
 
     def add(self, layer):
         """Add instance of derived class of layer.
@@ -107,7 +107,7 @@ class NeuralNetwork:
             layer.set_parent(parent)
             parent = layer
 
-        output_layer = OutputLayer(shape=self.layers[-1].shape)
+        output_layer = OutputLayer()
         output_layer.set_parent(self.layers[-1])
         self.add(output_layer)
 
@@ -228,7 +228,7 @@ class NeuralNetwork:
     def print_config(self):
         """Display configuration of layers."""
         for i, layer in enumerate(self.layers):
-            print(('%2d-th layer, shape : ' + str(layer.shape)                  + ', ' + layer.get_type()) % (i))
+            print(('%2d-th layer, (input_shape, output_shape) : '                    + str((layer.input_shape, layer.output_shape))                    + ', ' + layer.get_type()) % (i))
 
     def save(self, name, path=None):
         """Save model to storage.

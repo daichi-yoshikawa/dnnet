@@ -68,7 +68,7 @@ def pad_img(img, pad_rows, pad_cols):
     return np.pad(img, pad_width=npad, mode='constant', constant_values=0)
 
 
-# In[3]:
+# In[101]:
 
 def reshape_img(img):
     """Returns reshaped 4d matrix.
@@ -143,7 +143,7 @@ def extend_img_for_filtering(img, rem_r, rem_c):
     """
     pad_r = (gap_r//2, gap_r - (gap_r//2))
     pad_c = (gap_c//2, gap_c - (gap_c//2))
-    return pad_img(img, pad_r, pad_c)
+    return pad_img(img, pad_r, pad_c), pad_r, pad_c
 
 
 def im2col(img, f_shape, pad, strides, force=False):
@@ -160,7 +160,7 @@ def im2col(img, f_shape, pad, strides, force=False):
     img : np.array
         Image matrix in 2-4d array, whose shape is (rows, cols),
         (channels, rows, cols), or (batches, channels, rows, cols).
-    f_shape : tuple (rows, cols)
+    f_shape : tuple (num of filter, rows, cols)
         Filter's shape.
     pad : tuple (rows, cols)
         Number of pad, which consists of 0s. If rows/cols shape is
@@ -185,16 +185,21 @@ def im2col(img, f_shape, pad, strides, force=False):
     force : bool, default False
         Force conversion by padding in case of that
         combination of image shape, filter shape and strides is improper.
+
+    Returns
+    -------
+    np.array
+        The resulting image matrix in 2d array.
     """
     pimg = pad_img(reshape_img(img), pad[0], pad[1])
 
     batches, chs, rows, cols = pimg.shape
-    f_rows, f_cols = f_shape
+    _, f_rows, f_cols = f_shape
     gap_r, gap_c = get_remainders_of_filtering(rows, cols, f_rows, f_cols, strides)
 
     if (gap_r > 0) or (gap_c > 0):
         if force:
-            pimg = extend_img_for_filtering(pimg, gap_r, gap_c)
+            pimg, ext_pad_r, ext_pad_r = extend_img_for_filtering(pimg, gap_r, gap_c)
             batches, chs, rows, cols = pimg.shape
         else:
             msg = 'Filter cannot be applied to image with the strides.\n'                + 'Image shape (with pad) : ' + str((rows, cols)) + '\n'                + 'Filter shape : ' + str((f_rows, f_cols)) + '\n'                + 'Strides : ' + str(strides)
@@ -217,25 +222,72 @@ def im2col(img, f_shape, pad, strides, force=False):
     return dst_img
 
 
-# In[5]:
+def im2col_shape(img_shape, f_shape, pad, strides, force=False):
+    """
+    Arguments
+    ---------
+    Returns
+    -------
+    tuple
+        Shape (rows, cols) of the resulting matrix of im2col function.
+    """
+    chs, rows, cols = img_shape
+    if isinstance(pad[0], tuple):
+        rows += np.sum(pad[0])
+    else:
+        rows += 2*pad[0]
+    if isinstance(pad[1], tuple):
+        cols += np.sum(pad[1])
+    else:
+        cols += 2*pad[1]
 
-"""
-img = np.arange(144).reshape(2, 2, 6, 6).astype(np.float32)
+    num_of_filter, f_rows, f_cols = f_shape
+    gap_r, gap_c = get_remainders_of_filtering(rows, cols, f_rows, f_cols, strides)
 
-# Arguments
-f_shape = (3, 3)
+    if (gap_r > 0) or (gap_c > 0):
+        if force:
+            pad_r = (gap_r//2, gap_r - (gap_r//2))
+            pad_c = (gap_c//2, gap_c - (gap_c//2))
+
+            rows += np.sum(pad_r)
+            cols += np.sum(pad_c)
+        else:
+            msg = 'Filter cannot be applied to image with the strides.\n'                + 'Image shape (with pad) : ' + str((rows, cols)) + '\n'                + 'Filter shape : ' + str((f_rows, f_cols)) + '\n'                + 'Strides : ' + str(strides)
+            raise RuntimeError(msg)
+
+    dst_rows = (rows - f_rows) // strides[0] + 1
+    dst_cols = (cols - f_cols) // strides[1] + 1
+
+    return (dst_rows, dst_cols)
+
+
+# In[102]:
+
+img = np.arange(216).reshape(3, 2, 6, 6)
+f_shape = (32, 3, 3)
+#pad = (1, 1)
 pad = (0, 0)
 strides = (1, 1)
 force = True
+#print(img)
+col = im2col(img, f_shape, pad, strides, force)
+w_rows = 2 * 3 * 3
+w_cols = 32
+w = np.ones((w_rows, w_cols))
 
-conv_img = im2col(img, f_shape, pad, strides, force)
-print(img.shape)
-print(img)
-print('')
-print(conv_img.shape)
-print(conv_img)
-"""
-print()
+batches, chs, rows, cols = img.shape
+rows, cols = im2col_shape(
+                (chs, rows, cols), f_shape, pad, strides, force)
+print(rows, cols)
+fire = np.dot(col, w)
+print(fire.shape, batches*rows*cols)
+fire = fire.reshape(batches, rows, cols, -1).transpose(0, 3, 1, 2)
+fire.shape
+
+
+# In[100]:
+
+fire
 
 
 # In[112]:
@@ -251,9 +303,4 @@ def col2im(mat, window_shape, batch_size, channels, h, w, strides=(1, 1), ch_axi
     image = image.transpose(0, 1, 2, 4, 3, 5).reshape(batch_size, channels, h, w)
 
     return image
-
-
-def flatten(img):
-    batch_size, channels, rows, cols = img.shape
-    return img.reshape(batch_size, channels*rows*cols)
 

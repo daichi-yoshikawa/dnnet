@@ -19,22 +19,31 @@ from ..utils.conv_utils import im2col
 class PoolingLayer(Layer):
     def __init__(self, pool_shape):
         self.pool_shape = pool_shape
-        
+
     def get_type(self):
         return 'pooling'
-    
+
+    def set_parent(self, parent):
+        Layer.set_parent(self, parent)
+
     def forward(self, x):
         pass
-    
+
     def backward(self, dy):
         pass
-    
+
     def predict_to_eval(self, x):
         pass
-    
+
     def predict(self, x):
         pass
-    
+
     def finalize_training(self, x):
+        pass
+
+    def __forward(self, x):
+        pass
+
+    def __backward(self, dy):
         pass
 

@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -56,7 +56,7 @@ model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
 #model = NeuralNetwork(input_shape=784, dtype=dtype)
 model.add(DropoutLayer(drop_ratio=0.2))
 
-model.add(AffineLayer(output_shape=400, random_weight=RandomWeight.Type.he))
+model.add(AffineLayer(output_shape=1000, random_weight=RandomWeight.Type.he))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.srrelu))
 model.add(DropoutLayer(drop_ratio=0.5))

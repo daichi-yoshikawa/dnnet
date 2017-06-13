@@ -139,8 +139,8 @@ class BatchNormLayer(Layer):
         tmp4 = tmp3.sum(axis=0)
 
         self.backfire = tmp3 - tmp4 / batch_size
-        self.beta -= dbeta / batch_size
-        self.gamma -= dgamma / batch_size
+        self.beta = self.beta - dbeta / batch_size
+        self.gamma = self.gamma - dgamma / batch_size
 
         if is_multi_channels_image(self.input_shape):
             self.backfire = unflatten(self.backfire, self.input_shape)

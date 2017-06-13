@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[9]:
+# In[ ]:
 
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
@@ -14,10 +14,6 @@ import numpy as np
 from .layer import Layer
 from ..utils.conv_utils import pad_img, im2col, col2im, im2col_shape
 from ..training.random_weight import RandomWeight
-
-
-# In[4]:
-
 
 class ConvolutionalLayer(Layer):
     def __init__(self, f_shape, pad=(0, 0), strides=(1, 1), force=False):

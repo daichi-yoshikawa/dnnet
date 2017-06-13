@@ -1,7 +1,8 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
+
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -143,6 +144,8 @@ def scale_normalization(x, ep=1e-5):
 def w2im(w, shape, layout):
     """Reshape 2d weight matrix to 2d image matrix which represents well aligned filters.
 
+    This is utilized to visualize weight matrix by matplotlib.pyplot.
+
     Arguments
     ---------
     w : np.array
@@ -168,8 +171,6 @@ def w2im(w, shape, layout):
     return img
 
 
-# In[28]:
-
 def is_multi_channels_image(shape):
     if not isinstance(shape, tuple):
         return False
@@ -178,10 +179,12 @@ def is_multi_channels_image(shape):
         return True
     return False
 
+
 def flatten(m, im_shape):
     batches = m.shape[0]
     chs, rows, cols = im_shape
     return m.reshape(batches, chs*rows*cols)
+
 
 def unflatten(m, im_shape):
     batches = m.shape[0]

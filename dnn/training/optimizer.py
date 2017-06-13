@@ -1,7 +1,8 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[ ]:
+
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause

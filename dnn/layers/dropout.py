@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
@@ -13,10 +13,6 @@ import numpy as np
 from .layer import Layer
 from ..utils import is_multi_channels_image
 from ..utils import flatten, unflatten
-
-
-# In[2]:
-
 
 class DropoutLayer(Layer):
     """Implement Dropout.

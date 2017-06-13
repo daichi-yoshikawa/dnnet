@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
@@ -13,10 +13,6 @@ import numpy as np
 
 from .layer import Layer
 from ..utils.conv_utils import im2col
-
-
-# In[ ]:
-
 
 class PoolingLayer(Layer):
     def __init__(self, pool_shape):

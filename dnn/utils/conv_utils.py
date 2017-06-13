@@ -1,21 +1,17 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
+
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
-
-# This file is going to be merged with nn_utils module.
 
 from __future__ import absolute_import
 
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
-
-
-# In[2]:
 
 def pad_img(img, pad_rows, pad_cols):
     """Returns padded matrix which represents image.
@@ -67,8 +63,6 @@ def pad_img(img, pad_rows, pad_cols):
 
     return np.pad(img, pad_width=npad, mode='constant', constant_values=0)
 
-
-# In[101]:
 
 def reshape_img(img):
     """Returns reshaped 4d matrix.
@@ -261,7 +255,8 @@ def im2col_shape(img_shape, f_shape, pad, strides, force=False):
     return (dst_rows, dst_cols)
 
 
-# In[102]:
+# In[ ]:
+
 
 img = np.arange(216).reshape(3, 2, 6, 6)
 f_shape = (32, 3, 3)
@@ -285,12 +280,14 @@ fire = fire.reshape(batches, rows, cols, -1).transpose(0, 3, 1, 2)
 fire.shape
 
 
-# In[100]:
+# In[ ]:
+
 
 fire
 
 
-# In[112]:
+# In[ ]:
+
 
 def col2im(mat, window_shape, batch_size, channels, h, w, strides=(1, 1), ch_axis=1):
     win_h, win_w = window_shape

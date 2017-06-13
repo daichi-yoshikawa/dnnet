@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
@@ -94,10 +94,4 @@ class AffineLayer(Layer):
 
         if is_multi_channels_image(self.input_shape):
             self.backfire = unflatten(self.backfire, self.input_shape)
-
-
-# In[ ]:
-
-
-
 

@@ -1,7 +1,8 @@
 
 # coding: utf-8
 
-# In[2]:
+# In[ ]:
+
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
@@ -20,7 +21,8 @@ from .training.back_propagation import BackPropagation
 from .layers.layer import Layer, InputLayer, OutputLayer
 
 
-# In[2]:
+# In[ ]:
+
 
 class NeuralNetwork:
     """Interface of neural network.

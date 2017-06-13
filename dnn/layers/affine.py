@@ -82,11 +82,11 @@ class AffineLayer(Layer):
         self.fire = np.dot(self.x, self.w)
 
         if is_multi_channels_image(self.output_shape):
-            self.fire = unflatten(self.fire, self.input_shape)
+            self.fire = unflatten(self.fire, self.output_shape)
 
     def __backward(self, dy):
         if is_multi_channels_image(self.output_shape):
-            dy = flatten(dy, self.input_shape)
+            dy = flatten(dy, self.output_shape)
 
         batch_size = self.x.shape[0]
         self.dw = self.dtype(1.) / batch_size * np.dot(self.x.T, dy)        

@@ -3,6 +3,7 @@
 
 # In[1]:
 
+
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
@@ -15,6 +16,7 @@ from ..utils.conv_utils import im2col
 
 
 # In[ ]:
+
 
 class PoolingLayer(Layer):
     def __init__(self, pool_shape):
@@ -30,9 +32,6 @@ class PoolingLayer(Layer):
         pass
 
     def backward(self, dy):
-        pass
-
-    def predict_to_eval(self, x):
         pass
 
     def predict(self, x):

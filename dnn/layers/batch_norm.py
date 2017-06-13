@@ -3,6 +3,7 @@
 
 # In[2]:
 
+
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
@@ -83,10 +84,6 @@ class BatchNormLayer(Layer):
     def backward(self, dy):
         self.__backward(dy)
         self.parent.backward(self.backfire)
-
-    def predict_to_eval(self, x):
-        self.__predict(x)
-        return self.child.predict_to_eval(self.fire)
 
     def predict(self, x):
         self.__predict(x)

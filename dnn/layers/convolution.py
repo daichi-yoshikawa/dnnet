@@ -3,6 +3,7 @@
 
 # In[9]:
 
+
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
@@ -16,6 +17,7 @@ from ..training.random_weight import RandomWeight
 
 
 # In[4]:
+
 
 class ConvolutionalLayer(Layer):
     def __init__(self, f_shape, pad=(0, 0), strides=(1, 1), force=False):
@@ -42,10 +44,6 @@ class ConvolutionalLayer(Layer):
     def backward(self, dy):
         self.__backward(dy)
         self.parent.backward(self.backfire)
-
-    def predict_to_eval(self, x):
-        self.__forward(x)
-        return self.child.predict_to_eval(self.fire)
 
     def predict(self, x):
         self.__forward(x)

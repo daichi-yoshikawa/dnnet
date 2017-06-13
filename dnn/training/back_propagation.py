@@ -3,6 +3,7 @@
 
 # In[7]:
 
+
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
@@ -238,11 +239,11 @@ class BackPropagation:
         acc_train = None
         acc_test = None
 
-        y_train_pred = layers[0].predict_to_eval(x_train)
+        y_train_pred = layers[0].predict(x_train)
         loss_train = self.loss_function.get(y=y_train_pred, t=y_train)
 
         if x_test.size != 0:
-            y_test_pred = layers[0].predict_to_eval(x_test)
+            y_test_pred = layers[0].predict(x_test)
             loss_test = self.loss_function.get(y=y_test_pred, t=y_test)
 
         if not isinstance(self.loss_function, SquaredError):

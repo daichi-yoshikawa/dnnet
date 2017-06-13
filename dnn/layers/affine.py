@@ -3,6 +3,7 @@
 
 # In[1]:
 
+
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
@@ -64,10 +65,6 @@ class AffineLayer(Layer):
         self.__backward(dy)
         self.parent.backward(self.backfire)
 
-    def predict_to_eval(self, x):
-        self.__forward(x)
-        return self.child.predict_to_eval(self.fire)
-
     def predict(self, x):
         self.__forward(x)
         return self.child.predict(self.fire)
@@ -100,6 +97,7 @@ class AffineLayer(Layer):
 
 
 # In[ ]:
+
 
 
 

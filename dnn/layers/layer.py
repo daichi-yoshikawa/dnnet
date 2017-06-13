@@ -3,6 +3,7 @@
 
 # In[2]:
 
+
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
@@ -88,17 +89,6 @@ class Layer:
             current predicted results against training data.
         """
         raise NotImplementedError('Layer.backward')
-
-    def predict_to_eval(self, x):
-        """Forward calculation called in evaluation phase.
-
-        Arguments
-        ---------
-        x : np.array
-            fire of parent layer in 2d array.
-            If no parent layer, it would be normalized descriptive features.
-        """
-        raise NotImplementedError('Layer.predict_to_eval')
 
     def predict(self, x):
         """Forward calculation called in prediction phase.

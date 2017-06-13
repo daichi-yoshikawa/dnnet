@@ -3,6 +3,7 @@
 
 # In[10]:
 
+
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
@@ -46,10 +47,6 @@ class ActivationLayer(Layer):
     def backward(self, dy):
         self.__backward(dy)
         self.parent.backward(self.backfire)
-
-    def predict_to_eval(self, x):
-        self.__forward(x)
-        return self.child.predict_to_eval(self.fire)
 
     def predict(self, x):
         self.__forward(x)

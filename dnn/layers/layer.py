@@ -132,9 +132,6 @@ class InputLayer(Layer):
     def backward(self, dy):
         pass
 
-    def predict_to_eval(self, x):
-        return self.child.predict_to_eval(x)
-
     def predict(self, x):
         return self.child.predict(x)
 
@@ -161,10 +158,6 @@ class OutputLayer(Layer):
         """Starting point of backward calculation."""
         self.backfire = dy
         self.parent.backward(self.backfire)
-
-    def predict_to_eval(self, x):
-        self.fire = x
-        return self.fire
 
     def predict(self, x):
         self.fire = x

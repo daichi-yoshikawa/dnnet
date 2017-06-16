@@ -73,7 +73,7 @@ class Layer:
         Arguments
         ---------
         x : np.array
-            fire of parent layer in 2d array.
+            Fire of parent layer in 2d array.
             If no parent layer, it would be normalized descriptive features.
         """
         raise NotImplementedError('Layer.forward')
@@ -84,7 +84,7 @@ class Layer:
         Arguments
         ---------
         dy : np.array
-            backfire of child layer in 2d array.
+            Backfire of child layer in 2d array.
             If no child layer, it would be errors of
             current predicted results against training data.
         """
@@ -96,7 +96,7 @@ class Layer:
         Arguments
         ---------
         x : np.array
-            fire of parent layer in 2d array.
+            Fire of parent layer in 2d array.
             If no parent layer, it would be normalized descriptive features.
         """
         raise NotImplementedError('Layer.predict')
@@ -107,7 +107,7 @@ class Layer:
         Arguments
         ---------
         x : np.array
-            fire of parent layer in 2d array.
+            Fire of parent layer in 2d array.
             If no parent layer, it would be normalized descriptive features.
         """
         raise NotImplementedError('Layer.finalize')

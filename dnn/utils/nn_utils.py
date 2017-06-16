@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
@@ -26,7 +26,7 @@ def get_kwarg(key, dtype, default_value, **kwargs):
         Value which is returned when key is not found.
         Type is the same as the dtype.
     **kwargs : 
-        The same as **kwargs.
+        Keyword arguments.
 
     Returns
     -------
@@ -155,6 +155,11 @@ def w2im(w, shape, layout):
         filters are taken as single channel by taking average over channels.
     layout : tuple (rows, cols)
         Number of filter to display in direction of rows and cols respectively.
+
+    Returns
+    -------
+    np.array
+        Well-aligned weight matrix in 2d array.
     """
     if (w.shape[0] - 1) != np.prod(shape):
         msg = '(w.shape[0] - 1) != np.prod(shape)\n'            + '  w.shape[0] : ' + str(w.shape[0]) + '\n'            + '  shape.size : ' + str(np.prod(shape))
@@ -172,21 +177,79 @@ def w2im(w, shape, layout):
 
 
 def is_multi_channels_image(shape):
-    if not isinstance(shape, tuple):
-        return False
+    """Returns true when shape is (channels, rows, cols).
 
-    if len(shape) == 3:
-        return True
+    Convolutional Neural Network(CNN) and
+    fully connected neural network(NN) require different shape of input.
+    Tuple (channels, rows, cols) and a scalar value.
+    If it detects invalid shape, raise RuntimeError.
+
+    Arguments
+    ---------
+    shape : int or tuple
+        input_shape/output_shape of layer.
+        If int, it represents number of neurons of layer.
+        If tuple, it represents shape of input image in format of
+        (channels, rows, cols).
+
+    Returns
+    -------
+    bool
+        If true, it is 
+    """
+    if isinstance(shape, tuple):
+        if len(shape) == 3:
+            return True
+        else:
+            msg = 'Shape must be int or tuple (channels, rows, cols).\n'                + 'shape : ' + str(shape)
+            raise RuntimeError(msg)
+
     return False
 
 
 def flatten(m, im_shape):
+    """Flatten matrix in shape of (batches, channels, rows, cols)
+    to (batches, -1).
+
+    This function has no side effect, that is, it doesn't modify
+    argument "m" directly.
+
+    Arguments
+    ---------
+    m : np.array
+        4D matrix in shape of (batches, channels, rows, cols).
+    im_shape : tuple
+        Shape of image, which is supposed to be (channels, rows, cols).
+
+    Returns
+    -------
+    np.array
+        Flattened matrix in 2d array.
+    """
     batches = m.shape[0]
     chs, rows, cols = im_shape
     return m.reshape(batches, chs*rows*cols)
 
 
 def unflatten(m, im_shape):
+    """Revert flattened matrix(batches, -1) to unflattened matrix
+    (batches, channels, rows, cols).
+
+    This function has no side effect, that is, it doesn't modify
+    argument "m" directly.
+
+    Arguments
+    ---------
+    m : np.array
+        2D matrix in shape of (batches, -1).
+    im_shape : tuple
+        Shape of image, which is supposed to be (channels, rows, cols).
+
+    Returns
+    -------
+    np.array
+        Unflattened matrix in 4d array.
+    """
     batches = m.shape[0]
     chs, rows, cols = im_shape
     return m.reshape(batches, chs, rows, cols)

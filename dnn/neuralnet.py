@@ -189,8 +189,6 @@ class NeuralNetwork:
                 **kwargs)
 
         if shuffle:
-            if is_multi_channels_image(x.shape):
-                pass
             x, y = shuffle_data(x, y)
         x, y = self.__convert_dtype(x, y)
         x_train, y_train, x_test, y_test = split_data(x, y, test_data_ratio)

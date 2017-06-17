@@ -46,6 +46,7 @@ And then execute the follows.
    $ git clone git://github.com/yyuu/pyenv-virtualenv.git
 ```
 * Install python 3.5.2
+
 If you're going to use theano in the resulting env,
 ```
 env PYTHON_CONFIGURE_OPTS=--enable-shared pyenv install 3.5.2

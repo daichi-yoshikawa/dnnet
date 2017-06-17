@@ -16,6 +16,10 @@ Less dependencies, easier to use.
 ```
 $ sudo apt-get install git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev
 ```
+* Install tkinter(This is required to use matplotlib in virtualenv)
+```
+$ sudo apt-get install python3-tk python-tk tk-dev
+```
 * Install pyenv
 ```
    $ cd ~
@@ -25,7 +29,7 @@ $ sudo apt-get install git gcc make openssl libssl-dev libbz2-dev libreadline-de
 * Set paths
 Add the following description in ~/.bashrc
 ```
-export PYENV_ROOT="${HOME}/Documents/pyenv"
+export PYENV_ROOT=${HOME}/Documents/pyenv
 if [ -d "${PYENV_ROOT}" ]; then
     export PATH=${PYENV_ROOT}/bin:$PATH
     eval "$(pyenv init -)"
@@ -42,6 +46,11 @@ And then execute the follows.
    $ git clone git://github.com/yyuu/pyenv-virtualenv.git
 ```
 * Install python 3.5.2
+If you're going to use theano in the resulting env,
+```
+env PYTHON_CONFIGURE_OPTS=--enable-shared pyenv install 3.5.2
+```
+else ...
 ```
    $ pyenv install 3.5.2
 ```

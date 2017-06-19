@@ -15,6 +15,7 @@ from .layer import Layer
 from ..utils import is_multi_channels_image
 from ..utils import flatten, unflatten
 
+
 class BatchNormLayer(Layer):
     """Implementation of Batch Normalization.
 
@@ -149,7 +150,8 @@ class BatchNormLayer(Layer):
         if is_multi_channels_image(self.input_shape):
             x = flatten(x, self.input_shape)
 
-        self.fire = self.gamma * (x - self.miu) / np.sqrt(self.var + self.ep) + self.beta
+        self.fire = self.gamma * (x - self.miu) / np.sqrt(self.var + self.ep)
+        self.fire = self.fire + self.beta
 
         if is_multi_channels_image(self.output_shape):
             self.fire = unflatten(self.fire, self.input_shape)

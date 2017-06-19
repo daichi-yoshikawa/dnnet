@@ -14,6 +14,7 @@ from .layer import Layer
 from ..utils import is_multi_channels_image
 from ..utils import flatten, unflatten
 
+
 class DropoutLayer(Layer):
     """Implement Dropout.
 
@@ -91,7 +92,7 @@ class DropoutLayer(Layer):
 
     def __predict(self, x):
         if is_multi_channels_image(self.input_shape):
-            x = flatten(x, self.input_shape)        
+            x = flatten(x, self.input_shape)
 
         self.fire = (1. - self.drop_ratio) * x
 

@@ -12,6 +12,7 @@ from __future__ import absolute_import
 import numpy as np
 from enum import Enum
 
+
 class RandomWeight:
     """Base class for random initialization of weight.
 
@@ -21,7 +22,7 @@ class RandomWeight:
         Enumeration of name of methods to generate random weight.
     """
     Type = Enum('Type', 'default, xavier, he')
-    
+
     def get_type(self):
         """
         Returns
@@ -30,7 +31,7 @@ class RandomWeight:
             Name of method.
         """
         raise NotImplementedError('RandomWeight.get_type')
-    
+
     def get(self, rows, cols):
         """Returns weight set to random values based on selected method.
 
@@ -108,7 +109,7 @@ class He(RandomWeight):
         _, size = self.get_layer_sizes(rows, cols)
         ep = np.sqrt(2.) / np.sqrt(size)
         return ep * np.random.randn(rows, cols)
-    
+
 
 class RandomWeightFactory:
     """Factory class to get random initialization's instance.
@@ -118,9 +119,9 @@ class RandomWeightFactory:
     Get random initialization's instance through this class.
     """
     __random_weight = {
-            RandomWeight.Type.default : DefaultRandomWeight(),
-            RandomWeight.Type.xavier : Xavier(),
-            RandomWeight.Type.he : He(),
+            RandomWeight.Type.default: DefaultRandomWeight(),
+            RandomWeight.Type.xavier: Xavier(),
+            RandomWeight.Type.he: He(),
     }
 
     @classmethod

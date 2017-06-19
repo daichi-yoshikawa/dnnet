@@ -16,6 +16,7 @@ from .layer import Layer
 from ..utils import is_multi_channels_image
 from ..utils import flatten, unflatten
 
+
 class ActivationLayer(Layer):
     """Implements layer which convert values by activation function.
 
@@ -82,7 +83,7 @@ class Activation:
     Warning
     -------
     This class should not be used directly.
-    Use derived classes instead. 
+    Use derived classes instead.
     """
     Type = Enum('Type', 'sigmoid, relu, elu, srrelu, tanh, softmax')
 
@@ -125,7 +126,7 @@ class ReLU(Activation):
     Parameters
     ----------
     __mask : np.array
-        2d matrix whose entry(i, j) is 
+        2d matrix whose entry(i, j) is
         1 when x(i, j) > 0 and 0 when x(i, j) == 0.
     """
     def get_type(self):
@@ -147,7 +148,7 @@ class ELU(Activation):
     alpha : float, default 1.0
         Controls the value to which an ELU saturates for negative net inputs.
     __mask : np.array
-        2d matrix whose entry(i, j) is 
+        2d matrix whose entry(i, j) is
         1 when x(i, j) > 0 and 0 when x(i, j) == 0.
 
     References
@@ -176,7 +177,7 @@ class SRReLU(Activation):
     Parameters
     ----------
     __mask : np.array
-        2d matrix whose entry(i, j) is 
+        2d matrix whose entry(i, j) is
         1 when x(i, j) > 0 and 0 when x(i, j) == 0.
     """
     def get_type(self):
@@ -184,10 +185,10 @@ class SRReLU(Activation):
 
     def activate(self, x):
         self.__mask = (x > 0.)
-        return (np.sqrt(self.__mask * x + 1) - 1)# + ~self.__mask * self.alpha * (np.exp(x) - 1)
+        return (np.sqrt(self.__mask * x + 1) - 1)
 
     def grad(self, x):
-        return self.__mask * 0.5 / (x + 1)# + ~self.__mask * (x + self.alpha)
+        return self.__mask * 0.5 / (x + 1)
 
 
 class Tanh(Activation):

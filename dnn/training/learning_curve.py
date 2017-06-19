@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from collections import OrderedDict
 
+
 class LearningCurve:
     """Class to manage historical losses and accuracies.
 
@@ -59,7 +60,8 @@ class LearningCurve:
 
     def get(self):
         """Returns losses and accuracies w.r.t training and test data."""
-        return self.vals['loss_train'], self.vals['acc_train'],               self.vals['loss_test'], self.vals['acc_test']
+        return (self.vals['loss_train'], self.vals['acc_train'],
+                self.vals['loss_test'], self.vals['acc_test'])
 
     def add(self, loss_train, loss_test=None, acc_train=None, acc_test=None):
         """Records losses and accuracies for training and test data.
@@ -71,10 +73,12 @@ class LearningCurve:
         loss_test : float, default None
             Loss value w.r.t test data. If None, this value is ignored.
         acc_train : float, default None
-            Accuracy w.r.t training data. In the case of regression, this will be None.
+            Accuracy w.r.t training data.
+            In the case of regression, this will be None.
             If None, this value is ignored.
         acc_test : float, default None
-            Accuracy w.r.t test data. In the case of regression, this will be None.
+            Accuracy w.r.t test data.
+            In the case of regression, this will be None.
             If None, this value is ignored.
         """
         self.__add('loss_train', loss_train)
@@ -97,7 +101,12 @@ class LearningCurve:
 
         sys.stdout.write('\n')
 
-    def plot(self, loss_range=None, acc_range=None, figsize=(8,10), fontsize=12):
+    def plot(
+            self,
+            loss_range=None,
+            acc_range=None,
+            figsize=(8, 10),
+            fontsize=12):
         """Plots curves of losses and accuracies w.r.t training and test data.
 
         Arguments
@@ -149,7 +158,7 @@ class LearningCurve:
             plt.xlabel('Epochs[-]', fontsize=fontsize, fontname='serif')
             plt.ylabel('Loss', fontsize=fontsize, fontname='serif')
             plt.title('Loss')
-        
+
         if recorded_loss_and_acc:
             plt.subplot(2, 1, 2)
         if self.vals['acc_train'] is not None:
@@ -189,16 +198,21 @@ class LearningCurve:
         sys.stdout.write(msg % (self.vals[key][-1]))
 
     def __recorded_loss(self):
-        """Returns true if at least one loss data has been already recorded."""
-        if (self.vals['loss_train'] is None) and (self.vals['loss_test'] is None):
+        """Returns true if at least one loss has been recorded."""
+        loss_train_is_none = (self.vals['loss_train'] is None)
+        loss_test_is_none = (self.vals['loss_test'] is None)
+
+        if loss_train_is_none and loss_test_is_none:
             return False
         return True
 
     def __recorded_acc(self):
-        """Returns true if at least one accuracy data has been already recorded."""
-        if (self.vals['acc_train'] is None) and (self.vals['acc_test'] is None):
+        """Returns true if at least one accuracy has been recorded."""
+        acc_train_is_none = self.vals['acc_train'] is None
+        acc_test_is_none = self.vals['acc_test'] is None
+        if acc_train_is_none and acc_test_is_none:
             return False
-        return True     
+        return True
 
     def __recorded_loss_and_acc(self):
         """Returns true if at least a pair of loss and accuracy data

@@ -21,6 +21,7 @@ from .loss_function import SquaredError
 from .learning_curve import LearningCurve
 from ..utils.nn_utils import shuffle_data
 
+
 class BackPropagation:
     """Back propagation algorithm to update weights of neural network.
 
@@ -29,8 +30,8 @@ class BackPropagation:
     epochs : int
         Number of all data scanning.
     batch_size : int
-        Mini batch size.
-        This number of data are treated at the same time for one update of weight.
+        Mini batch size. This number of data are treated
+        at the same time for one update of weight.
     optimizer : Derived class of Optimizer
             Instance of derived class of Optimizer.
     optimizers : OrderedDict of derived class of Optimizer
@@ -45,15 +46,22 @@ class BackPropagation:
     dtype : type
         Data type of variables. Generally float64 or float32.
     """
-    def __init__(self, epochs, batch_size, optimizer, loss_function, learning_curve, dtype):
+    def __init__(
+            self,
+            epochs,
+            batch_size,
+            optimizer,
+            loss_function,
+            learning_curve,
+            dtype):
         """
         Arguments
         ---------
         epochs : int
             Number of all data scanning.
         batch_size : int
-            Mini batch size.
-            This number of data are treated at the same time for one update of weight .
+            Mini batch size. This number of data are treated
+            at the same time for one update of weight .
         optimizer : Derived class of Optimizer
             Instance of derived class of Optimizer.
         loss_function : LossFunction.Type
@@ -70,7 +78,8 @@ class BackPropagation:
         self.batch_size = batch_size
         self.optimizer = optimizer
         self.optimizers = OrderedDict()
-        self.loss_function = LossFunctionFactory.get(loss_function=loss_function)
+        self.loss_function = LossFunctionFactory.get(
+                loss_function=loss_function)
         self.lc = LearningCurve(dtype=dtype) if learning_curve else None
         self.dtype = dtype
 
@@ -113,8 +122,6 @@ class BackPropagation:
         """This method is called after completion of training.
 
         Optimizer or layer might require some finilization after training.
-        For example, batch normalization requires average and variance of each features
-        over all data set. This kind of procedure can be done through this method.
 
         Arguments
         ---------
@@ -213,7 +220,8 @@ class BackPropagation:
         """Evaluate loss of model under training.
 
         If test data is empty, doesn't display loss w.r.t test data.
-        If you select squared error as loss function, accuracy will not displayed.
+        If you select squared error as loss function,
+        accuracy will not displayed.
 
         Arguments
         ---------
@@ -259,8 +267,6 @@ class BackPropagation:
     def __get_accuracy(self, y, y_pred):
         """Calculate accuracy and return it.
 
-        This method is supposed to be called only in the case of classification.
-
         Arguments
         ---------
         y : np.array
@@ -274,6 +280,10 @@ class BackPropagation:
         -------
         float
             Accuracy of predicted result in range from 0.0 to 1.0.
+
+        Warning
+        -------
+            This method is supposed to be called in the case of classification.
         """
         consistency = np.argmax(y, axis=1) == np.argmax(y_pred, axis=1)
         return consistency.sum().astype(self.dtype) / consistency.shape[0]

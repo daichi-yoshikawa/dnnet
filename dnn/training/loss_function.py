@@ -12,6 +12,7 @@ from __future__ import absolute_import
 import numpy as np
 from enum import Enum
 
+
 class LossFunction:
     """Base class for loss functions.
 
@@ -28,7 +29,7 @@ class LossFunction:
         Used to avoid log(0) computation.
     """
     Type = Enum(
-            'Type',\
+            'Type',
             'multinomial_cross_entropy, binomial_cross_entropy, squared_error'
     )
     ep = 1e-5
@@ -54,20 +55,20 @@ class LossFunction:
 
 
 class MultinomialCrossEntropy(LossFunction):
-    """Loss function which is generally used for multi-class classification."""
+    """Loss function which is used for multi-class classification."""
     def get(self, y, t):
         return (-t * np.log(y + self.ep)).sum() / y.shape[0]
 
 
 class BinomialCrossEntropy(LossFunction):
-    """Loss function which is generally used for binary-class classification."""
+    """Loss function which is used for binary-class classification."""
     def get(self, y, t):
         error = -t * np.log(y + self.ep) - (1 - t) * np.log(1 - y + self.ep)
         return error.sum() / y.shape[0]
 
 
 class SquaredError(LossFunction):
-    """Loss function which is generally used for regression."""
+    """Loss function which is used for regression."""
     def get(self, y, t):
         return 0.5 * np.power(y - t, 2, dtype=y.dtype).sum() / y.shape[0]
 
@@ -80,12 +81,12 @@ class LossFunctionFactory:
     Get loss function's instance through this class.
     """
     __loss_function = {
-            LossFunction.Type.multinomial_cross_entropy :\
-                    MultinomialCrossEntropy(),
-            LossFunction.Type.binomial_cross_entropy :\
-                    BinomialCrossEntropy(),
-            LossFunction.Type.squared_error :\
-                    SquaredError(),
+            LossFunction.Type.multinomial_cross_entropy:
+            MultinomialCrossEntropy(),
+            LossFunction.Type.binomial_cross_entropy:
+            BinomialCrossEntropy(),
+            LossFunction.Type.squared_error:
+            SquaredError(),
     }
 
     @classmethod

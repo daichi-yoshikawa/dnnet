@@ -17,6 +17,7 @@ from ..training.random_weight import DefaultRandomWeight, Xavier, He
 from ..utils import is_multi_channels_image
 from ..utils import flatten, unflatten
 
+
 class AffineLayer(Layer):
     """Implement affine transform of matrix.
 
@@ -49,7 +50,7 @@ class AffineLayer(Layer):
 
         w_rows = np.prod(self.input_shape)
         w_cols = np.prod(self.output_shape)
-        self.w = self.random_weight.get(w_rows, w_cols)#DefaultRandomWeight().get(w_rows, w_cols)
+        self.w = self.random_weight.get(w_rows, w_cols)
         self.w = np.r_[np.zeros((1, w_cols)), self.w]
         self.w = self.w.astype(self.dtype)
         self.dw = np.zeros_like(self.w, dtype=self.w.dtype)
@@ -89,7 +90,7 @@ class AffineLayer(Layer):
             dy = flatten(dy, self.output_shape)
 
         batch_size = self.x.shape[0]
-        self.dw = self.dtype(1.) / batch_size * np.dot(self.x.T, dy)        
+        self.dw = self.dtype(1.) / batch_size * np.dot(self.x.T, dy)
         self.backfire = np.dot(dy, self.w[1:, :].T)
 
         if is_multi_channels_image(self.input_shape):

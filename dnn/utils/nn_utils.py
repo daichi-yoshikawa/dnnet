@@ -11,6 +11,7 @@ from __future__ import absolute_import
 
 import numpy as np
 
+
 def get_kwarg(key, dtype, default_value, **kwargs):
     """Get value which is specified through kwargs.
 
@@ -22,10 +23,10 @@ def get_kwarg(key, dtype, default_value, **kwargs):
         Name of variable.
     dtype : type
         Type of variable.
-    default_value : 
+    default_value : type of dtype
         Value which is returned when key is not found.
         Type is the same as the dtype.
-    **kwargs : 
+    **kwargs : keyword arguments
         Keyword arguments.
 
     Returns
@@ -48,9 +49,11 @@ def shuffle_data(x, y):
     Arguments
     ---------
     x : np.array
-        Descriptive features in 2d array whose shape is (num of data, num of feature).
+        Descriptive features in 2d array
+        whose shape is (num of data, num of feature).
     y : np.array
-        Target features in 2d array whose shape is (num of data, num of feature).
+        Target features in 2d array
+        whose shape is (num of data, num of feature).
 
     Returns
     -------
@@ -70,27 +73,32 @@ def shuffle_data(x, y):
 
 
 def split_data(x, y, test_data_ratio):
-    """Split one dataset which consists of descriptive features and target features
-    into 2 datasets, that is training data and test data.
+    """Split one dataset which consists of
+    descriptive features and target features into 2 datasets,
+    that is training data and test data.
 
     The number of x's row must be the same as the one of y's row.
 
     Arguments
     ---------
     x : np.array
-        Descriptive features in 2d array whose shape is (num of data, num of feature).
+        Descriptive features in 2d array
+        whose shape is (num of data, num of feature).
     y : np.array
-        Target features in 2d array whose shape is (num of data, num of feature).
+        Target features in 2d array
+        whose shape is (num of data, num of feature).
     test_data_ratio : float
-        Desired ratio of test data in range from 0.0 to 1.0. 
+        Desired ratio of test data in range from 0.0 to 1.0.
         If 0.3, 30% data is for test data and
         rest of the data is for training data.
 
     Returns
     -------
     np.array, np.array, np.array, np.array
-        The former 2 arrays are descriptive features and target features of training data.
-        The latter 2 arrays are descriptive features and target features of test data.
+        The former 2 arrays are descriptive features
+        and target features of training data.
+        The latter 2 arrays are descriptive features
+        and target features of test data.
     """
     training_data_num = x.shape[0]
 
@@ -142,7 +150,8 @@ def scale_normalization(x, ep=1e-5):
 
 
 def w2im(w, shape, layout):
-    """Reshape 2d weight matrix to 2d image matrix which represents well aligned filters.
+    """Reshape 2d weight matrix to 2d image matrix
+    which represents well aligned filters.
 
     This is utilized to visualize weight matrix by matplotlib.pyplot.
 
@@ -151,10 +160,11 @@ def w2im(w, shape, layout):
     w : np.array
         Weight matrix in 2d array.
     shape : tuple (rows, cols)
-        Shape of filter. In the case of multi-channel,
-        filters are taken as single channel by taking average over channels.
+        Shape of filter. In the case of multi-channel, filters are
+        taken as single channel by taking average over channels.
     layout : tuple (rows, cols)
-        Number of filter to display in direction of rows and cols respectively.
+        Number of filter to display
+        in direction of rows and cols respectively.
 
     Returns
     -------
@@ -162,16 +172,24 @@ def w2im(w, shape, layout):
         Well-aligned weight matrix in 2d array.
     """
     if (w.shape[0] - 1) != np.prod(shape):
-        msg = '(w.shape[0] - 1) != np.prod(shape)\n'            + '  w.shape[0] : ' + str(w.shape[0]) + '\n'            + '  shape.size : ' + str(np.prod(shape))
+        msg = ('(w.shape[0] - 1) != np.prod(shape)\n'
+               '  w.shape[0] : {}\n'
+               '  shape.size : {}'
+               .format(w.shape[0], np.prod(shape)))
         raise RuntimeError(msg)
 
     if w.shape[1] < np.prod(layout):
-        msg = 'w.shape[1] != np.prod(shape)\n'            + '  w.shape[1] : ' + str(w.shape[1]) + '\n'            + '  shape.size : ' + str(np.prod(layout))
+        msg = ('w.shape[1] != np.prod(shape)\n'
+               '  w.shape[1] : {}\n'
+               '  shape.size : {}'
+               .format(w.shape[1], np.prod(layout)))
         raise RuntimeError(msg)
 
     img = w[1:, :np.prod(layout)].T
     img = img.reshape(layout[0], layout[1], shape[0], shape[1])
-    img = img.transpose(0, 2, 1, 3).reshape(layout[0]*shape[0], layout[1]*shape[1])
+
+    rows, cols = layout[0]*shape[0], layout[1]*shape[1]
+    img = img.transpose(0, 2, 1, 3).reshape(rows, cols)
 
     return img
 
@@ -195,13 +213,14 @@ def is_multi_channels_image(shape):
     Returns
     -------
     bool
-        If true, it is 
+        If true, shape is in format of (channels, rows, cols).
     """
     if isinstance(shape, tuple):
         if len(shape) == 3:
             return True
         else:
-            msg = 'Shape must be int or tuple (channels, rows, cols).\n'                + 'shape : ' + str(shape)
+            msg = ('Shape must be int or tuple (channels, rows, cols).\n'
+                   '  shape : {}'.format(str(shape)))
             raise RuntimeError(msg)
 
     return False

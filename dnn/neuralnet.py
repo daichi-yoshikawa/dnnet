@@ -101,7 +101,7 @@ class NeuralNetwork:
         and before starting training.
         """
         if self.layers.size == 0:
-            msg = 'NeuralNetwork has no layer.\n'                + 'Please add layers before compiling.'
+            msg = 'NeuralNetwork has no layer.\n Add layers before compiling.'
             raise RuntimeError(msg)
 
         parent = self.layers[0]
@@ -201,13 +201,21 @@ class NeuralNetwork:
                 learning_curve,
                 self.dtype
         )
-        lc = back_prop.fit(self.layers, x_train, y_train, x_test, y_test, shuffle_per_epoch)
+
+        lc = back_prop.fit(
+                self.layers,
+                x_train,
+                y_train,
+                x_test,
+                y_test,
+                shuffle_per_epoch
+        )
 
         return lc
 
     def fit_generator(self, x, y, optimizer, loss_function, **kwargs):
         """Train model for large size data set by using generator.
-        TODO
+        TODO(
         """
         raise NotImplementError('NeuralNetwork.fit_one_batch')
 
@@ -231,7 +239,11 @@ class NeuralNetwork:
     def print_config(self):
         """Display configuration of layers."""
         for i, layer in enumerate(self.layers):
-            print(('%2d-th layer, (input_shape, output_shape) : '                    + str((layer.input_shape, layer.output_shape))                    + ', ' + layer.get_type()) % (i))
+            print(('%2d-th layer, (input_shape, output_shape) : '
+                   '({input_shape}, {output_shape}), {layer_type}'
+                   .format(input_shape=layer.input_shape,
+                           output_shape=layer.output_shape,
+                           layer_type=layer.get_type()) % (i)))
 
     def save(self, name, path=None):
         """Save model to storage.
@@ -273,13 +285,15 @@ class NeuralNetwork:
         ---------
         index : int
             index-th affine/convolution layer's weight matrix is visualized.
-            This index starts from 0, that is, the first layer with weight matrix is 0-th.
+            This index starts from 0, that is,
+            the first layer with weight matrix is 0-th.
             If this value is out of range, raise RuntimeError.
         shape : tuple (rows, cols)
-            Shape of filter. In the case of multi-channel,
-            filters are taken as single channel by taking average over channels.
+            Shape of filter. In the case of multi-channel, filters are
+            taken as single channel by taking average over channels.
         layout : tuple (rows, cols)
-            Number of filter to display in direction of rows and cols respectively.
+            Number of filter to display
+            in direction of rows and cols respectively.
         """
         # Get index of layer which is index-th layer with weight matrix.
         num_of_layer_with_filter = 0

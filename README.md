@@ -31,8 +31,8 @@ Add the following description in ~/.bashrc
 ```
 export PYENV_ROOT=${HOME}/Documents/pyenv
 if [ -d "${PYENV_ROOT}" ]; then
-    export PATH=${PYENV_ROOT}/bin:$PATH
-    eval "$(pyenv init -)"
+  export PATH=${PYENV_ROOT}/bin:$PATH
+  eval "$(pyenv init -)"
 fi
 ```
 And then execute the follows.

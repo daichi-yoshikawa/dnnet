@@ -33,9 +33,6 @@ class PoolingLayer(Layer):
     def predict(self, x):
         pass
 
-    def finalize_training(self, x):
-        pass
-
     def __forward(self, x):
         pass
 

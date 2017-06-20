@@ -114,24 +114,7 @@ class BackPropagation:
             self.__train_one_epoch(layers, x_train, y_train)
             self.__evaluate(layers, x_train, y_train, x_test, y_test, epoch)
 
-        self.__finalize_training(layers, x_train)
-
         return self.lc
-
-    def __finalize_training(self, layers, x):
-        """This method is called after completion of training.
-
-        Optimizer or layer might require some finilization after training.
-
-        Arguments
-        ---------
-        layers : list or np.array of Layer
-            All layers which configure neural network.
-        x : np.array
-            Descriptive features in 2d array.
-            x_train.shape == (num of data, num of feature)
-        """
-        layers[0].finalize_training(x)
 
     def __train_one_epoch(self, layers, x_train, y_train):
         """Implements training for one epoch.

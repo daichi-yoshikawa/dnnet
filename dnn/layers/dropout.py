@@ -67,10 +67,6 @@ class DropoutLayer(Layer):
         self.__predict(x)
         return self.child.predict(self.fire)
 
-    def finalize_training(self, x):
-        self.__predict(x)
-        self.child.finalize_training(self.fire)
-
     def __forward(self, x):
         if is_multi_channels_image(self.input_shape):
             x = flatten(x, self.input_shape)

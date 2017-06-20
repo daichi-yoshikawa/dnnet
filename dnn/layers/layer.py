@@ -102,17 +102,6 @@ class Layer:
         """
         raise NotImplementedError('Layer.predict')
 
-    def finalize_training(self, x):
-        """Implements finalizing training of layer.
-
-        Arguments
-        ---------
-        x : np.array
-            Fire of parent layer in 2d array.
-            If no parent layer, it would be normalized descriptive features.
-        """
-        raise NotImplementedError('Layer.finalize')
-
 
 class InputLayer(Layer):
     """Implement the first layer of neural network.
@@ -135,9 +124,6 @@ class InputLayer(Layer):
 
     def predict(self, x):
         return self.child.predict(x)
-
-    def finalize_training(self, x):
-        self.child.finalize_training(x)
 
 
 class OutputLayer(Layer):
@@ -163,7 +149,4 @@ class OutputLayer(Layer):
     def predict(self, x):
         self.fire = x
         return self.fire
-
-    def finalize_training(self, x):
-        self.fire = x
 

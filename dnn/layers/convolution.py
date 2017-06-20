@@ -45,10 +45,6 @@ class ConvolutionalLayer(Layer):
         self.__forward(x)
         return self.child.predict(self.fire)
 
-    def finalize_training(self, x):
-        self.__forward(x)
-        self.child.finalize_training(self.fire)
-
     def __forward(self, x):
         # x.shape : (batches, chs, rows, cols) -> (rows, cols)
         self.x = im2col(x, self.f_shape, self.pad, self.strides, self.force)

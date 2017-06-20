@@ -70,10 +70,6 @@ class AffineLayer(Layer):
         self.__forward(x)
         return self.child.predict(self.fire)
 
-    def finalize_training(self, x):
-        self.__forward(x)
-        self.child.finalize_training(self.fire)
-
     def __forward(self, x):
         if is_multi_channels_image(self.input_shape):
             x = flatten(x, self.input_shape)

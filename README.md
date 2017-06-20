@@ -7,9 +7,9 @@ Less dependencies, easier to use.
 ## Setup Python Virtual Environment
 ### Assumption
 * Use python3
-* Make directory for pyenv in "/home/<user-name>"
-* Root directory of your python-workspace is in "/home/<user-name>/Workspace/python3_ws"
-* "/home/<user-name>/Workspace/python3_ws/" is your working directory
+* Make directory for pyenv in "/home/<user-name>/Documents"
+* Root directory of your python virtual env is in "/home/<user-name>/Work/py352_ws"
+* "/home/<user-name>/Work/py352_ws/" is your working directory
 
 ### Setup procedure
 * Install required packages
@@ -57,13 +57,13 @@ else ...
 ```
 * Setup local pyenv
 ```
-   $ mkdir -p ~/Workspace/python3_ws
+   $ mkdir -p ~/Work/py352_ws
    $ pyenv virtualenv 3.5.2 <name of this environment>
 ```
-<name of this environment> can be like py352, python3_env, or anything you like.<br>
-Here, it's assumed that you named the environment as "py352".
+<name of this environment> can be like py352_env, python3_env, or anything you like.<br>
+Here, it's assumed that you named the environment as "py352_env".
 ```
-   $ pyenv local py352
+   $ pyenv local py352_env
    $ pip install --upgrade pip
 ```
 
@@ -72,7 +72,7 @@ Here, it's assumed that you named the environment as "py352".
 * numpy
 * matplotlib
 
-Go to your virtual environment like /home/<user-name>/Workspace/python-2,
+Go to your virtual environment like /home/<user-name>/Work/py352_ws,
 and do the follows.
 ```
 pip install numpy

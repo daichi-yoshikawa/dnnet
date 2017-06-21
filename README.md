@@ -63,6 +63,7 @@ else ...
 <name of this environment> can be like py352_env, python3_env, or anything you like.<br>
 Here, it's assumed that you named the environment as "py352_env".
 ```
+   $ cd ~/Work/py352_ws
    $ pyenv local py352_env
    $ pip install --upgrade pip
 ```

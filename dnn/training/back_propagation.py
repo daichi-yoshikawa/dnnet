@@ -204,7 +204,7 @@ class BackPropagation:
 
         If test data is empty, doesn't display loss w.r.t test data.
         If you select squared error as loss function,
-        accuracy will not displayed.
+        accuracy won't be displayed.
 
         Arguments
         ---------

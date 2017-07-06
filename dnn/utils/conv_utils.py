@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
+
 def pad_img(img, pad_rows, pad_cols):
     """Returns padded matrix which represents image.
 
@@ -217,9 +218,27 @@ def im2col(img, f_shape, pad, strides, force=False):
 
 
 def im2col_shape(img_shape, f_shape, pad, strides, force=False):
-    """
+    """Returns shape of resulting matrix of im2col.
+
+    As for the behaviour of im2col, refer to im2col documentation.
+
     Arguments
     ---------
+    img_shape : tuple (channels, rows, cols)
+        Number of channels and size of source image.
+    f_shape : tuple (num of filters, rows, cols)
+        Number and size of filter.
+    pad : tuple (rows, cols)
+        Number of pad, which consists of 0s. If rows/cols shape is
+        tuple (upper/left, lower/right), you can specify number of pad
+        in upper/left or lower/right part of img.
+        Example is shown in im2col documentation.
+    strides : tuple (rows, cols)
+        Stride size of filter in rows and cols direction.
+    force : bool, default False
+        Force conversion by padding in case of that
+        combination of image shape, filter shape and strides is improper.
+
     Returns
     -------
     tuple

@@ -86,6 +86,13 @@ class Momentum(Optimizer):
 
 
 class AdaGrad(Optimizer):
+    """
+    References
+    ----------
+    Adaptive Subgradient Methods for
+    Online Learning and Stochastic Optimization
+    http://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf
+    """
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
         self.learning_rate = kwargs.pop('learning_rate', 3e-2)
@@ -108,6 +115,12 @@ class AdaGrad(Optimizer):
 
 
 class Adam(Optimizer):
+    """
+    References
+    ----------
+    Adam: A Method for Stochastic Optimization
+    https://arxiv.org/pdf/1412.6980v9.pdf
+    """
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)
@@ -139,6 +152,11 @@ class Adam(Optimizer):
 
 
 class AdaDelta(Optimizer):
+    """
+    References
+    ADADELTA: AN ADAPTIVE LEARNING RATE METHOD
+    http://www.matthewzeiler.com/pubs/googleTR2012/googleTR2012.pdf
+    """
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)
@@ -166,6 +184,14 @@ class AdaDelta(Optimizer):
 
 
 class RMSProp(Optimizer):
+    """
+    References
+    ----------
+    Neural Networks for Machine Learning
+    Lecture 6a
+    Overview of mini-batch gradient descent
+    http://www.cs.toronto.edu/~tijmen/csc321/slides/lecture_slides_lec6.pdf
+    """
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)
@@ -186,6 +212,12 @@ class RMSProp(Optimizer):
 
 
 class SMORMS3(Optimizer):
+    """
+    References
+    ----------
+    Rmsprop loses to smorms3 - beware the epsilon! 
+     http://sifter.org/˜simon/journal/20150420.html
+    """
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)

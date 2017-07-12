@@ -14,14 +14,11 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .utils.nn_utils import get_kwarg, shuffle_data, split_data, w2im
+from .utils.nn_utils import shuffle_data, split_data, w2im
 from .utils.nn_utils import is_multi_channels_image, flatten, unflatten
 from .training.random_weight import RandomWeight
 from .training.back_propagation import BackPropagation
 from .layers.layer import Layer, InputLayer, OutputLayer
-
-
-# In[ ]:
 
 
 class NeuralNetwork:
@@ -157,36 +154,12 @@ class NeuralNetwork:
         If your data set is so large that all data cannot be stored in memory,
         you cannot use this method. Use fit_genenerator instead.
         """
-        epochs = get_kwarg(
-                key='epochs',
-                dtype=int,
-                default_value=10,
-                **kwargs)
-        batch_size = get_kwarg(
-                key='batch_size',
-                dtype=int,
-                default_value=100,
-                **kwargs)
-        learning_curve = get_kwarg(
-                key='learning_curve',
-                dtype=bool,
-                default_value=True,
-                **kwargs)
-        shuffle = get_kwarg(
-                key='shuffle',
-                dtype=bool,
-                default_value=True,
-                **kwargs)
-        shuffle_per_epoch = get_kwarg(
-                key='shuffle_per_epoch',
-                dtype=bool,
-                default_value=False,
-                **kwargs)
-        test_data_ratio = get_kwarg(
-                key='test_data_ratio',
-                dtype=self.dtype,
-                default_value=self.dtype(0.),
-                **kwargs)
+        epochs = kwargs.pop('epochs', 10)
+        batch_size = kwargs.pop('batch_size', 100)
+        learning_curve = kwargs.pop('learning_curve', True)
+        shuffle = kwargs.pop('shuffle', True)
+        shuffle_per_epoch = kwargs.pop('shuffle_per_epoch', False)
+        test_data_ratio = kwargs.pop('test_data_ratio', self.dtype(0.))
 
         if shuffle:
             x, y = shuffle_data(x, y)

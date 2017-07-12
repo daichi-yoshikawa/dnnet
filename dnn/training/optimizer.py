@@ -12,8 +12,6 @@ from __future__ import absolute_import
 import numpy as np
 from enum import Enum
 
-from ..utils.nn_utils import get_kwarg
-
 
 class Optimizer:
     """
@@ -55,8 +53,8 @@ class Optimizer:
 
 class SGD(Optimizer):
     def __init__(self, dtype=np.float32, **kwargs):
-        self.learning_rate = get_kwarg('learning_rate', dtype, 3e-2, **kwargs)
-        self.weight_decay = get_kwarg('weight_decay', dtype, 0., **kwargs)
+        self.learning_rate = kwargs.pop('learning_rate', 3e-2)
+        self.weight_decay = kwargs.pop('weight_decay', 0.)
 
     def get_type(self):
         return 'sgd'
@@ -69,9 +67,9 @@ class SGD(Optimizer):
 class Momentum(Optimizer):
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
-        self.learning_rate = get_kwarg('learning_rate', dtype, 3e-2, **kwargs)
-        self.weight_decay = get_kwarg('weight_decay', dtype, 0., **kwargs)
-        self.momentum_rate = get_kwarg('momentum_rate', dtype, 0.9, **kwargs)
+        self.learning_rate = kwargs.pop('learning_rate', 3e-2)
+        self.weight_decay = kwargs.pop('weight_decay', 0.)
+        self.momentum_rate = kwargs.pop('momentum_rate', 0.9)
         self.pre_dw = None
 
     def get_type(self):
@@ -90,9 +88,9 @@ class Momentum(Optimizer):
 class AdaGrad(Optimizer):
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
-        self.learning_rate = get_kwarg('learning_rate', dtype, 3e-2, **kwargs)
-        self.weight_decay = get_kwarg('weight_decay', dtype, 0., **kwargs)
-        self.ep = get_kwarg('ep', dtype, 1e-5, **kwargs)
+        self.learning_rate = kwargs.pop('learning_rate', 3e-2)
+        self.weight_decay = kwargs.pop('weight_decay', 0.)
+        self.ep = kwargs.pop('ep', 1e-5)
         self.h = None
 
     def get_type(self):
@@ -112,11 +110,11 @@ class AdaGrad(Optimizer):
 class Adam(Optimizer):
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
-        self.learning_rate = get_kwarg('learning_rate', dtype, 1e-3, **kwargs)
-        self.weight_decay = get_kwarg('weight_decay', dtype, 0., **kwargs)
-        self.beta = get_kwarg('beta', dtype, 0.9, **kwargs)
-        self.gamma = get_kwarg('gamma', dtype, 0.999, **kwargs)
-        self.ep = get_kwarg('ep', dtype, 1e-5, **kwargs)
+        self.learning_rate = kwargs.pop('learning_rate', 1e-3)
+        self.weight_decay = kwargs.pop('weight_decay', 0.)
+        self.beta = kwargs.pop('beta', 0.9)
+        self.gamma = kwargs.pop('gamma', 0.999)
+        self.ep = kwargs.pop('ep', 1e-5)
         self.v = None
         self.r = None
 
@@ -143,10 +141,10 @@ class Adam(Optimizer):
 class AdaDelta(Optimizer):
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
-        self.learning_rate = get_kwarg('learning_rate', dtype, 1e-3, **kwargs)
-        self.weight_decay = get_kwarg('weight_decay', dtype, 0., **kwargs)
-        self.gamma = get_kwarg('gamma', dtype, 0.95, **kwargs)
-        self.ep = get_kwarg('ep', dtype, 1e-5, **kwargs)
+        self.learning_rate = kwargs.pop('learning_rate', 1e-3)
+        self.weight_decay = kwargs.pop('weight_decay', 0.)
+        self.gamma = kwargs.pop('gamma', 0.95)
+        self.ep = kwargs.pop('ep', 1e-5)
         self.r = None
         self.s = None
         self.v = None
@@ -170,10 +168,10 @@ class AdaDelta(Optimizer):
 class RMSProp(Optimizer):
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
-        self.learning_rate = get_kwarg('learning_rate', dtype, 1e-3, **kwargs)
-        self.weight_decay = get_kwarg('weight_decay', dtype, 0., **kwargs)
-        self.gamma = get_kwarg('gamma', dtype, 0.9, **kwargs)
-        self.ep = get_kwarg('ep', dtype, 1e-5, **kwargs)
+        self.learning_rate = kwargs.pop('learning_rate', 1e-3)
+        self.weight_decay = kwargs.pop('weight_decay', 0.)
+        self.gamma = kwargs.pop('gamma', 0.9)
+        self.ep = kwargs.pop('ep', 1e-5)
         self.h = None
 
     def optimize(self, w, dw):
@@ -190,9 +188,9 @@ class RMSProp(Optimizer):
 class SMORMS3(Optimizer):
     def __init__(self, dtype=np.float32, **kwargs):
         self.dtype = dtype
-        self.learning_rate = get_kwarg('learning_rate', dtype, 1e-3, **kwargs)
-        self.weight_decay = get_kwarg('weight_decay', dtype, 0., **kwargs)
-        self.ep = get_kwarg('ep', dtype, 1e-5, **kwargs)
+        self.learning_rate = kwargs.pop('learning_rate', 1e-3)
+        self.weight_decay = kwargs.pop('weight_decay', 0.)
+        self.ep = kwargs.pop('ep', 1e-5)
         self.s = 1.
         self.v = None
         self.r = None

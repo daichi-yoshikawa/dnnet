@@ -12,34 +12,6 @@ from __future__ import absolute_import
 import numpy as np
 
 
-def get_kwarg(key, dtype, default_value, **kwargs):
-    """Get value which is specified through kwargs.
-
-    If the key is not found, default_value is returned.
-
-    Arguments
-    ---------
-    key : str
-        Name of variable.
-    dtype : type
-        Type of variable.
-    default_value : type of dtype
-        Value which is returned when key is not found.
-        Type is the same as the dtype.
-    **kwargs : keyword arguments
-        Keyword arguments.
-
-    Returns
-    -------
-        If key is found, kwargs[key].
-        If key is not found, default_value you set.
-    """
-    if key in kwargs:
-        return dtype(kwargs[key])
-    else:
-        return default_value
-
-
 def shuffle_data(x, y):
     """Shuffle descriptive features and target features.
 

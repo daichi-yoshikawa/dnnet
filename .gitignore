@@ -1,15 +1,5 @@
 __pycache__/
-dnn/__pycache__/
-dnn/layers/__pycache__/
-dnn/training/__pycache__/
-dnn/utils/__pycache__/
-
-dnn/.ipynb_checkpoints/
-dnn/layers/.ipynb_checkpoints/
-dnn/training/.ipynb_checkpoints/
-dnn/utils/.ipynb_checkpoints/
-
-examples/mnist/.ipynb_checkpoints/
+.ipynb_checkpoints/
 
 *.pyc
 *.txt

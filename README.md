@@ -88,3 +88,20 @@ cd <path-to-dnn>/examples/mnist
 python -B mnist.py
 ```
 
+# Use in your scripts.
+```
+import sys
+sys.path.append('<path-to-dnn-root-dir>')
+
+from dnn.neuralnet import NeuralNetwork
+```
+
+For example, if dnn directory is in ~/Work/dnn,
+do like below.
+```
+import os
+import sys
+sys.path.append(os.path.join(os.getenv('HOME'), 'Work/dnn'))
+
+from dnn.neuralnet import NeuralNetwork
+```

@@ -1,24 +1,16 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
-
-from __future__ import absolute_import
 
 import os
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-from .utils.nn_utils import shuffle_data, split_data, w2im
-from .utils.nn_utils import is_multi_channels_image, flatten, unflatten
-from .training.random_weight import RandomWeight
-from .training.back_propagation import BackPropagation
-from .layers.layer import Layer, InputLayer, OutputLayer
+from dnn.utils.nn_utils import shuffle_data, split_data, w2im
+from dnn.utils.nn_utils import is_multi_channels_image, flatten, unflatten
+from dnn.training.random_weight import RandomWeight
+from dnn.training.back_propagation import BackPropagation
+from dnn.layers.layer import Layer, InputLayer, OutputLayer
 
 
 class NeuralNetwork:

@@ -1,19 +1,12 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-from __future__ import absolute_import
-
 import numpy as np
 
-from .layer import Layer
-from ..utils.conv_utils import pad_img, im2col, col2im, im2col_shape
-from ..training.random_weight import RandomWeight
+from dnn.layers.layer import Layer
+from dnn.training.random_weight import RandomWeight
+from dnn.utils.conv_utils import pad_img, im2col, col2im, im2col_shape
+
 
 class ConvolutionalLayer(Layer):
     def __init__(self, f_shape, pad=(0, 0), strides=(1, 1), force=False):

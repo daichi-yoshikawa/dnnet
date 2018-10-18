@@ -1,18 +1,10 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-from __future__ import absolute_import
-
 import numpy as np
-from .layer import Layer
-from ..utils import is_multi_channels_image
-from ..utils import flatten, unflatten
+from dnn.layers.layer import Layer
+from dnn.utils.nn_utils import is_multi_channels_image
+from dnn.utils.nn_utils import flatten, unflatten
 
 
 class DropoutLayer(Layer):

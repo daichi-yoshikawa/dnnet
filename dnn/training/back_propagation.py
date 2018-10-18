@@ -1,25 +1,17 @@
-
-# coding: utf-8
-
-# In[ ]:
-
-
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
-
-from __future__ import absolute_import
 
 import sys
 import copy
 import numpy as np
 from collections import OrderedDict
 
-from .loss_function import LossFunctionFactory
-from .loss_function import MultinomialCrossEntropy
-from .loss_function import BinomialCrossEntropy
-from .loss_function import SquaredError
-from .learning_curve import LearningCurve
-from ..utils.nn_utils import shuffle_data
+from dnn.training.loss_function import LossFunctionFactory
+from dnn.training.loss_function import MultinomialCrossEntropy
+from dnn.training.loss_function import BinomialCrossEntropy
+from dnn.training.loss_function import SquaredError
+from dnn.training.learning_curve import LearningCurve
+from dnn.utils.nn_utils import shuffle_data
 
 
 class BackPropagation:

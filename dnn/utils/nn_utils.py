@@ -1,13 +1,5 @@
-
-# coding: utf-8
-
-# In[1]:
-
-
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
-
-from __future__ import absolute_import
 
 import numpy as np
 

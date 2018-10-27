@@ -83,9 +83,6 @@ class BatchNormLayer(Layer):
         return self.child.predict(self.fire)
 
     def __forward(self, x):
-        if is_multi_channels_image(self.input_shape):
-            x = flatten(x, self.input_shape)
-
         miu = np.mean(x, axis=0)
         self.xmiu = x - miu
 
@@ -110,13 +107,7 @@ class BatchNormLayer(Layer):
         self.var *= self.momentum
         self.var += (1. - self.momentum) * var
 
-        if is_multi_channels_image(self.output_shape):
-            self.fire = unflatten(self.fire, self.input_shape)
-
     def __backward(self, dy):
-        if is_multi_channels_image(self.output_shape):
-            dy = flatten(dy, self.input_shape)
-
         batch_size = dy.shape[0]
 
         dbeta = dy.sum(axis=0)
@@ -131,16 +122,6 @@ class BatchNormLayer(Layer):
         self.beta = self.beta - dbeta / batch_size
         self.gamma = self.gamma - dgamma / batch_size
 
-        if is_multi_channels_image(self.input_shape):
-            self.backfire = unflatten(self.backfire, self.input_shape)
-
     def __predict(self, x):
-        if is_multi_channels_image(self.input_shape):
-            x = flatten(x, self.input_shape)
-
         self.fire = self.gamma * (x - self.miu) / np.sqrt(self.var + self.ep)
         self.fire = self.fire + self.beta
-
-        if is_multi_channels_image(self.output_shape):
-            self.fire = unflatten(self.fire, self.input_shape)
-

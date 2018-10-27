@@ -45,7 +45,7 @@ class DropoutLayer(Layer):
         self.output_shape = self.input_shape
 
         input_size = np.prod(self.input_shape)
-        self.mask = np.arange(input_size).reshape(input_size)
+        self.mask = np.arange(input_size).reshape(self.input_shape)
 
     def forward(self, x):
         self.__forward(x)
@@ -60,30 +60,11 @@ class DropoutLayer(Layer):
         return self.child.predict(self.fire)
 
     def __forward(self, x):
-        if is_multi_channels_image(self.input_shape):
-            x = flatten(x, self.input_shape)
-
         np.random.shuffle(self.mask.reshape(self.mask.size))
         self.fire = (self.mask >= int(self.drop_ratio*self.mask.size)) * x
 
-        if is_multi_channels_image(self.output_shape):
-            self.fire = unflatten(self.fire, self.input_shape)
-
     def __backward(self, dy):
-        if is_multi_channels_image(self.output_shape):
-            dy = flatten(dy, self.input_shape)
-
         self.backfire = (self.mask >= int(self.drop_ratio*self.mask.size)) * dy
 
-        if is_multi_channels_image(self.input_shape):
-            self.backfire = unflatten(self.backfire, self.input_shape)
-
     def __predict(self, x):
-        if is_multi_channels_image(self.input_shape):
-            x = flatten(x, self.input_shape)
-
         self.fire = (1. - self.drop_ratio) * x
-
-        if is_multi_channels_image(self.output_shape):
-            self.fire = unflatten(self.fire, self.input_shape)
-

@@ -2,7 +2,7 @@
 # License: BSD 3 clause
 
 import sys
-sys.path.append('../../')
+sys.path.append('../..')
 
 import pickle
 import numpy as np

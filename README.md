@@ -85,7 +85,16 @@ pip install matplotlib
 * Run neural network for mnist.
 ```
 cd <path-to-dnn>/examples/mnist
-python -B mnist.py
+python mnist.py
+```
+
+If you get an error "ImportError: Python is not installed as a framework.",
+it might be because of matplotlib issue.(This happened to me when working with MacOS.)
+
+In the case, please try the follow.
+```
+cd ~/.matplotlib
+echo "backend: TkAgg" >> matplotlibrc
 ```
 
 # Use in your scripts.

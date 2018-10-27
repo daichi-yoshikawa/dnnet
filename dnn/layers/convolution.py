@@ -4,16 +4,16 @@
 import numpy as np
 
 from dnn.layers.layer import Layer
-from dnn.training.random_weight import RandomWeight
-from dnn.utils.conv_utils import pad_img, im2col, col2im, im2col_shape
+from dnn.training.random_weight import RandomWeight, RandomWeightFactory
+from dnn.utils.conv_utils import pad_img, im2col, col2im
 
 
 class ConvolutionalLayer(Layer):
-    def __init__(self, f_shape, pad=(0, 0), strides=(1, 1), force=False):
-        self.f_shape = f_shape
+    def __init__(self, filter_shape, pad=(0, 0), strides=(1, 1)):
+        self.filter_shape = filter_shape
         self.pad = pad
         self.strides = strides
-        self.force = force
+        self.random_weight = RandomWeightFactory().get(RandomWeight.Type.default)
         self.x = None
 
     def get_type(self):
@@ -39,51 +39,42 @@ class ConvolutionalLayer(Layer):
         return self.child.predict(self.fire)
 
     def __forward(self, x):
-        # x.shape : (batches, chs, rows, cols) -> (rows, cols)
-        self.x = im2col(x, self.f_shape, self.pad, self.strides, self.force)
-        self.fire = np.dot(self.x, self.w) + self.b
+        if len(x.shape) != 4:
+            msg = 'Convolution layer assumes that input is 4-d array.\n'\
+                + '    shape : %s' % str(x.shape)
+            raise RuntimeError(msg)
 
-        # fire.shape : (rows, cols) -> (batches, chs, rows, cols)
-        # Reshape fire into proper shape
-        # with consideration of the following description.
-        # A column of fire consists of one of resulting images in 1d array.
-        # This 1d image is aligned in cols direction, and number of it is
-        # the same as the number of filter.
-        batches = x.shape[0]
-        chs, rows, cols = self.ouput_shape
-        self.fire = self.reshape(batches, rows, cols, chs).transpose(0, 3, 1, 2)
+        n_batches, _, _, _ = x.shape
+        n_channels, n_rows, n_cols = self.output_shape
+
+        x_pad = pad_img(x, self.pad[0], self.pad[1])
+        self.x = im2col(x_pad, self.filter_shape, self.strides)
+        self.x = np.c_[np.ones((self.x.shape[0], 1), dtype=self.dtype), self.x]
+
+        self.fire = np.dot(self.x, self.w)
+        self.fire = self.fire.reshape(n_batches, n_rows, n_cols, n_channels)
+        self.fire = self.fire.transpose(0, 3, 1, 2)
 
     def __backward(self, dy):
-        # Transpose and reshape dy. This is the opposite of the
-        # reshape and transpose which are applied to fire in __forward method.
-        num_of_f, f_rows, f_cols = self.f_shape
-        dy = dy.transpose(0, 2, 3, 1).reshape(-1, num_of_f)
+        n_batches, _, _, _ = self.fire.shape
+        n_channels, _, _ = self.input_shape
+        n_filters, n_rows_filter, n_cols_filter = self.filter_shape
+        dy = dy.transpose(0, 2, 3, 1).reshape(-1, n_filters)
+        self.dw = self.dtype(1.) / n_batches * np.dot(self.x.T, dy)
 
-        batches, _, _, _ = self.fire.shape
-        chs, _, _ = self.input_shape
-        self.dw = self.dtype(1.) / bathes * np.dot(self.x.T, dy)
-        self.dw = self.dw.T.reshape(num_of_f, chs, f_rows, f_cols)
-        self.db = dy.sum(axis=0)
+        input_shape = list(self.fire.shape)
+        input_shape[3] -= 1
+        output_shape = list(self.output_shape)
+        output_shape[1] -= 1
+        self.backfire = np.dot(dy, self.w[1:, :].T)
 
-        self.backfire = np.dot(dy, self.w.T)
-        ###self.backfire = col2im(self.backfire, FH, FW, self.stride, self.pad)
+        print(self.backfire.shape, input_shape, output_shape)
+        self.backfire = col2im(
+                self.backfire, tuple(input_shape), tuple(output_shape),
+                self.filter_shape, self.pad, self.strides, aggregate=True)
+        self.backfire = self.backfire[:, :, pad[0]:-pad[0], pad[1]:-pad[1]]
+        print(self.backfire)
 
-        #batch_size = self.x.shape[0]
-        #self.dw = self.dtype(1.) / batch_size * np.dot(self.x.T, dy)     
-        #self.backfire = np.dot(dy, self.w[1:, :].T)
-
-        """
-        FN, C, FH, FW = self.W.shape
-        dout = dout.transpose(0,2,3,1).reshape(-1, FN)
-
-        self.db = np.sum(dout, axis=0)
-        self.dW = np.dot(self.col.T, dout)
-        self.dW = self.dW.transpose(1, 0).reshape(FN, C, FH, FW)
-
-        dcol = np.dot(dout, self.col_W.T)
-        dx = col2im(dcol, self.x.shape, FH, FW, self.stride, self.pad)
-        """
-        
     def __check_shape(self, shape):
         if not isinstance(shape, tuple):
             msg = 'Invalid type of shape : ' + type(shape)
@@ -93,19 +84,31 @@ class ConvolutionalLayer(Layer):
             raise RuntimeError(msg)
 
     def __init_weight(self, parent):
-        chs, rows, cols = self.input_shape
-        num_of_f, f_rows, f_cols = self.f_shape
-        w_rows = chs * f_rows * f_cols
-        w_cols = num_of_f
-        self.w = DefaultRandomWeight().get(w_rows, w_cols)
-        self.w = self.w.astype(self.dtype)
+        n_channels, _, _ = self.input_shape
+        n_filters, n_rows_filter, n_cols_filter = self.filter_shape
+
+        n_rows = n_channels * n_rows_filter * n_cols_filter + 1
+        n_cols = n_filters
+
+        self.w = self.random_weight.get(n_rows, n_cols).astype(self.dtype)
         self.dw = np.zeros_like(self.w, dtype=self.dtype)
-        self.b = np.zeros((1, w_cols), dtype=self.dtype)
-        self.db = np.zeros_like(self.b, dtype=self.dtype)
 
     def __set_output_shape(self):
-        chs = self.f_shape[0]
-        rows, cols = im2col_shape(
-                self.input_shape, self.f_shape, self.pad, self.strides, self.force)
-        self.output_shape = (chs, rows, cols)
+        n_channels_in, n_rows_in, n_cols_in = self.input_shape
+        n_channels_filter, n_rows_filter, n_cols_filter = self.filter_shape
 
+        n_channels_out = n_channels_filter
+        rem_rows = (n_rows_in + 2*self.pad[0] - n_rows_filter) % self.strides[0]
+        rem_cols = (n_cols_in + 2*self.pad[1] - n_cols_filter) % self.strides[1]
+
+        if (rem_rows > 0) or (rem_cols > 0):
+            msg = 'Invalid combos of input shape, filter size, pad, and stride.\n'\
+                + '    input shape : %s\n' % str(self.input_shape)\
+                + '    filter size : %s\n' % str(self.filter_shape)\
+                + '    pad, stride : %s, %s' % (str(self.pad), str(self.strides))
+            RuntimeError(msg)
+
+        n_rows_out = (n_rows_in + 2*self.pad[0] - n_rows_filter) // self.strides[0] + 1
+        n_cols_out = (n_cols_in + 2*self.pad[1] - n_cols_filter) // self.strides[1] + 1
+
+        self.output_shape = (n_channels_out, n_rows_out, n_cols_out)

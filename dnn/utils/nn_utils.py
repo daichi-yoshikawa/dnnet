@@ -27,7 +27,7 @@ def shuffle_data(x, y):
     if x.shape[0] != y.shape[0]:
         msg1 = 'x rows : ' + str(x.shape[0]) + '\n'
         msg2 = 'y rows : ' + str(y.shape[0]) + '\n'
-        msg = 'x and y data size are different.' * msg1 + msg2
+        msg = 'x and y data size are different.\n' + msg1 + msg2
         raise AttributeError(msg)
 
     index = np.arange(x.shape[0])

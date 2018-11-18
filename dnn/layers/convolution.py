@@ -16,6 +16,9 @@ class ConvolutionalLayer(Layer):
         self.random_weight = RandomWeightFactory().get(RandomWeight.Type.default)
         self.x = None
 
+    def set_dtype(self, dtype):
+        self.dtype = dtype
+
     def get_type(self):
         return 'convolution'
 
@@ -25,6 +28,9 @@ class ConvolutionalLayer(Layer):
         self.__check_shape(self.input_shape)
         self.__init_weight(parent)
         self.__set_output_shape()
+
+    def has_weight(self):
+        return True
 
     def forward(self, x):
         self.__forward(x)
@@ -57,23 +63,22 @@ class ConvolutionalLayer(Layer):
 
     def __backward(self, dy):
         n_batches, _, _, _ = self.fire.shape
-        n_channels, _, _ = self.input_shape
+        n_channels, n_rows, n_cols = self.input_shape
         n_filters, n_rows_filter, n_cols_filter = self.filter_shape
         dy = dy.transpose(0, 2, 3, 1).reshape(-1, n_filters)
         self.dw = self.dtype(1.) / n_batches * np.dot(self.x.T, dy)
-
-        input_shape = list(self.fire.shape)
-        input_shape[3] -= 1
-        output_shape = list(self.output_shape)
-        output_shape[1] -= 1
+        
+        input_shape = (n_batches, n_channels, n_rows, n_cols)
         self.backfire = np.dot(dy, self.w[1:, :].T)
 
-        print(self.backfire.shape, input_shape, output_shape)
         self.backfire = col2im(
-                self.backfire, tuple(input_shape), tuple(output_shape),
+                self.backfire, input_shape, self.output_shape,
                 self.filter_shape, self.pad, self.strides, aggregate=True)
-        self.backfire = self.backfire[:, :, pad[0]:-pad[0], pad[1]:-pad[1]]
-        print(self.backfire)
+
+        if self.pad[0] > 0:
+            self.backfire = self.backfire[:, :, self.pad[0]:-self.pad[0], :]
+        if self.pad[1] > 0:
+            self.backfire = self.backfire[:, :, :, self.pad[1]:-self.pad[1]]
 
     def __check_shape(self, shape):
         if not isinstance(shape, tuple):
@@ -87,10 +92,12 @@ class ConvolutionalLayer(Layer):
         n_channels, _, _ = self.input_shape
         n_filters, n_rows_filter, n_cols_filter = self.filter_shape
 
-        n_rows = n_channels * n_rows_filter * n_cols_filter + 1
+        n_rows = n_channels * n_rows_filter * n_cols_filter
         n_cols = n_filters
 
         self.w = self.random_weight.get(n_rows, n_cols).astype(self.dtype)
+        self.w = np.r_[np.zeros((1, n_cols)), self.w]
+        self.w = self.w.astype(self.dtype)
         self.dw = np.zeros_like(self.w, dtype=self.dtype)
 
     def __set_output_shape(self):

@@ -15,11 +15,13 @@ from dnn.training.optimizer import AdaGrad, AdaDelta, RMSProp
 from dnn.training.random_weight import RandomWeight
 from dnn.training.loss_function import LossFunction
 
-from dnn.layers.affine import AffineLayer
-from dnn.layers.convolution import ConvolutionalLayer
 from dnn.layers.activation import Activation, ActivationLayer
-from dnn.layers.dropout import DropoutLayer
+from dnn.layers.affine import AffineLayer
 from dnn.layers.batch_norm import BatchNormLayer
+from dnn.layers.convolution import ConvolutionalLayer
+from dnn.layers.dropout import DropoutLayer
+from dnn.layers.pooling import PoolingLayer
+
 
 def get_mnist():
     sys.stdout.write('Load MNIST data .')
@@ -50,6 +52,7 @@ dtype = np.float32
 model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
 model.add(DropoutLayer(drop_ratio=0.2))
 model.add(ConvolutionalLayer(filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1)))
+model.add(PoolingLayer(window_shape=(2, 2)))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
 model.add(DropoutLayer(drop_ratio=0.5))
@@ -64,6 +67,8 @@ model.print_config()
 x, y = get_mnist()
 scale_normalization(x)
 
+#x = np.array(x[:10000, :])
+#y = np.array(y[:10000, :])
 x = x.reshape(-1, 1, 28, 28)
 
 optimizer = AdaGrad(learning_rate=5e-2, weight_decay=1e-3, dtype=dtype)

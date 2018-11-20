@@ -75,9 +75,6 @@ def im2col(img, filter_shape, strides):
         Filter's shape.
     strides : tuple (rows, cols)
         Stride size of filter in rows and cols direction.
-    force : bool, default False
-        Force conversion by padding in case of that
-        combination of image shape, filter shape and strides is improper.
 
     Returns
     -------

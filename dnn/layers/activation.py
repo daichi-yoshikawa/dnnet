@@ -109,7 +109,7 @@ class ReLU(Activation):
         return 'relu'
 
     def activate(self, x):
-        self.__mask = (x > 0.).astype(x.dtype)
+        self.__mask = (x > 0.0).astype(x.dtype)
         return x * self.__mask
 
     def grad(self, x):
@@ -136,7 +136,7 @@ class ELU(Activation):
         return 'elu'
 
     def activate(self, x):
-        self.__mask = (x > 0.).astype(x.dtype)
+        self.__mask = (x > 0.0).astype(x.dtype)
         return self.__mask * x + ~(self.__mask) * (np.exp(x) - 1)
 
     def grad(self, x):
@@ -160,7 +160,7 @@ class SRReLU(Activation):
         return 'selu'
 
     def activate(self, x):
-        self.__mask = (x > 0.).astype(x.dtype)
+        self.__mask = (x > 0.0).astype(x.dtype)
         return (np.sqrt(self.__mask * x + 1) - 1)
 
     def grad(self, x):

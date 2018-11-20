@@ -67,7 +67,7 @@ class ConvolutionalLayer(Layer):
         n_filters, n_rows_filter, n_cols_filter = self.filter_shape
         dy = dy.transpose(0, 2, 3, 1).reshape(-1, n_filters)
         self.dw = self.dtype(1.) / n_batches * np.dot(self.x.T, dy)
-        
+
         input_shape = (n_batches, n_channels, n_rows, n_cols)
         self.backfire = np.dot(dy, self.w[1:, :].T)
 
@@ -113,7 +113,7 @@ class ConvolutionalLayer(Layer):
                 + '    input shape : %s\n' % str(self.input_shape)\
                 + '    filter size : %s\n' % str(self.filter_shape)\
                 + '    pad, stride : %s, %s' % (str(self.pad), str(self.strides))
-            RuntimeError(msg)
+            raise RuntimeError(msg)
 
         n_rows_out = (n_rows_in + 2*self.pad[0] - n_rows_filter) // self.strides[0] + 1
         n_cols_out = (n_cols_in + 2*self.pad[1] - n_cols_filter) // self.strides[1] + 1

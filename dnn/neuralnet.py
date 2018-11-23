@@ -167,14 +167,28 @@ class NeuralNetwork:
                 self.dtype
         )
 
-        lc = back_prop.fit(
-                self.layers,
-                x_train,
-                y_train,
-                x_test,
-                y_test,
-                shuffle_per_epoch
-        )
+        np_err_config = np.seterr('raise')
+        try:
+            lc = back_prop.fit(
+                    self.layers,
+                    x_train,
+                    y_train,
+                    x_test,
+                    y_test,
+                    shuffle_per_epoch
+            )
+        except FloatingPointError as e:
+            msg = str(e) + '\nOverflow or underflow occurred. Retry with smaller learning_rate or larger weight_decay for Optimizer.'
+            raise RuntimeError(msg)
+        except Exception as e:
+            raise RuntimeError(e)
+        finally:
+            np.seterr(
+                    divide=np_err_config['divide'],
+                    over=np_err_config['over'],
+                    under=np_err_config['under'],
+                    invalid=np_err_config['invalid']
+            )
 
         return lc
 

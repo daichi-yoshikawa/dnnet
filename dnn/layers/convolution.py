@@ -9,11 +9,13 @@ from dnn.utils.conv_utils import pad_img, im2col, col2im
 
 
 class ConvolutionalLayer(Layer):
-    def __init__(self, filter_shape, pad=(0, 0), strides=(1, 1)):
+    def __init__(
+            self, filter_shape, pad=(0, 0), strides=(1, 1),
+            random_weight=RandomWeight.Type.he):
         self.filter_shape = filter_shape
         self.pad = pad
         self.strides = strides
-        self.random_weight = RandomWeightFactory().get(RandomWeight.Type.default)
+        self.random_weight = RandomWeightFactory().get(random_weight)
         self.x = None
 
     def set_dtype(self, dtype):

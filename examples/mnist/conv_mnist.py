@@ -48,17 +48,39 @@ def get_mnist():
 
     return x, y
 
-dtype = np.float32
+dtype = np.float64
+"""
 model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
-model.add(DropoutLayer(drop_ratio=0.2))
+#model.add(DropoutLayer(drop_ratio=0.2))
 model.add(ConvolutionalLayer(filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1)))
-model.add(PoolingLayer(window_shape=(2, 2)))
-model.add(BatchNormLayer())
+#model.add(PoolingLayer(window_shape=(2, 2)))
+#model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
-model.add(DropoutLayer(drop_ratio=0.5))
+#model.add(DropoutLayer(drop_ratio=0.5))
 
 model.add(AffineLayer(output_shape=10, random_weight=RandomWeight.Type.default))
-model.add(BatchNormLayer())
+#model.add(BatchNormLayer())
+model.add(ActivationLayer(activation=Activation.Type.softmax))
+model.compile()
+"""
+
+np.seterr('raise')
+
+model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
+model.add(ConvolutionalLayer(
+        filter_shape=(32, 5, 5), pad=(0, 0), strides=(1, 1),
+        random_weight=RandomWeight.Type.he))
+model.add(ActivationLayer(activation=Activation.Type.relu))
+model.add(PoolingLayer(window_shape=(2, 2)))
+
+model.add(ConvolutionalLayer(filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1)))
+model.add(ActivationLayer(activation=Activation.Type.relu))
+model.add(PoolingLayer(window_shape=(2, 2)))
+
+model.add(AffineLayer(output_shape=100, random_weight=RandomWeight.Type.he))
+model.add(ActivationLayer(activation=Activation.Type.relu))
+
+model.add(AffineLayer(output_shape=10, random_weight=RandomWeight.Type.he))
 model.add(ActivationLayer(activation=Activation.Type.softmax))
 model.compile()
 
@@ -67,11 +89,9 @@ model.print_config()
 x, y = get_mnist()
 scale_normalization(x)
 
-#x = np.array(x[:10000, :])
-#y = np.array(y[:10000, :])
 x = x.reshape(-1, 1, 28, 28)
 
-optimizer = AdaGrad(learning_rate=5e-2, weight_decay=1e-3, dtype=dtype)
+optimizer = AdaGrad(learning_rate=3e-4, weight_decay=1e-3, dtype=dtype)
 lc = model.fit(
         x=x,
         y=y,
@@ -86,4 +106,3 @@ lc = model.fit(
 )
 lc.plot(figsize=(8,10), fontsize=12)
 #model.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
-

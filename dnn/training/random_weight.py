@@ -42,7 +42,7 @@ class RandomWeight:
         raise NotImplementedError('RandomWeight.get')
 
     def get_layer_sizes(self, rows, cols):
-        """Semantially convert rows and cols into different variables."""
+        """Semantically convert rows and cols into different variables."""
         parent_size = rows
         size = cols
         return parent_size, size
@@ -78,8 +78,8 @@ class Xavier(RandomWeight):
         return 'xavier'
 
     def get(self, rows, cols):
-        _, size = self.get_layer_sizes(rows, cols)
-        ep = 1. / np.sqrt(size)
+        parent_size, _ = self.get_layer_sizes(rows, cols)
+        ep = 1. / np.sqrt(parent_size)
         return ep * np.random.randn(rows, cols)
 
 
@@ -98,8 +98,8 @@ class He(RandomWeight):
         return 'he'
 
     def get(self, rows, cols):
-        _, size = self.get_layer_sizes(rows, cols)
-        ep = np.sqrt(2.) / np.sqrt(size)
+        parent_size, _ = self.get_layer_sizes(rows, cols)
+        ep = np.sqrt(2.) / np.sqrt(parent_size)
         return ep * np.random.randn(rows, cols)
 
 

@@ -184,13 +184,6 @@ class Tanh(Activation):
 
 
 class Softmax(Activation):
-    """Softmax function to convert values into probabilities.
-
-    f(x) = exp(x) / exp(x).sum()
-         = exp(x) * exp(-c) / (exp(x).sum()) * exp(-c)
-         = exp(x - c) / exp(x - c).sum()
-    where c == x.max(), to avoid overflow of exp calculation.
-    """
     def get_type(self):
         return 'softmax'
 
@@ -235,4 +228,3 @@ class ActivationFactory:
             return Tanh()
         elif activation is Activation.Type.softmax:
             return Softmax()
-

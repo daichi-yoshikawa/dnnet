@@ -11,7 +11,7 @@ import dnn
 from dnn.neuralnet import NeuralNetwork
 from dnn.utils.nn_utils import scale_normalization
 
-from dnn.training.optimizer import AdaGrad, AdaDelta, RMSProp
+from dnn.training.optimizer import AdaGrad, AdaDelta, Adam, RMSProp
 from dnn.training.random_weight import RandomWeight
 from dnn.training.loss_function import LossFunction
 
@@ -64,21 +64,28 @@ model.add(ActivationLayer(activation=Activation.Type.softmax))
 model.compile()
 """
 
-np.seterr('raise')
-
 model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
 model.add(ConvolutionalLayer(
-        filter_shape=(32, 5, 5), pad=(0, 0), strides=(1, 1),
+        filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1),
         random_weight=RandomWeight.Type.he))
 model.add(ActivationLayer(activation=Activation.Type.relu))
-model.add(PoolingLayer(window_shape=(2, 2)))
-
-model.add(ConvolutionalLayer(filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1)))
+model.add(ConvolutionalLayer(
+        filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1),
+        random_weight=RandomWeight.Type.he))
 model.add(ActivationLayer(activation=Activation.Type.relu))
-model.add(PoolingLayer(window_shape=(2, 2)))
+#model.add(PoolingLayer(window_shape=(2, 2)))
+model.add(DropoutLayer(drop_ratio=0.25))
 
-model.add(AffineLayer(output_shape=100, random_weight=RandomWeight.Type.he))
+model.add(ConvolutionalLayer(filter_shape=(64, 3, 3), pad=(0, 0), strides=(1, 1)))
 model.add(ActivationLayer(activation=Activation.Type.relu))
+model.add(ConvolutionalLayer(filter_shape=(64, 3, 3), pad=(0, 0), strides=(1, 1)))
+model.add(ActivationLayer(activation=Activation.Type.relu))
+#model.add(PoolingLayer(window_shape=(2, 2)))
+model.add(DropoutLayer(drop_ratio=0.25))
+
+model.add(AffineLayer(output_shape=256, random_weight=RandomWeight.Type.he))
+model.add(ActivationLayer(activation=Activation.Type.relu))
+model.add(DropoutLayer(drop_ratio=0.5))
 
 model.add(AffineLayer(output_shape=10, random_weight=RandomWeight.Type.he))
 model.add(ActivationLayer(activation=Activation.Type.softmax))
@@ -91,11 +98,12 @@ scale_normalization(x)
 
 x = x.reshape(-1, 1, 28, 28)
 
-optimizer = AdaGrad(learning_rate=3e-4, weight_decay=1e-3, dtype=dtype)
+optimizer = Adam(learning_rate=1e-3, weight_decay=1e-3, dtype=dtype)
+print('Learning Rate :', optimizer.learning_rate)
 lc = model.fit(
         x=x,
         y=y,
-        epochs=10,
+        epochs=30,
         batch_size=100,
         optimizer=optimizer,
         loss_function=LossFunction.Type.multinomial_cross_entropy,

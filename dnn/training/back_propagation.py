@@ -104,7 +104,14 @@ class BackPropagation:
                 x_train, y_train = shuffle_data(x_train, y_train)
 
             self.__train_one_epoch(layers, x_train, y_train)
-            self.__evaluate(layers, x_train, y_train, x_test, y_test, epoch)
+            #loss_train, acc_train = self.__evaluate(
+            #        layers, x_train, y_train, epoch, batch_size=100)
+            loss_test, acc_test = self.__evaluate(
+                    layers, x_test, y_test, epoch, batch_size=100)
+            if self.lc is not None:
+                #self.lc.add(loss_train, loss_test, acc_train, acc_test)
+                self.lc.add(None, loss_test, None, acc_test)
+                self.lc.stdout(epoch)
 
         return self.lc
 
@@ -191,65 +198,68 @@ class BackPropagation:
             if layer.has_weight() is True:
                 self.optimizers[i].optimize(layer.w, layer.dw)
 
-    def __evaluate(self, layers, x_train, y_train, x_test, y_test, epoch):
+    def __evaluate(self, layers, x, y, epoch, batch_size):
         """Evaluate loss of model under training.
 
-        If test data is empty, doesn't display loss w.r.t test data.
         If you select squared error as loss function,
-        accuracy won't be displayed.
+        accuracy won't be calculated.
 
         Arguments
         ---------
         layers : list or np.array of Layer
             All layers which configures of neural network.
-        x_train : np.array
-            Descriptive features in 2d array, which is used to train model.
-            x_train.shape == (num of data, num of feature)
-        y_train : np.array
-            Target features in 2d array, which is used to train model.
+        x : np.array
+            Descriptive features in 2d array.
+            x.shape == (num of data, num of feature)
+        y : np.array
+            Target features in 2d array.
             y_train.shape == (num of data, num of feature)
-        x_test : np.array
-            Descriptive features in 2d array, which is used to evaluate model.
-            x_test.shape == x_train.shape
-        y_test : np.array
-            Target features in 2d array, which is used to evaluate model.
-            y_test.shape == y_train.shape
         epoch : int
             Number of epoch.
+        batch_size : int
+            Batch size used in evaluation. Will be needed to avoid memory error.
+
+        Returns
+        -------
+        float, float
+            Loss and accuracy respectively. Can be None.
         """
-        y_test_pred = None
-        loss_test = None
-        acc_train = None
-        acc_test = None
+        loss = 0.0
+        acc = 0.0
 
-        y_train_pred = layers[0].predict(x_train)
-        loss_train = self.loss_function.get(y=y_train_pred, t=y_train)
+        data_num = x.shape[0]
+        n_batches = 0
 
-        if x_test.size != 0:
-            y_test_pred = layers[0].predict(x_test)
-            loss_test = self.loss_function.get(y=y_test_pred, t=y_test)
+        for i in range(0, data_num, batch_size):
+            end = i + batch_size
 
-        if not isinstance(self.loss_function, SquaredError):
-            acc_train = self.__get_accuracy(y=y_train, y_pred=y_train_pred)
+            if end > data_num:
+                end = data_num
 
-            if y_test_pred.size != 0:
-                acc_test = self.__get_accuracy(y=y_test, y_pred=y_test_pred)
+            y_pred = layers[0].predict(x[i:end])
+            loss += self.loss_function.get(y_pred, y[i:end])
 
-        if self.lc is not None:
-            self.lc.add(loss_train, loss_test, acc_train, acc_test)
-            self.lc.stdout(epoch)
+            if not isinstance(self.loss_function, SquaredError):
+                acc += self.__get_accuracy(y_pred, y[i:end])
 
-    def __get_accuracy(self, y, y_pred):
+            n_batches += 1
+
+        loss = loss / n_batches if loss > 0.0 else None
+        acc = acc / n_batches if acc > 0.0 else None
+
+        return loss, acc
+
+    def __get_accuracy(self, y_pred, y):
         """Calculate accuracy and return it.
 
         Arguments
         ---------
-        y : np.array
-            Reference of target features in 2d array.
-            y.shape == (num of data, num of feature)
         y_pred : np.array
             Predicted target features in 2d array.
             y_pred.shape == (num of data, num of feature)
+        y : np.array
+            Reference of target features in 2d array.
+            y.shape == (num of data, num of feature)
 
         Returns
         -------

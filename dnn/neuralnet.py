@@ -3,6 +3,9 @@
 
 import os
 import pickle
+import sys
+import time
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -146,6 +149,8 @@ class NeuralNetwork:
         If your data set is so large that all data cannot be stored in memory,
         you cannot use this method. Use fit_genenerator instead.
         """
+        start = time.time()
+
         epochs = kwargs.pop('epochs', 10)
         batch_size = kwargs.pop('batch_size', 100)
         learning_curve = kwargs.pop('learning_curve', True)
@@ -189,6 +194,9 @@ class NeuralNetwork:
                     under=np_err_config['under'],
                     invalid=np_err_config['invalid']
             )
+
+        end = time.time()
+        sys.stdout.write('Calculation time : %.2f[s]' % (end - start))
 
         return lc
 

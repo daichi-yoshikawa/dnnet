@@ -44,10 +44,7 @@ class PoolingLayer(Layer):
 
         n_batches, _, _, _ = x.shape
         n_channels, n_rows, n_cols = self.output_shape
-
-        window_shape = [1]
-        window_shape.extend(self.window_shape)
-        window_shape = tuple(window_shape)
+        window_shape = tuple([1] + list(self.window_shape))
 
         self.x = im2col(x, window_shape, self.strides)
         self.x = self.x.reshape(self.x.shape[0] * n_channels, -1)
@@ -55,17 +52,15 @@ class PoolingLayer(Layer):
         self.fire = self.fire.reshape(n_batches, n_rows, n_cols, n_channels).transpose(0, 3, 1, 2)
 
     def __backward(self, dy):
-        indices = [np.arange(self.x.shape[0], dtype=int), np.argmax(self.x, axis=1)]
+        indices = [np.arange(self.x.shape[0], dtype=int),
+                   np.argmax(self.x, axis=1)]
         grad = np.zeros_like(self.x, dtype=self.x.dtype)
         grad[indices] = 1
-        self.backfire = grad * dy.flatten().reshape(-1, 1)
-
+        self.backfire = grad * dy.transpose(0, 2, 3, 1).flatten().reshape(-1, 1)
+        
         n_batches, _, _, _ = self.fire.shape
-        n_channels, n_rows, n_cols = self.input_shape
-        input_shape = (n_batches, n_channels, n_rows, n_cols)
-        window_shape = [1]
-        window_shape.extend(self.window_shape)
-        window_shape = tuple(window_shape)
+        input_shape = tuple([n_batches] + list(self.input_shape))
+        window_shape = tuple([1] + list(self.window_shape))
 
         self.backfire = col2im(
                 self.backfire, input_shape, self.output_shape,

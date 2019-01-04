@@ -58,7 +58,7 @@ class NeuralNetwork:
                 return pickle.load(f)
         except IOError as e:
             msg = str(e) + '\nNeuralNetwork.load failed.'
-            print(msg)
+            raise DNNIOError(msg)
 
     def __init__(self, input_shape, dtype=np.float32):
         """
@@ -165,24 +165,14 @@ class NeuralNetwork:
         x_train, y_train, x_test, y_test = split_data(x, y, test_data_ratio)
 
         back_prop = BackPropagation(
-                epochs,
-                batch_size,
-                optimizer,
-                loss_function,
-                learning_curve,
-                self.dtype
-        )
+                epochs, batch_size, optimizer, loss_function,
+                learning_curve, self.dtype)
 
         np_err_config = np.seterr('raise')
         try:
             lc = back_prop.fit(
-                    self.layers,
-                    x_train,
-                    y_train,
-                    x_test,
-                    y_test,
-                    shuffle_per_epoch
-            )
+                    self.layers, x_train, y_train, x_test, y_test,
+                    shuffle_per_epoch, batch_size)
         except FloatingPointError as e:
             msg = str(e) + '\nOverflow or underflow occurred. Retry with smaller learning_rate or larger weight_decay for Optimizer.'
             raise RuntimeError(msg)
@@ -227,8 +217,9 @@ class NeuralNetwork:
     def print_config(self):
         """Display configuration of layers."""
         for i, layer in enumerate(self.layers):
-            print(('%2d-th layer, (input_shape, output_shape) : '
-                   '({input_shape}, {output_shape}), {layer_type}'
+            sys.stdout.write((
+                   '%2d-th layer, (input_shape, output_shape) : '
+                   '({input_shape}, {output_shape}), {layer_type}\n'
                    .format(input_shape=layer.input_shape,
                            output_shape=layer.output_shape,
                            layer_type=layer.get_type()) % (i)))

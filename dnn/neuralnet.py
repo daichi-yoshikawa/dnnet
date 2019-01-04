@@ -9,6 +9,7 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
+from dnn.exception import DNNIOError, DNNRuntimeError
 from dnn.utils.nn_utils import shuffle_data, split_data, w2im
 from dnn.utils.nn_utils import is_multi_channels_image, flatten, unflatten
 from dnn.training.random_weight import RandomWeight
@@ -196,7 +197,7 @@ class NeuralNetwork:
             )
 
         end = time.time()
-        sys.stdout.write('Calculation time : %.2f[s]' % (end - start))
+        sys.stdout.write('Calculation time : %.2f[s]\n' % (end - start))
 
         return lc
 
@@ -254,11 +255,11 @@ class NeuralNetwork:
             path = os.getenv("HOME") + path[1:]
 
         try:
-            with open(path + '/' + name, 'wb') as f:
+            with open(os.path.join(path, name), 'wb') as f:
                 pickle.dump(self, f)
         except IOError as e:
             msg = str(e) + '\nNeuralNetwork.save failed.'
-            print(msg)
+            raise DNNIOError(msg)
 
     def show_filters(self, index, shape, layout, figsize=(8, 8)):
         """Visualize filters.

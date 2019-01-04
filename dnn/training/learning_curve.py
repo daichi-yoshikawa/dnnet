@@ -130,7 +130,7 @@ class LearningCurve:
             raise RuntimeError(msg)
 
         if not self.__recorded_loss_or_acc():
-            print('No recorded loss and accuracy.')
+            sys.stdout.write('No recorded loss and accuracy.\n')
             return
 
         plt.figure(figsize=figsize)
@@ -172,6 +172,7 @@ class LearningCurve:
 
         if recorded_loss_and_acc:
             plt.tight_layout()
+
         plt.show()
 
     def __add(self, key, val):

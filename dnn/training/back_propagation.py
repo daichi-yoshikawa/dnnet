@@ -75,7 +75,9 @@ class BackPropagation:
         self.lc = LearningCurve(dtype=dtype) if learning_curve else None
         self.dtype = dtype
 
-    def fit(self, layers, x_train, y_train, x_test, y_test, shuffle_per_epoch):
+    def fit(
+            self, layers, x_train, y_train, x_test, y_test,
+            shuffle_per_epoch, batch_size):
         """Train prediction model based on training data.
 
         Arguments
@@ -96,6 +98,8 @@ class BackPropagation:
             y_test.shape == y_train.shape
         shuffle_per_epoch : bool
             If true, shuffle training data per each epoch.
+        batch_size : int
+            Batch size used in evaluation. Will be needed to avoid memory error.
         """
         self.__initialize_optimizers(layers)
 
@@ -104,13 +108,12 @@ class BackPropagation:
                 x_train, y_train = shuffle_data(x_train, y_train)
 
             self.__train_one_epoch(layers, x_train, y_train)
-            #loss_train, acc_train = self.__evaluate(
-            #        layers, x_train, y_train, epoch, batch_size=100)
+            loss_train, acc_train = self.__evaluate(
+                    layers, x_train, y_train, epoch, batch_size)
             loss_test, acc_test = self.__evaluate(
-                    layers, x_test, y_test, epoch, batch_size=100)
+                    layers, x_test, y_test, epoch, batch_size)
             if self.lc is not None:
-                #self.lc.add(loss_train, loss_test, acc_train, acc_test)
-                self.lc.add(None, loss_test, None, acc_test)
+                self.lc.add(loss_train, loss_test, acc_train, acc_test)
                 self.lc.stdout(epoch)
 
         return self.lc

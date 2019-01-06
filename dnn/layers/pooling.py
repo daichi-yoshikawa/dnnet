@@ -6,6 +6,7 @@ import numpy as np
 from dnn.layers.layer import Layer
 from dnn.utils.conv_utils import im2col, col2im
 
+
 class PoolingLayer(Layer):
     def __init__(self, window_shape):
         self.layer_index = 0
@@ -57,15 +58,17 @@ class PoolingLayer(Layer):
         self.x = im2col(x, window_shape, self.strides)
         self.x = self.x.reshape(self.x.shape[0] * n_channels, -1)
         self.fire = np.max(self.x, axis=1)
-        self.fire = self.fire.reshape(n_batches, n_rows, n_cols, n_channels).transpose(0, 3, 1, 2)
+        self.fire = self.fire.reshape(
+                n_batches, n_rows, n_cols, n_channels).transpose(0, 3, 1, 2)
 
     def __backward(self, dy):
         indices = [np.arange(self.x.shape[0], dtype=int),
                    np.argmax(self.x, axis=1)]
         grad = np.zeros_like(self.x, dtype=self.x.dtype)
         grad[indices] = 1
-        self.backfire = grad * dy.transpose(0, 2, 3, 1).flatten().reshape(-1, 1)
-        
+        self.backfire = grad * dy.transpose(
+                0, 2, 3, 1).flatten().reshape(-1, 1)
+
         n_batches, _, _, _ = self.fire.shape
         input_shape = tuple([n_batches] + list(self.input_shape))
         window_shape = tuple([1] + list(self.window_shape))
@@ -79,24 +82,30 @@ class PoolingLayer(Layer):
             msg = 'Invalid type of shape : ' + type(shape)
             raise RuntimeError(msg)
         elif len(shape) != 3:
-            msg = 'Invalid shape : ' + str(shape) + '\nShape must be (channels, rows, cols).'
+            msg = 'Invalid shape : ' + str(shape)\
+                + '\nShape must be (channels, rows, cols).'
             raise RuntimeError(msg)
 
     def __set_output_shape(self):
         n_channels, n_rows_in, n_cols_in = self.input_shape
         n_rows_window, n_cols_window = self.window_shape
 
-        rem_rows = (n_rows_in + 2*self.pad[0] - n_rows_window) % self.strides[0]
-        rem_cols = (n_cols_in + 2*self.pad[1] - n_cols_window) % self.strides[1]
+        rem_rows = n_rows_in + 2*self.pad[0] - n_rows_window
+        rem_rows %= self.strides[0]
+        rem_cols = n_cols_in + 2*self.pad[1] - n_cols_window
+        rem_cols %= self.strides[1]
 
         if(rem_rows > 0) or (rem_cols > 0):
-            msg = 'Invalid combos of input shape, window size, pad, and stride.\n'\
+            msg = 'Invalid combos of input, window, pad, and stride.\n'\
                 + '    input shape : %s\n' % str(self.input_shape)\
                 + '    window size : %s\n' % str(self.window_shape)\
-                + '    pad, stride : %s, %s' % (str(self.pad), str(self.strides))
+                + '    pad, stride : %s, %s'\
+                % (str(self.pad), str(self.strides))
             raise RuntimeError(msg)
 
-        n_rows_out = (n_rows_in + 2*self.pad[0] - n_rows_window) // self.strides[0] + 1
-        n_cols_out = (n_cols_in + 2*self.pad[1] - n_cols_window) // self.strides[1] + 1
+        n_rows_out = n_rows_in + 2*self.pad[0] - n_rows_window
+        n_rows_out = n_rows_out // self.strides[0] + 1
+        n_cols_out = n_cols_in + 2*self.pad[1] - n_cols_window
+        n_cols_out = n_cols_out // self.strides[1] + 1
 
         self.output_shape = (n_channels, n_rows_out, n_cols_out)

@@ -88,7 +88,8 @@ def im2col(img, filter_shape, strides):
     rem_cols = (n_cols - n_cols_filter) % strides[1]
 
     if (rem_rows > 0) or (rem_cols > 0):
-        msg = 'Filter can not be applied to image with the specified strides.\n'\
+        msg = 'Filter can not be applied to image '\
+            + 'with the specified strides.\n'\
             + '    rem_rows : %d\n    rem_cols : %d' % (rem_rows, rem_cols)
         raise RuntimeError(msg)
 
@@ -105,12 +106,15 @@ def im2col(img, filter_shape, strides):
 
     dst_n_rows = n_batches * dst_n_rows * dst_n_cols
     dst_n_cols = n_channels * n_rows_filter * n_cols_filter
-    dst_img = dst_img.transpose(0, 2, 3, 1, 4, 5).reshape(dst_n_rows, dst_n_cols)
+    dst_img = dst_img.transpose(
+            0, 2, 3, 1, 4, 5).reshape(dst_n_rows, dst_n_cols)
 
     return dst_img
 
 
-def col2im(col, input_shape, output_shape, filter_shape, pad, strides, aggregate=True):
+def col2im(
+        col, input_shape, output_shape,
+        filter_shape, pad, strides, aggregate=True):
     n_batches, n_channels, n_rows, n_cols = input_shape
     _, n_rows_filter, n_cols_filter = filter_shape
     _, n_rows_out, n_cols_out = output_shape
@@ -122,18 +126,23 @@ def col2im(col, input_shape, output_shape, filter_shape, pad, strides, aggregate
     y_step = y_strd * n_rows_out
     x_step = x_strd * n_cols_out
 
-    col_ = col.reshape(n_batches, n_rows_out, n_cols_out, n_channels, n_rows_filter, n_cols_filter).transpose(0, 3, 4, 5, 1, 2)
-    img = np.zeros((n_batches, n_channels, n_rows_img, n_cols_img), dtype=col.dtype)
+    col_ = col.reshape(
+            n_batches, n_rows_out, n_cols_out, n_channels,
+            n_rows_filter, n_cols_filter).transpose(0, 3, 4, 5, 1, 2)
+    img = np.zeros((n_batches, n_channels, n_rows_img, n_cols_img),
+                   dtype=col.dtype)
 
     if aggregate:
         for y in range(n_rows_filter):
             y_end = y + y_step
             for x in range(n_cols_filter):
-                img[:, :, y:y_end:y_strd, x:x+x_step:x_strd] += col_[:, :, y, x, :, :]
+                img[:, :, y:y_end:y_strd, x:x+x_step:x_strd] +=\
+                        col_[:, :, y, x, :, :]
     else:
         for y in range(n_rows_filter):
             y_end = y + y_step
             for x in range(n_cols_filter):
-                img[:, :, y:y_end:y_strd, x:x+x_step:x_strd] = col_[:, :, y, x, :, :]
+                img[:, :, y:y_end:y_strd, x:x+x_step:x_strd] =\
+                        col_[:, :, y, x, :, :]
 
     return img

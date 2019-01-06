@@ -174,7 +174,9 @@ class NeuralNetwork:
                     self.layers, x_train, y_train, x_test, y_test,
                     shuffle_per_epoch, batch_size)
         except FloatingPointError as e:
-            msg = str(e) + '\nOverflow or underflow occurred. Retry with smaller learning_rate or larger weight_decay for Optimizer.'
+            msg = str(e) + '\nOverflow or underflow occurred. '\
+                + 'Retry with smaller learning_rate or '\
+                + 'larger weight_decay for Optimizer.'
             raise RuntimeError(msg)
         except Exception as e:
             raise RuntimeError(e)
@@ -294,4 +296,3 @@ class NeuralNetwork:
     def __convert_dtype(self, x, y):
         """Convert data type of features into selected one in constructor."""
         return x.astype(self.dtype), y.astype(self.dtype)
-

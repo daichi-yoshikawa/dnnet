@@ -96,4 +96,3 @@ class LossFunctionFactory:
             Instance of selected loss function.
         """
         return cls.__loss_function[loss_function]
-

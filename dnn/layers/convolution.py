@@ -95,7 +95,8 @@ class ConvolutionalLayer(Layer):
             msg = 'Invalid type of shape : ' + type(shape)
             raise RuntimeError(msg)
         elif len(shape) != 3:
-            msg = 'Invalid shape : ' + str(shape) + '\nShape must be (channels, rows, cols).'
+            msg = 'Invalid shape : ' + str(shape)\
+                + '\nShape must be (channels, rows, cols).'
             raise RuntimeError(msg)
 
     def __init_weight(self, parent):
@@ -115,17 +116,22 @@ class ConvolutionalLayer(Layer):
         n_channels_filter, n_rows_filter, n_cols_filter = self.filter_shape
 
         n_channels_out = n_channels_filter
-        rem_rows = (n_rows_in + 2*self.pad[0] - n_rows_filter) % self.strides[0]
-        rem_cols = (n_cols_in + 2*self.pad[1] - n_cols_filter) % self.strides[1]
+        rem_rows = n_rows_in + 2*self.pad[0] - n_rows_filter
+        rem_rows %= self.strides[0]
+        rem_cols = n_cols_in + 2*self.pad[1] - n_cols_filter
+        rem_cols %= self.strides[1]
 
         if (rem_rows > 0) or (rem_cols > 0):
-            msg = 'Invalid combos of input shape, filter size, pad, and stride.\n'\
+            msg = 'Invalid combos of input, filter, pad, and stride.\n'\
                 + '    input shape : %s\n' % str(self.input_shape)\
-                + '    filter size : %s\n' % str(self.filter_shape)\
-                + '    pad, stride : %s, %s' % (str(self.pad), str(self.strides))
+                + '    filter shape : %s\n' % str(self.filter_shape)\
+                + '    pad, stride : %s, %s'\
+                % (str(self.pad), str(self.strides))
             raise RuntimeError(msg)
 
-        n_rows_out = (n_rows_in + 2*self.pad[0] - n_rows_filter) // self.strides[0] + 1
-        n_cols_out = (n_cols_in + 2*self.pad[1] - n_cols_filter) // self.strides[1] + 1
+        n_rows_out = n_rows_in + 2*self.pad[0] - n_rows_filter
+        n_rows_out = n_rows_out // self.strides[0] + 1
+        n_cols_out = n_cols_in + 2*self.pad[1] - n_cols_filter
+        n_cols_out = n_cols_out // self.strides[1] + 1
 
         self.output_shape = (n_channels_out, n_rows_out, n_cols_out)

@@ -99,7 +99,8 @@ class BackPropagation:
         shuffle_per_epoch : bool
             If true, shuffle training data per each epoch.
         batch_size : int
-            Batch size used in evaluation. Will be needed to avoid memory error.
+            Batch size used in evaluation.
+            Will be needed to avoid memory error.
         """
         self.__initialize_optimizers(layers)
 
@@ -220,7 +221,8 @@ class BackPropagation:
         epoch : int
             Number of epoch.
         batch_size : int
-            Batch size used in evaluation. Will be needed to avoid memory error.
+            Batch size used in evaluation.
+            Will be needed to avoid memory error.
 
         Returns
         -------
@@ -275,4 +277,3 @@ class BackPropagation:
         """
         consistency = np.argmax(y, axis=1) == np.argmax(y_pred, axis=1)
         return consistency.sum().astype(self.dtype) / consistency.shape[0]
-

@@ -131,4 +131,3 @@ class RandomWeightFactory:
             Instance of selected random initialization.
         """
         return cls.__random_weight[random_weight]
-

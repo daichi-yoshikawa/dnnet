@@ -207,7 +207,7 @@ class SMORMS3(Optimizer):
     """
     References
     ----------
-    Rmsprop loses to smorms3 - beware the epsilon! 
+    Rmsprop loses to smorms3 - beware the epsilon!
      http://sifter.org/˜simon/journal/20150420.html
     """
     def __init__(self, dtype=np.float32, **kwargs):
@@ -240,4 +240,3 @@ class SMORMS3(Optimizer):
         dw /= np.sqrt(self.r) + self.ep
         w -= dw
         self.s = 1. + (1. - self.x) * self.s
-

@@ -199,6 +199,7 @@ class Softmax(Activation):
     def grad(self, x):
         return 1.
 
+
 class ActivationFactory:
     """Factory class to get activation's instance.
 

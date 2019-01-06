@@ -236,4 +236,3 @@ def unflatten(m, im_shape):
     batches = m.shape[0]
     chs, rows, cols = im_shape
     return m.reshape(batches, chs, rows, cols)
-

@@ -163,4 +163,3 @@ class OutputLayer(Layer):
     def predict(self, x):
         self.fire = x
         return self.fire
-

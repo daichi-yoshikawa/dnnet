@@ -224,4 +224,3 @@ class LearningCurve:
         if self.__recorded_loss() or self.__recorded_acc():
             return True
         return False
-

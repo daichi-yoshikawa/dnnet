@@ -82,4 +82,3 @@ class AffineLayer(Layer):
 
         if is_multi_channels_image(self.input_shape):
             self.backfire = unflatten(self.backfire, self.input_shape)
-

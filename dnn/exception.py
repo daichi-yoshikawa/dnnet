@@ -1,5 +1,6 @@
 """This module implements DNN Exceptions."""
 
+
 class DNNIOError(IOError):
     """Raised when IO failure occurs."""
     def __init__(self, msg):

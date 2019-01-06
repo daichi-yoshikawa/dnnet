@@ -8,6 +8,7 @@ from dnn.utils.conv_utils import im2col, col2im
 
 class PoolingLayer(Layer):
     def __init__(self, window_shape):
+        self.layer_index = 0
         self.window_shape = window_shape
         self.pad = (0, 0)
         self.strides = (1, 1)
@@ -17,6 +18,13 @@ class PoolingLayer(Layer):
 
     def get_type(self):
         return 'pooling'
+
+    def get_config_str_tail(self):
+        tail = Layer.get_config_str_tail(self) + ', '
+        tail += 'filter: %s, ' % (self.window_shape,)
+        tail += 'pad: %s, ' % (self.pad,)
+        tail += 'strides: %s' % (self.strides,)
+        return tail
 
     def set_parent(self, parent):
         Layer.set_parent(self, parent)

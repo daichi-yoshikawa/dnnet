@@ -40,6 +40,10 @@ class DropoutLayer(Layer):
     def get_type(self):
         return 'dropout'
 
+    def get_config_str_tail(self):
+        tail = 'drop_ratio: %.2f' % self.drop_ratio
+        return tail
+
     def set_parent(self, parent):
         Layer.set_parent(self, parent)
         self.output_shape = self.input_shape

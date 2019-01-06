@@ -66,6 +66,9 @@ class BatchNormLayer(Layer):
     def get_type(self):
         return 'batch_norm'
 
+    def get_config_str_tail(self):
+        return ''
+
     def set_parent(self, parent):
         Layer.set_parent(self, parent)
         self.output_shape = self.input_shape

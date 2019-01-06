@@ -214,15 +214,12 @@ class NeuralNetwork:
         """
         return self.layers[0].predict(x.astype(self.dtype))
 
-    def print_config(self):
-        """Display configuration of layers."""
+    def get_config_str(self):
+        config_str = ''
         for i, layer in enumerate(self.layers):
-            sys.stdout.write((
-                   '%2d-th layer, (input_shape, output_shape) : '
-                   '({input_shape}, {output_shape}), {layer_type}\n'
-                   .format(input_shape=layer.input_shape,
-                           output_shape=layer.output_shape,
-                           layer_type=layer.get_type()) % (i)))
+            config_str += layer.get_config_str() + '\n'
+        config_str = config_str.rstrip('\n')
+        return config_str
 
     def save(self, name, path=None):
         """Save model to storage.

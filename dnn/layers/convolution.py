@@ -12,6 +12,7 @@ class ConvolutionalLayer(Layer):
     def __init__(
             self, filter_shape, pad=(0, 0), strides=(1, 1),
             random_weight=RandomWeight.Type.he):
+        self.layer_index = 0
         self.filter_shape = filter_shape
         self.pad = pad
         self.strides = strides
@@ -23,6 +24,13 @@ class ConvolutionalLayer(Layer):
 
     def get_type(self):
         return 'convolution'
+
+    def get_config_str_tail(self):
+        tail = Layer.get_config_str_tail(self) + ', '
+        tail += 'filter: %s, ' % (self.filter_shape,)
+        tail += 'pad: %s, ' % (self.pad,)
+        tail += 'strides: %s' % (self.strides,)
+        return tail
 
     def set_parent(self, parent):
         Layer.set_parent(self, parent)

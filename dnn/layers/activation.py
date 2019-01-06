@@ -24,10 +24,15 @@ class ActivationLayer(Layer):
         activation : Activation.Type
            Name of activation function to use.
         """
+        self.layer_index = 0
         self.activation = ActivationFactory.get(activation)
 
     def get_type(self):
         return 'activation'
+
+    def get_config_str_tail(self):
+        tail = 'func: %s' % self.activation.get_type()
+        return tail
 
     def set_parent(self, parent):
         Layer.set_parent(self, parent)
@@ -193,7 +198,6 @@ class Softmax(Activation):
 
     def grad(self, x):
         return 1.
-
 
 class ActivationFactory:
     """Factory class to get activation's instance.

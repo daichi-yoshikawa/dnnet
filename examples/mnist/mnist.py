@@ -59,7 +59,8 @@ model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.softmax))
 model.compile()
 
-model.print_config()
+config_str = model.get_config_str()
+print(config_str)
 
 x, y = get_mnist()
 scale_normalization(x)
@@ -105,7 +106,8 @@ ae.add(AffineLayer(output_shape=784, random_weight=RandomWeight.Type.he))
 #ae.add(ActivationLayer(activation=Activation.Type.srrelu))
 ae.compile()
 
-ae.print_config()
+config_str = ae.get_config_str()
+print(config_str)
 
 optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
 

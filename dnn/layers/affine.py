@@ -41,7 +41,8 @@ class AffineLayer(Layer):
 
         w_rows = np.prod(self.input_shape)
         w_cols = np.prod(self.output_shape)
-        self.w = self.random_weight.get(w_rows, w_cols)
+
+        self.w = self.random_weight.get(w_rows, w_cols, parent)
         self.w = np.r_[np.zeros((1, w_cols)), self.w]
         self.w = self.w.astype(self.dtype)
         self.dw = np.zeros_like(self.w, dtype=self.w.dtype)

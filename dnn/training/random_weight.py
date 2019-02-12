@@ -24,7 +24,7 @@ class RandomWeight:
         """
         raise NotImplementedError('RandomWeight.get_type')
 
-    def get(self, rows, cols):
+    def get(self, rows, cols, parent_layer):
         """Returns weight set to random values based on selected method.
 
         Arguments
@@ -33,19 +33,19 @@ class RandomWeight:
             Number of rows of resulting weight.
         cols : int
             Number of cols of resulting weight.
+        parent_layer : Layer or its derived class
+            Instance of parent layer of the layer which is
+            associated with weights.
 
         Returns
         -------
         np.array
             Resulting weight in 2d array.
         """
-        raise NotImplementedError('RandomWeight.get')
+        return self.get_ep(parent_layer) * np.random.randn(rows, cols)
 
-    def get_layer_sizes(self, rows, cols):
-        """Semantically convert rows and cols into different variables."""
-        parent_size = rows
-        size = cols
-        return parent_size, size
+    def get_ep(self, parent_layer):
+        raise NotImplementedError('RandomWeight.get_ep')
 
 
 class DefaultRandomWeight(RandomWeight):
@@ -58,10 +58,10 @@ class DefaultRandomWeight(RandomWeight):
     def get_type(self):
         return 'default'
 
-    def get(self, rows, cols):
-        parent_size, size = self.get_layer_sizes(rows, cols)
-        ep = np.sqrt(6.) / np.sqrt(parent_size + size)
-        return ep * np.random.randn(rows, cols)
+    def get_ep(self, parent_layer):
+        parent_size = np.prod(parent_layer.output_shape)
+        ep = np.sqrt(6) / np.sqrt(parent_size)
+        return ep
 
 
 class Xavier(RandomWeight):
@@ -77,10 +77,10 @@ class Xavier(RandomWeight):
     def get_type(self):
         return 'xavier'
 
-    def get(self, rows, cols):
-        parent_size, _ = self.get_layer_sizes(rows, cols)
+    def get_ep(self, parent_layer):
+        parent_size = np.prod(parent_layer.output_shape)
         ep = 1. / np.sqrt(parent_size)
-        return ep * np.random.randn(rows, cols)
+        return ep
 
 
 class He(RandomWeight):
@@ -97,10 +97,10 @@ class He(RandomWeight):
     def get_type(self):
         return 'he'
 
-    def get(self, rows, cols):
-        parent_size, _ = self.get_layer_sizes(rows, cols)
+    def get_ep(self, parent_layer):
+        parent_size = np.prod(parent_layer.output_shape)
         ep = np.sqrt(2.) / np.sqrt(parent_size)
-        return ep * np.random.randn(rows, cols)
+        return ep
 
 
 class RandomWeightFactory:

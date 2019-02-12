@@ -97,7 +97,7 @@ class ConvolutionalLayer(Layer):
         n_rows = n_channels * n_rows_filter * n_cols_filter
         n_cols = n_filters
 
-        self.w = self.random_weight.get(n_rows, n_cols).astype(self.dtype)
+        self.w = self.random_weight.get(n_rows, n_cols, parent).astype(self.dtype)
         self.w = np.r_[np.zeros((1, n_cols)), self.w]
         self.w = self.w.astype(self.dtype)
         self.dw = np.zeros_like(self.w, dtype=self.dtype)

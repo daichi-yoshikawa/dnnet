@@ -11,8 +11,8 @@ import dnn
 from dnn.neuralnet import NeuralNetwork
 from dnn.utils.nn_utils import scale_normalization
 
-from dnn.training.optimizer import AdaGrad, AdaDelta, Adam, RMSProp
-from dnn.training.random_weight import RandomWeight
+from dnn.training.optimizer import AdaGrad
+from dnn.training.weight_initialization import DefaultInitialization, He
 from dnn.training.loss_function import LossFunction
 
 from dnn.layers.activation import Activation, ActivationLayer
@@ -51,41 +51,43 @@ def get_mnist():
 dtype = np.float32
 
 model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
-model.add(ConvolutionalLayer(
-        filter_shape=(16, 5, 5), pad=(0, 0), strides=(1, 1),
-        random_weight=RandomWeight.Type.he))
+
+model.add(
+    ConvolutionalLayer(
+        filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1),
+        weight_initialization=He()))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
 
-model.add(ConvolutionalLayer(
-        filter_shape=(16, 5, 5), pad=(0, 0), strides=(1, 1),
-        random_weight=RandomWeight.Type.he))
+model.add(
+    ConvolutionalLayer(
+        filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1),
+        weight_initialization=He()))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
-model.add(PoolingLayer(window_shape=(2, 2)))
 model.add(DropoutLayer(drop_ratio=0.25))
 
-"""
-model.add(ConvolutionalLayer(
-        filter_shape=(16, 5, 5), pad=(0, 0), strides=(1, 1),
-        random_weight=RandomWeight.Type.he))
+model.add(
+    ConvolutionalLayer(
+        filter_shape=(64, 3, 3), pad=(0, 0), strides=(1, 1),
+        weight_initialization=He()))
+model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
-model.add(ConvolutionalLayer(
-        filter_shape=(16, 5, 5), pad=(0, 0), strides=(1, 1),
-        random_weight=RandomWeight.Type.he))
-model.add(ActivationLayer(activation=Activation.Type.relu))
-model.add(ConvolutionalLayer(
-        filter_shape=(16, 5, 5), pad=(0, 0), strides=(1, 1),
-        random_weight=RandomWeight.Type.he))
-model.add(ActivationLayer(activation=Activation.Type.relu))
-"""
 
-model.add(AffineLayer(output_shape=256, random_weight=RandomWeight.Type.he))
+model.add(
+    ConvolutionalLayer(
+        filter_shape=(64, 3, 3), pad=(0, 0), strides=(1, 1),
+        weight_initialization=He()))
+model.add(BatchNormLayer())
+model.add(ActivationLayer(activation=Activation.Type.relu))
+
+model.add(AffineLayer(output_shape=256, weight_initialization=He()))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
 model.add(DropoutLayer(drop_ratio=0.5))
 
-model.add(AffineLayer(output_shape=10, random_weight=RandomWeight.Type.he))
+model.add(AffineLayer(output_shape=10, weight_initialization=DefaultInitialization()))
+model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.softmax))
 model.compile()
 
@@ -97,7 +99,7 @@ scale_normalization(x)
 
 x = x.reshape(-1, 1, 28, 28)
 
-optimizer = Adam(learning_rate=1e-3, weight_decay=1e-3, dtype=dtype)
+optimizer = AdaGrad(learning_rate=1e-3, weight_decay=1e-3, dtype=dtype)
 print('Learning Rate :', optimizer.learning_rate)
 
 lc = model.fit(
@@ -107,6 +109,8 @@ lc = model.fit(
         test_data_ratio=0.142857 # Use 60,000 for training and 10,000 for test.
 )
 lc.plot(figsize=(8,10), fontsize=12)
-#model.show_filters(0, shape=(5, 5), layout=(10, 10), figsize=(12, 12))
-
 model.save(path='output', name='mnist_conv_net.dat')
+
+#model.visualize_filters(index=0, n_rows=4, n_cols=8, filter_shape=(3, 3), figsize=(8, 8))
+#model.visualize_filters(index=0, shape=None, figsize=(8, 8))
+#model.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))

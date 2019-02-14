@@ -4,19 +4,18 @@
 import numpy as np
 
 from dnn.layers.layer import Layer
-from dnn.training.random_weight import RandomWeight, RandomWeightFactory
+from dnn.training.weight_initialization import DefaultInitialization
 from dnn.utils.conv_utils import pad_img, im2col, col2im
 
 
 class ConvolutionalLayer(Layer):
     def __init__(
             self, filter_shape, pad=(0, 0), strides=(1, 1),
-            random_weight=RandomWeight.Type.he):
-        self.layer_index = 0
+            weight_initialization=DefaultInitialization()):
         self.filter_shape = filter_shape
         self.pad = pad
         self.strides = strides
-        self.random_weight = RandomWeightFactory().get(random_weight)
+        self.weight_initialization = weight_initialization
         self.x = None
 
     def set_dtype(self, dtype):
@@ -106,7 +105,7 @@ class ConvolutionalLayer(Layer):
         n_rows = n_channels * n_rows_filter * n_cols_filter
         n_cols = n_filters
 
-        self.w = self.random_weight.get(n_rows, n_cols).astype(self.dtype)
+        self.w = self.weight_initialization.get(n_rows, n_cols, self).astype(self.dtype)
         self.w = np.r_[np.zeros((1, n_cols)), self.w]
         self.w = self.w.astype(self.dtype)
         self.dw = np.zeros_like(self.w, dtype=self.dtype)

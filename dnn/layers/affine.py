@@ -4,7 +4,7 @@
 import numpy as np
 
 from dnn.layers.layer import Layer
-from dnn.training.random_weight import RandomWeight, RandomWeightFactory
+from dnn.training.weight_initialization import DefaultInitialization
 from dnn.utils.nn_utils import is_multi_channels_image
 from dnn.utils.nn_utils import flatten, unflatten
 
@@ -24,9 +24,9 @@ class AffineLayer(Layer):
         Extended parent layer's output in 2d array.
         This consists of original parent layer's output and bias term.
     """
-    def __init__(self, output_shape, random_weight=RandomWeight.Type.default):
+    def __init__(self, output_shape, weight_initialization=DefaultInitialization()):
         self.output_shape = output_shape
-        self.random_weight = RandomWeightFactory().get(random_weight)
+        self.weight_initialization = weight_initialization
         self.x = None
         self.multi_channels_image = False
 
@@ -41,7 +41,8 @@ class AffineLayer(Layer):
 
         w_rows = np.prod(self.input_shape)
         w_cols = np.prod(self.output_shape)
-        self.w = self.random_weight.get(w_rows, w_cols)
+
+        self.w = self.weight_initialization.get(w_rows, w_cols, self)
         self.w = np.r_[np.zeros((1, w_cols)), self.w]
         self.w = self.w.astype(self.dtype)
         self.dw = np.zeros_like(self.w, dtype=self.w.dtype)

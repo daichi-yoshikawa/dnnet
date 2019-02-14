@@ -137,6 +137,8 @@ class NeuralNetwork:
             Shuffle training data every epoch.
         test_data_ratio : float, default 0
             Ratio of test data. If 0, all data is used for training.
+        train_data_ratio_for_eval : float, default 1.0
+            Ratio of training data to calculate accuracy w.r.t training data.
 
         Returns
         -------
@@ -158,6 +160,8 @@ class NeuralNetwork:
         shuffle = kwargs.pop('shuffle', True)
         shuffle_per_epoch = kwargs.pop('shuffle_per_epoch', False)
         test_data_ratio = kwargs.pop('test_data_ratio', self.dtype(0.))
+        train_data_ratio_for_eval = kwargs.pop(
+                'train_data_ratio_for_eval', 1.0)
 
         if shuffle:
             x, y = shuffle_data(x, y)
@@ -172,7 +176,7 @@ class NeuralNetwork:
         try:
             lc = back_prop.fit(
                     self.layers, x_train, y_train, x_test, y_test,
-                    shuffle_per_epoch, batch_size)
+                    shuffle_per_epoch, batch_size, train_data_ratio_for_eval)
         except FloatingPointError as e:
             msg = str(e) + '\nOverflow or underflow occurred. '\
                 + 'Retry with smaller learning_rate or '\

@@ -4,6 +4,7 @@
 import sys
 import copy
 import numpy as np
+import random
 from collections import OrderedDict
 
 from dnn.training.loss_function import LossFunctionFactory
@@ -39,13 +40,8 @@ class BackPropagation:
         Data type of variables. Generally float64 or float32.
     """
     def __init__(
-            self,
-            epochs,
-            batch_size,
-            optimizer,
-            loss_function,
-            learning_curve,
-            dtype):
+            self, epochs, batch_size, optimizer, loss_function,
+            learning_curve, dtype):
         """
         Arguments
         ---------
@@ -77,7 +73,7 @@ class BackPropagation:
 
     def fit(
             self, layers, x_train, y_train, x_test, y_test,
-            shuffle_per_epoch, batch_size):
+            shuffle_per_epoch, batch_size, train_data_ratio_for_eval):
         """Train prediction model based on training data.
 
         Arguments
@@ -101,16 +97,24 @@ class BackPropagation:
         batch_size : int
             Batch size used in evaluation.
             Will be needed to avoid memory error.
+        train_data_ratio_for_eval : float
+            Define how much train data is used to calculate accuraccy for
+            training data.
         """
         self.__initialize_optimizers(layers)
 
         for epoch in range(self.epochs):
             if shuffle_per_epoch:
                 x_train, y_train = shuffle_data(x_train, y_train)
-
             self.__train_one_epoch(layers, x_train, y_train)
+
+            train_data_size = x_train.shape[0]
+            train_data_size = int(train_data_size * train_data_ratio_for_eval)
+            indices = random.sample(range(x_train.shape[0]), train_data_size)
+            x_train_ = np.array(x_train[indices])
+            y_train_ = np.array(y_train[indices])
             loss_train, acc_train = self.__evaluate(
-                    layers, x_train, y_train, epoch, batch_size)
+                    layers, x_train_, y_train_, epoch, batch_size)
             loss_test, acc_test = self.__evaluate(
                     layers, x_test, y_test, epoch, batch_size)
             if self.lc is not None:

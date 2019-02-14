@@ -94,7 +94,7 @@ class NeuralNetwork:
         """
         if self.layers.size == 0:
             msg = 'NeuralNetwork has no layer.\n Add layers before compiling.'
-            raise RuntimeError(msg)
+            raise DNNRuntimeError(msg)
 
         parent = self.layers[0]
 
@@ -180,9 +180,9 @@ class NeuralNetwork:
             msg = str(e) + '\nOverflow or underflow occurred. '\
                 + 'Retry with smaller learning_rate or '\
                 + 'larger weight_decay for Optimizer.'
-            raise RuntimeError(msg)
+            raise DNNRuntimeError(msg)
         except Exception as e:
-            raise RuntimeError(e)
+            raise DNNRuntimeError(e)
         finally:
             np.seterr(
                     divide=np_err_config['divide'],
@@ -269,7 +269,7 @@ class NeuralNetwork:
             index-th affine/convolution layer's weight matrix is visualized.
             This index starts from 0, that is,
             the first layer with weight matrix is 0-th.
-            If this value is out of range, raise RuntimeError.
+            If this value is out of range, raise DNNRuntimeError.
         shape : tuple (rows, cols)
             Shape of filter. In the case of multi-channel, filters are
             taken as single channel by taking average over channels.
@@ -294,7 +294,7 @@ class NeuralNetwork:
 
         if tgt_layer_idx is None:
             msg = str(index) + '-th layer with weight matrix doesn\'t exist.'
-            raise RuntimeError(msg)
+            raise DNNRuntimeError(msg)
         if tgt_layer_type == 'convolution':
             self.visualize_filter_of_convolution_layer(
                 self.layers[tgt_layer_idx], n_rows, n_cols, filter_shape, figsize)
@@ -304,7 +304,7 @@ class NeuralNetwork:
         else:
             msg = 'NeuralNetwork.visualize_filters does not support '\
                 + '%s' % tgt_layer_type
-            raise RuntimeError(msg)
+            raise DNNRuntimeError(msg)
         print(tgt_layer_idx, tgt_layer_type)
 
     def visualize_filter_of_convolution_layer(
@@ -315,7 +315,7 @@ class NeuralNetwork:
                 + 'n_filters : %d\n' % n_filters\
                 + 'n_rows : %d\n' % n_rows\
                 + 'n_cols : %d\n' % n_cols
-            raise RuntimeError(msg)
+            raise DNNRuntimeError(msg)
 
         w = layer.w[1:, :n_rows*n_cols]
         img = w.T.reshape(-1, filter_shape[0], filter_shape[1])
@@ -338,7 +338,7 @@ class NeuralNetwork:
             index-th affine/convolution layer's weight matrix is visualized.
             This index starts from 0, that is,
             the first layer with weight matrix is 0-th.
-            If this value is out of range, raise RuntimeError.
+            If this value is out of range, raise DNNRuntimeError.
         shape : tuple (rows, cols)
             Shape of filter. In the case of multi-channel, filters are
             taken as single channel by taking average over channels.
@@ -354,7 +354,7 @@ class NeuralNetwork:
             msg = '(w.shape[0] - 1) != np.prod(shape)\n'\
                 + 'w.shape[0] : %d\n' % w.shape[0]\
                 + 'np.prod(shape) : %d' % np.prod(shape)
-            raise RuntimeError(msg)
+            raise DNNRuntimeError(msg)
 
         #if w.shape[1] < np.prod(layout):
 
@@ -399,7 +399,7 @@ class NeuralNetwork:
 
         if tgt_index is None:
             msg = str(index) + '-th layer with weight matrix doesn\'t exist.'
-            raise RuntimeError(msg)
+            raise DNNRuntimeError(msg)
 
         img = w2im(self.layers[tgt_index].w, shape, layout)
         plt.figure(figsize=figsize)

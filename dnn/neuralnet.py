@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 
 from dnn.utils.nn_utils import shuffle_data, split_data, w2im
 from dnn.utils.nn_utils import is_multi_channels_image, flatten, unflatten
-from dnn.training.random_weight import RandomWeight
 from dnn.training.back_propagation import BackPropagation
 from dnn.layers.layer import Layer, InputLayer, OutputLayer
 
@@ -259,6 +258,116 @@ class NeuralNetwork:
         except IOError as e:
             msg = str(e) + '\nNeuralNetwork.save failed.'
             print(msg)
+
+    def visualize_filters(
+            self, index, n_rows, n_cols, filter_shape, figsize=(8, 8)):
+        """Visualize filters.
+
+        Weight matrix in affine layer or convolution layer
+        can be shown as image.
+        If weight matrix is so big that all filters cannot be displayed,
+        displayed filters are randomly selected.
+
+        Arguments
+        ---------
+        index : int
+            index-th affine/convolution layer's weight matrix is visualized.
+            This index starts from 0, that is,
+            the first layer with weight matrix is 0-th.
+            If this value is out of range, raise RuntimeError.
+        shape : tuple (rows, cols)
+            Shape of filter. In the case of multi-channel, filters are
+            taken as single channel by taking average over channels.
+        filter_shape : tuple (rows, cols)
+
+        layout : tuple (rows, cols)
+            Number of filter to display
+            in direction of rows and cols respectively.
+        """
+        # Get index of layer which is index-th layer with weight matrix.
+        n_layers_w_filter = 0
+        tgt_layer_idx = None
+        tgt_layer_type = None
+
+        for i, layer in enumerate(self.layers, 0):
+            if layer.has_weight():
+                if n_layers_w_filter == index:
+                    tgt_layer_idx = i
+                    tgt_layer_type = layer.get_type()
+                    break
+                n_layers_w_filter += 1
+
+        if tgt_layer_idx is None:
+            msg = str(index) + '-th layer with weight matrix doesn\'t exist.'
+            raise RuntimeError(msg)
+        if tgt_layer_type == 'convolution':
+            self.visualize_filter_of_convolution_layer(
+                self.layers[tgt_layer_idx], n_rows, n_cols, filter_shape, figsize)
+        elif tgt_layer_type == 'affine':
+            self.visualize_filter_of_affine_layer(
+                self.layers[tgt_layer_idx], n_rows, n_cols, filter_shape, figsize)
+        else:
+            msg = 'NeuralNetwork.visualize_filters does not support '\
+                + '%s' % tgt_layer_type
+            raise RuntimeError(msg)
+        print(tgt_layer_idx, tgt_layer_type)
+
+    def visualize_filter_of_convolution_layer(
+            self, layer, n_rows, n_cols, filter_shape, figsize=(8, 8)):
+        n_filters = layer.w.shape[1]
+        if n_filters < n_rows * n_cols:
+            msg = 'n_rows and n_cols is too big.\n'\
+                + 'n_filters : %d\n' % n_filters\
+                + 'n_rows : %d\n' % n_rows\
+                + 'n_cols : %d\n' % n_cols
+            raise RuntimeError(msg)
+
+        w = layer.w[1:, :n_rows*n_cols]
+        img = w.T.reshape(-1, filter_shape[0], filter_shape[1])
+        plt.figure(figsize=figsize)
+        plt.imshow(img)
+        plt.show()
+
+    def visualize_filter_of_affine_layer(
+            self, layer, n_rows, n_cols, filter_shape, figsize=(8, 8)):
+        """Visualize filters.
+
+        Weight matrix in affine layer or convolution layer
+        can be shown as image.
+        If weight matrix is so big that all filters cannot be displayed,
+        displayed filters are randomly selected.
+
+        Arguments
+        ---------
+        index : int
+            index-th affine/convolution layer's weight matrix is visualized.
+            This index starts from 0, that is,
+            the first layer with weight matrix is 0-th.
+            If this value is out of range, raise RuntimeError.
+        shape : tuple (rows, cols)
+            Shape of filter. In the case of multi-channel, filters are
+            taken as single channel by taking average over channels.
+        layout : tuple (rows, cols)
+            Number of filter to display
+            in direction of rows and cols respectively.
+        """
+        w = layer.w
+
+        
+
+        if (w.shape[0] - 1) != np.prod(shape):
+            msg = '(w.shape[0] - 1) != np.prod(shape)\n'\
+                + 'w.shape[0] : %d\n' % w.shape[0]\
+                + 'np.prod(shape) : %d' % np.prod(shape)
+            raise RuntimeError(msg)
+
+        #if w.shape[1] < np.prod(layout):
+
+
+        #img = w2im(self.layers[tgt_index].w, shape, layout)
+        #plt.figure(figsize=figsize)
+        #plt.imshow(img)
+        #plt.show()
 
     def show_filters(self, index, shape, layout, figsize=(8, 8)):
         """Visualize filters.

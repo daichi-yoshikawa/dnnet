@@ -107,7 +107,7 @@ lc = model.fit(
         loss_function=LossFunction.Type.multinomial_cross_entropy,
         learning_curve=True, shuffle=True, shuffle_per_epoch=True,
         test_data_ratio=0.142857, # Use 60,000 for training and 10,000 for test.
-        train_data_ratio_for_eval=0.1
+        train_data_ratio_for_eval=0.01
 )
 lc.plot(figsize=(8,10), fontsize=12)
 model.save(path='output', name='mnist_conv_net.dat')

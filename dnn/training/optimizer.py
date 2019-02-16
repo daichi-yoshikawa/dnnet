@@ -39,7 +39,6 @@ class Optimizer:
         float
             Degree of regularization.
         """
-
         return (1. - learning_rate * weight_decay)
 
 

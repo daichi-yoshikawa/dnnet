@@ -67,7 +67,7 @@ class BackPropagation:
         self.optimizer = optimizer
         self.optimizers = OrderedDict()
         self.loss_function = LossFunctionFactory.get(
-                loss_function=loss_function)
+            loss_function=loss_function)
         self.lc = LearningCurve(dtype=dtype) if learning_curve else None
         self.dtype = dtype
 
@@ -114,9 +114,10 @@ class BackPropagation:
             x_train_ = np.array(x_train[indices])
             y_train_ = np.array(y_train[indices])
             loss_train, acc_train = self.__evaluate(
-                    layers, x_train_, y_train_, epoch, batch_size)
+                layers, x_train_, y_train_, epoch, batch_size)
             loss_test, acc_test = self.__evaluate(
-                    layers, x_test, y_test, epoch, batch_size)
+                layers, x_test, y_test, epoch, batch_size)
+
             if self.lc is not None:
                 self.lc.add(loss_train, loss_test, acc_train, acc_test)
                 self.lc.stdout(epoch)

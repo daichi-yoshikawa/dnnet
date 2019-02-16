@@ -51,8 +51,7 @@ class Layer:
         return config_str
 
     def get_config_str_head(self):
-        head = '%d-th %s'\
-                % (self.layer_index, self.get_type())
+        head = '%d-th %s' % (self.layer_index, self.get_type())
         return head
 
     def get_config_str_tail(self):

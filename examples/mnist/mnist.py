@@ -73,17 +73,11 @@ x = x.reshape(-1, 1, 28, 28)
 optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
 
 lc = model.fit(
-        x=x,
-        y=y,
-        epochs=5,
-        batch_size=100,
-        optimizer=optimizer,
-        loss_function=LossFunction.Type.multinomial_cross_entropy,
-        learning_curve=True,
-        shuffle=True,
-        shuffle_per_epoch=True,
-        test_data_ratio=0.142857 # Use 60,000 for training and 10,000 for test.
-)
+    x=x, y=y, epochs=5, batch_size=100, optimizer=optimizer,
+    loss_function=LossFunction.Type.multinomial_cross_entropy,
+    learning_curve=True, shuffle=True, shuffle_per_epoch=True,
+    test_data_ratio=0.142857, # Use 60,000 for training and 10,000 for test.
+    train_data_ratio_for_eval=0.01)
 lc.plot(figsize=(8,10), fontsize=12)
 model.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
 
@@ -110,17 +104,10 @@ x = x.reshape(-1, 1, 28, 28)
 y = x.reshape(-1, 784)
 
 lc2 = ae.fit(
-        x=x,
-        y=y,
-        epochs=10,
-        batch_size=100,
-        optimizer=optimizer,
-        loss_function=LossFunction.Type.squared_error,
-        learning_curve=True,
-        shuffle=True,
-        shuffle_per_epoch=True,
-        test_data_ratio=0.
-)
+    x=x, y=y, epochs=10, batch_size=100, optimizer=optimizer,
+    loss_function=LossFunction.Type.squared_error,
+    learning_curve=True, shuffle=True, shuffle_per_epoch=True,
+    test_data_ratio=0.)
 
 lc2.plot(figsize=(8, 6), fontsize=12)
 ae.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))

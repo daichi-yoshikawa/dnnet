@@ -21,8 +21,8 @@ class LossFunction:
         Used to avoid log(0) computation.
     """
     Type = Enum(
-            'Type',
-            'multinomial_cross_entropy, binomial_cross_entropy, squared_error'
+        'Type',
+        'multinomial_cross_entropy, binomial_cross_entropy, squared_error'
     )
     ep = 1e-5
 
@@ -73,12 +73,12 @@ class LossFunctionFactory:
     Get loss function's instance through this class.
     """
     __loss_function = {
-            LossFunction.Type.multinomial_cross_entropy:
-            MultinomialCrossEntropy(),
-            LossFunction.Type.binomial_cross_entropy:
-            BinomialCrossEntropy(),
-            LossFunction.Type.squared_error:
-            SquaredError(),
+        LossFunction.Type.multinomial_cross_entropy:
+        MultinomialCrossEntropy(),
+        LossFunction.Type.binomial_cross_entropy:
+        BinomialCrossEntropy(),
+        LossFunction.Type.squared_error:
+        SquaredError(),
     }
 
     @classmethod

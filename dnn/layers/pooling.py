@@ -60,7 +60,7 @@ class PoolingLayer(Layer):
         self.x = self.x.reshape(self.x.shape[0] * n_channels, -1)
         self.fire = np.max(self.x, axis=1)
         self.fire = self.fire.reshape(
-                n_batches, n_rows, n_cols, n_channels).transpose(0, 3, 1, 2)
+            n_batches, n_rows, n_cols, n_channels).transpose(0, 3, 1, 2)
 
     def __backward(self, dy):
         indices = [np.arange(self.x.shape[0], dtype=int),
@@ -68,15 +68,15 @@ class PoolingLayer(Layer):
         grad = np.zeros_like(self.x, dtype=self.x.dtype)
         grad[indices] = 1
         self.backfire = grad * dy.transpose(
-                0, 2, 3, 1).flatten().reshape(-1, 1)
+            0, 2, 3, 1).flatten().reshape(-1, 1)
 
         n_batches, _, _, _ = self.fire.shape
         input_shape = tuple([n_batches] + list(self.input_shape))
         window_shape = tuple([1] + list(self.window_shape))
 
         self.backfire = col2im(
-                self.backfire, input_shape, self.output_shape,
-                window_shape, self.pad, self.strides, aggregate=True)
+            self.backfire, input_shape, self.output_shape,
+            window_shape, self.pad, self.strides, aggregate=True)
 
     def __check_shape(self, shape):
         if not isinstance(shape, tuple):

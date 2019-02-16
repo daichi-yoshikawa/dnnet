@@ -82,8 +82,8 @@ class ConvolutionalLayer(Layer):
         self.backfire = np.dot(dy, self.w[1:, :].T)
 
         self.backfire = col2im(
-                self.backfire, input_shape, self.output_shape,
-                self.filter_shape, self.pad, self.strides, aggregate=True)
+            self.backfire, input_shape, self.output_shape,
+            self.filter_shape, self.pad, self.strides, aggregate=True)
 
         if self.pad[0] > 0:
             self.backfire = self.backfire[:, :, self.pad[0]:-self.pad[0], :]

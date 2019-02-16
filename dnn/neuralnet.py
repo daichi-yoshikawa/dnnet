@@ -168,14 +168,14 @@ class NeuralNetwork:
         x_train, y_train, x_test, y_test = split_data(x, y, test_data_ratio)
 
         back_prop = BackPropagation(
-                epochs, batch_size, optimizer, loss_function,
-                learning_curve, self.dtype)
+            epochs, batch_size, optimizer, loss_function,
+            learning_curve, self.dtype)
 
         np_err_config = np.seterr('raise')
         try:
             lc = back_prop.fit(
-                    self.layers, x_train, y_train, x_test, y_test,
-                    shuffle_per_epoch, batch_size, train_data_ratio_for_eval)
+                self.layers, x_train, y_train, x_test, y_test,
+                shuffle_per_epoch, batch_size, train_data_ratio_for_eval)
         except FloatingPointError as e:
             msg = str(e) + '\nOverflow or underflow occurred. '\
                 + 'Retry with smaller learning_rate or '\
@@ -185,10 +185,10 @@ class NeuralNetwork:
             raise DNNRuntimeError(e)
         finally:
             np.seterr(
-                    divide=np_err_config['divide'],
-                    over=np_err_config['over'],
-                    under=np_err_config['under'],
-                    invalid=np_err_config['invalid']
+                divide=np_err_config['divide'],
+                over=np_err_config['over'],
+                under=np_err_config['under'],
+                invalid=np_err_config['invalid']
             )
 
         end = time.time()
@@ -348,8 +348,6 @@ class NeuralNetwork:
         """
         w = layer.w
 
-        
-
         if (w.shape[0] - 1) != np.prod(shape):
             msg = '(w.shape[0] - 1) != np.prod(shape)\n'\
                 + 'w.shape[0] : %d\n' % w.shape[0]\
@@ -357,8 +355,6 @@ class NeuralNetwork:
             raise DNNRuntimeError(msg)
 
         #if w.shape[1] < np.prod(layout):
-
-
         #img = w2im(self.layers[tgt_index].w, shape, layout)
         #plt.figure(figsize=figsize)
         #plt.imshow(img)

@@ -95,11 +95,9 @@ class LearningCurve:
 
         sys.stdout.write('\n')
 
+################################################################################
     def plot(
-            self,
-            loss_range=None,
-            acc_range=None,
-            figsize=(8, 10),
+            self, loss_range=None, acc_range=None, figsize=(8, 10),
             fontsize=12):
         """Plots curves of losses and accuracies w.r.t training and test data.
 

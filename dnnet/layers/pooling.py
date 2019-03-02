@@ -3,9 +3,9 @@
 
 import numpy as np
 
-from dnn.exception import DNNRuntimeError
-from dnn.layers.layer import Layer
-from dnn.utils.conv_utils import im2col, col2im
+from dnnet.exception import DNNetRuntimeError
+from dnnet.layers.layer import Layer
+from dnnet.utils.conv_utils import im2col, col2im
 
 
 class PoolingLayer(Layer):
@@ -50,7 +50,7 @@ class PoolingLayer(Layer):
         if len(x.shape) != 4:
             msg = 'Pooling layer only supports 4-d array.\n'\
                 + '    input shape : %s' % str(x.shape)
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
 
         n_batches, _, _, _ = x.shape
         n_channels, n_rows, n_cols = self.output_shape
@@ -81,11 +81,11 @@ class PoolingLayer(Layer):
     def __check_shape(self, shape):
         if not isinstance(shape, tuple):
             msg = 'Invalid type of shape : ' + type(shape)
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
         elif len(shape) != 3:
             msg = 'Invalid shape : ' + str(shape)\
                 + '\nShape must be (channels, rows, cols).'
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
 
     def __set_output_shape(self):
         n_channels, n_rows_in, n_cols_in = self.input_shape
@@ -102,7 +102,7 @@ class PoolingLayer(Layer):
                 + '    window size : %s\n' % str(self.window_shape)\
                 + '    pad, stride : %s, %s'\
                 % (str(self.pad), str(self.strides))
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
 
         n_rows_out = n_rows_in + 2*self.pad[0] - n_rows_window
         n_rows_out = n_rows_out // self.strides[0] + 1

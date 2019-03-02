@@ -6,18 +6,18 @@ sys.path.append('../..')
 
 import pickle
 import numpy as np
-import dnn
-from dnn.neuralnet import NeuralNetwork
-from dnn.utils.nn_utils import scale_normalization
+import dnnet
+from dnnet.neuralnet import NeuralNetwork
+from dnnet.utils.nn_utils import scale_normalization
 
-from dnn.training.optimizer import AdaGrad
-from dnn.training.weight_initialization import DefaultInitialization, He
-from dnn.training.loss_function import LossFunction
+from dnnet.training.optimizer import AdaGrad
+from dnnet.training.weight_initialization import DefaultInitialization, He
+from dnnet.training.loss_function import LossFunction
 
-from dnn.layers.affine import AffineLayer
-from dnn.layers.activation import Activation, ActivationLayer
-from dnn.layers.dropout import DropoutLayer
-from dnn.layers.batch_norm import BatchNormLayer
+from dnnet.layers.affine import AffineLayer
+from dnnet.layers.activation import Activation, ActivationLayer
+from dnnet.layers.dropout import DropoutLayer
+from dnnet.layers.batch_norm import BatchNormLayer
 
 from data import get_mnist
 
@@ -62,12 +62,12 @@ model.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
 
 # Auto Encoder
 ae = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
-ae.add(DropoutLayer(drop_ratio=0.2))
+#ae.add(DropoutLayer(drop_ratio=0.2))
 
 ae.add(AffineLayer(output_shape=100, weight_initialization=He()))
-ae.add(BatchNormLayer())
+#ae.add(BatchNormLayer())
 ae.add(ActivationLayer(activation=Activation.Type.srrelu))
-ae.add(DropoutLayer(drop_ratio=0.5))
+#ae.add(DropoutLayer(drop_ratio=0.5))
 
 ae.add(AffineLayer(output_shape=784, weight_initialization=He()))
 #ae.add(BatchNormLayer())

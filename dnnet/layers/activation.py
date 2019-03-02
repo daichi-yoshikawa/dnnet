@@ -4,9 +4,9 @@
 import numpy as np
 from enum import Enum
 
-from dnn.layers.layer import Layer
-from dnn.utils.nn_utils import is_multi_channels_image
-from dnn.utils.nn_utils import flatten, unflatten
+from dnnet.layers.layer import Layer
+from dnnet.utils.nn_utils import is_multi_channels_image
+from dnnet.utils.nn_utils import flatten, unflatten
 
 
 class ActivationLayer(Layer):

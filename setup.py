@@ -6,7 +6,7 @@ install_requires = ['numpy>=1.12.0']
 
 about = {}
 here = path.abspath(path.dirname(__file__))
-with open(path.join(here, 'dnn', '__version__.py'), 'r', encoding='utf-8') as f:
+with open(path.join(here, 'dnnet', '__version__.py'), 'r', encoding='utf-8') as f:
     exec(f.read(), about)
 
 with open('README.md', 'r', encoding='utf-8') as f:

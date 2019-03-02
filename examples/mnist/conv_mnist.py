@@ -7,20 +7,20 @@ sys.path.append('../..')
 import matplotlib.pyplot as plt
 import pickle
 import numpy as np
-import dnn
-from dnn.neuralnet import NeuralNetwork
-from dnn.utils.nn_utils import scale_normalization
+import dnnet
+from dnnet.neuralnet import NeuralNetwork
+from dnnet.utils.nn_utils import scale_normalization
 
-from dnn.training.optimizer import AdaGrad
-from dnn.training.weight_initialization import DefaultInitialization, He
-from dnn.training.loss_function import LossFunction
+from dnnet.training.optimizer import AdaGrad
+from dnnet.training.weight_initialization import DefaultInitialization, He
+from dnnet.training.loss_function import LossFunction
 
-from dnn.layers.activation import Activation, ActivationLayer
-from dnn.layers.affine import AffineLayer
-from dnn.layers.batch_norm import BatchNormLayer
-from dnn.layers.convolution import ConvolutionalLayer
-from dnn.layers.dropout import DropoutLayer
-from dnn.layers.pooling import PoolingLayer
+from dnnet.layers.activation import Activation, ActivationLayer
+from dnnet.layers.affine import AffineLayer
+from dnnet.layers.batch_norm import BatchNormLayer
+from dnnet.layers.convolution import ConvolutionalLayer
+from dnnet.layers.dropout import DropoutLayer
+from dnnet.layers.pooling import PoolingLayer
 
 from data import get_mnist
 

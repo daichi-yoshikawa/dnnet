@@ -7,12 +7,12 @@ import numpy as np
 import random
 from collections import OrderedDict
 
-from dnn.training.loss_function import LossFunctionFactory
-from dnn.training.loss_function import MultinomialCrossEntropy
-from dnn.training.loss_function import BinomialCrossEntropy
-from dnn.training.loss_function import SquaredError
-from dnn.training.learning_curve import LearningCurve
-from dnn.utils.nn_utils import shuffle_data
+from dnnet.training.loss_function import LossFunctionFactory
+from dnnet.training.loss_function import MultinomialCrossEntropy
+from dnnet.training.loss_function import BinomialCrossEntropy
+from dnnet.training.loss_function import SquaredError
+from dnnet.training.learning_curve import LearningCurve
+from dnnet.utils.nn_utils import shuffle_data
 
 
 class BackPropagation:

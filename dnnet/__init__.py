@@ -8,4 +8,4 @@ from .layers import layer, pooling
 from .training import back_propagation, learning_curve, loss_function
 from .training import optimizer, weight_initialization
 from .utils import conv_utils, nn_utils
-from .exception import DNNIOError, DNNRuntimeError
+from .exception import DNNetIOError, DNNetRuntimeError

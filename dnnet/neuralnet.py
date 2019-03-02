@@ -9,11 +9,11 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-from dnn.exception import DNNIOError, DNNRuntimeError
-from dnn.utils.nn_utils import shuffle_data, split_data, w2im
-from dnn.utils.nn_utils import is_multi_channels_image, flatten, unflatten
-from dnn.training.back_propagation import BackPropagation
-from dnn.layers.layer import Layer, InputLayer, OutputLayer
+from dnnet.exception import DNNetIOError, DNNetRuntimeError
+from dnnet.utils.nn_utils import shuffle_data, split_data, w2im
+from dnnet.utils.nn_utils import is_multi_channels_image, flatten, unflatten
+from dnnet.training.back_propagation import BackPropagation
+from dnnet.layers.layer import Layer, InputLayer, OutputLayer
 
 
 class NeuralNetwork:
@@ -57,7 +57,7 @@ class NeuralNetwork:
                 return pickle.load(f)
         except IOError as e:
             msg = str(e) + '\nNeuralNetwork.load failed.'
-            raise DNNIOError(msg)
+            raise DNNetIOError(msg)
 
     def __init__(self, input_shape, dtype=np.float32):
         """
@@ -94,7 +94,7 @@ class NeuralNetwork:
         """
         if self.layers.size == 0:
             msg = 'NeuralNetwork has no layer.\n Add layers before compiling.'
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
 
         parent = self.layers[0]
 
@@ -180,9 +180,9 @@ class NeuralNetwork:
             msg = str(e) + '\nOverflow or underflow occurred. '\
                 + 'Retry with smaller learning_rate or '\
                 + 'larger weight_decay for Optimizer.'
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
         except Exception as e:
-            raise DNNRuntimeError(e)
+            raise DNNetRuntimeError(e)
         finally:
             np.seterr(
                 divide=np_err_config['divide'],
@@ -252,7 +252,7 @@ class NeuralNetwork:
                 pickle.dump(self, f)
         except IOError as e:
             msg = str(e) + '\nNeuralNetwork.save failed.'
-            raise DNNIOError(msg)
+            raise DNNetIOError(msg)
 
     def visualize_filters(
             self, index, n_rows, n_cols, filter_shape, figsize=(8, 8)):
@@ -269,7 +269,7 @@ class NeuralNetwork:
             index-th affine/convolution layer's weight matrix is visualized.
             This index starts from 0, that is,
             the first layer with weight matrix is 0-th.
-            If this value is out of range, raise DNNRuntimeError.
+            If this value is out of range, raise DNNetRuntimeError.
         shape : tuple (rows, cols)
             Shape of filter. In the case of multi-channel, filters are
             taken as single channel by taking average over channels.
@@ -294,7 +294,7 @@ class NeuralNetwork:
 
         if tgt_layer_idx is None:
             msg = str(index) + '-th layer with weight matrix doesn\'t exist.'
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
         if tgt_layer_type == 'convolution':
             self.visualize_filter_of_convolution_layer(
                 self.layers[tgt_layer_idx], n_rows, n_cols, filter_shape, figsize)
@@ -304,7 +304,7 @@ class NeuralNetwork:
         else:
             msg = 'NeuralNetwork.visualize_filters does not support '\
                 + '%s' % tgt_layer_type
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
         print(tgt_layer_idx, tgt_layer_type)
 
     def visualize_filter_of_convolution_layer(
@@ -315,7 +315,7 @@ class NeuralNetwork:
                 + 'n_filters : %d\n' % n_filters\
                 + 'n_rows : %d\n' % n_rows\
                 + 'n_cols : %d\n' % n_cols
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
 
         w = layer.w[1:, :n_rows*n_cols]
         img = w.T.reshape(-1, filter_shape[0], filter_shape[1])
@@ -338,7 +338,7 @@ class NeuralNetwork:
             index-th affine/convolution layer's weight matrix is visualized.
             This index starts from 0, that is,
             the first layer with weight matrix is 0-th.
-            If this value is out of range, raise DNNRuntimeError.
+            If this value is out of range, raise DNNetRuntimeError.
         shape : tuple (rows, cols)
             Shape of filter. In the case of multi-channel, filters are
             taken as single channel by taking average over channels.
@@ -352,7 +352,7 @@ class NeuralNetwork:
             msg = '(w.shape[0] - 1) != np.prod(shape)\n'\
                 + 'w.shape[0] : %d\n' % w.shape[0]\
                 + 'np.prod(shape) : %d' % np.prod(shape)
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
 
         #if w.shape[1] < np.prod(layout):
         #img = w2im(self.layers[tgt_index].w, shape, layout)
@@ -395,7 +395,7 @@ class NeuralNetwork:
 
         if tgt_index is None:
             msg = str(index) + '-th layer with weight matrix doesn\'t exist.'
-            raise DNNRuntimeError(msg)
+            raise DNNetRuntimeError(msg)
 
         img = w2im(self.layers[tgt_index].w, shape, layout)
         plt.figure(figsize=figsize)

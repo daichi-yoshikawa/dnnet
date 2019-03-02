@@ -3,10 +3,10 @@
 
 import numpy as np
 
-from dnn.layers.layer import Layer
-from dnn.training.weight_initialization import DefaultInitialization
-from dnn.utils.nn_utils import is_multi_channels_image
-from dnn.utils.nn_utils import flatten, unflatten
+from dnnet.layers.layer import Layer
+from dnnet.training.weight_initialization import DefaultInitialization
+from dnnet.utils.nn_utils import is_multi_channels_image
+from dnnet.utils.nn_utils import flatten, unflatten
 
 
 class AffineLayer(Layer):

@@ -97,7 +97,12 @@ cd ~/.matplotlib
 echo "backend: TkAgg" >> matplotlibrc
 ```
 
-# Use in your scripts.
+# Use in your scripts (If you pip installed dnnet)
+```
+from dnnet.neuralnet import NeuralNetwork
+```
+
+# Use in your scripts (If you git cloned dnnet)
 ```
 import sys
 sys.path.append('<path-to-dnnet-root-dir>')

@@ -1,5 +1,5 @@
-dnn
-===
+dnnet
+=====
 Implementation of Deep Neural Network with numpy.
 Less dependencies, easier to use.
 
@@ -84,7 +84,7 @@ pip install matplotlib
 ## MNIST
 * Run neural network for mnist.
 ```
-cd <path-to-dnn>/examples/mnist
+cd <path-to-dnnet>/examples/mnist
 python mnist.py
 ```
 
@@ -100,17 +100,17 @@ echo "backend: TkAgg" >> matplotlibrc
 # Use in your scripts.
 ```
 import sys
-sys.path.append('<path-to-dnn-root-dir>')
+sys.path.append('<path-to-dnnet-root-dir>')
 
-from dnn.neuralnet import NeuralNetwork
+from dnnet.neuralnet import NeuralNetwork
 ```
 
-For example, if dnn directory is in ~/Work/dnn,
+For example, if dnnet directory is in ~/Work/dnnet,
 do like below.
 ```
 import os
 import sys
-sys.path.append(os.path.join(os.getenv('HOME'), 'Work/dnn'))
+sys.path.append(os.path.join(os.getenv('HOME'), 'Work/dnnet'))
 
-from dnn.neuralnet import NeuralNetwork
+from dnnet.neuralnet import NeuralNetwork
 ```

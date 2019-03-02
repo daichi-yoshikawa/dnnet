@@ -69,8 +69,8 @@ Here, it's assumed that you named the environment as "py352_env".
 ```
 
 ## Install requisites
-* python-3.5+ (Already installed)
-* numpy
+* python 3.4 or later
+* numpy 1.12.0 or later
 * matplotlib
 
 Go to your virtual environment like /home/<user-name>/Work/py352_ws,

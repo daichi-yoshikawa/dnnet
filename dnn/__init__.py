@@ -1,6 +1,11 @@
-__copyright__ = 'Copyright (C) 2017 Daichi Yoshikawa'
-__version__ = '0.1.0'
-__license__ = 'BSD-3-Clause'
-__author__ = 'Daichi Yoshikawa'
-__author_email__ = 'daichi.yoshikawa@gmail.com'
-__url__ = 'https://github.com/daichi-yoshikawa/dnn'
+from .__version__ import __title__, __description__, __url__, __version__
+from .__version__ import __author__, __author_email__, __license__
+from .__version__ import __copyright__
+
+from .neuralnet import NeuralNetwork
+from .layers import activation, affine, batch_norm, convolution, dropout
+from .layers import layer, pooling
+from .training import back_propagation, learning_curve, loss_function
+from .training import optimizer, weight_initialization
+from .utils import conv_utils, nn_utils
+from .exception import DNNIOError, DNNRuntimeError

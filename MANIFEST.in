@@ -1,0 +1,4 @@
+include LICENSE README.md
+recursive-include examples *.py
+recursive-exclude data *.npy
+global-exclude __pycache__

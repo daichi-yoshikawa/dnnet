@@ -1,0 +1,8 @@
+__title__ = 'dnn'
+__description__ = 'Deep Neural Network.'
+__url__ = 'https://github.com/daichi-yoshikawa/dnn'
+__version__ = '0.9.0'
+__author__ = 'Daichi Yoshikawa'
+__author_email__ = 'daichi.yoshikawa@gmail.com'
+__license__ = 'BSD-3-Clause'
+__copyright__ = 'Copyright (C) 2017 Daichi Yoshikawa'

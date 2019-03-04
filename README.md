@@ -17,7 +17,7 @@ finalize model, set optimizer, execute model fitting, and save model.
 
 In the below, some arguments are not specified to simplify the example.
 ```
-model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
+model = NeuralNetwork(input_shape=(1, 28, 28), dtype=np.float32)
 
 model.add(ConvolutionLayer(filter_shape=(32, 3, 3))
 model.add(BatchNormLayer())

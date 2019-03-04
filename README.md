@@ -10,7 +10,7 @@ Less dependencies, easier to use.
 * Use in your project
 
 # Brief tour of dnnet
-## Small example of usage
+## Quick glance of usage
 
 User can creates instance of NeuralNetwork, add layer one by one,<br>
 finalize model, set optimizer, execute model fitting, and save model.

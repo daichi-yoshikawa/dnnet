@@ -9,7 +9,7 @@ from dnnet.training.weight_initialization import DefaultInitialization
 from dnnet.utils.conv_utils import pad_img, im2col, col2im
 
 
-class ConvolutionalLayer(Layer):
+class ConvolutionLayer(Layer):
     def __init__(
             self, filter_shape, pad=(0, 0), strides=(1, 1),
             weight_initialization=DefaultInitialization()):

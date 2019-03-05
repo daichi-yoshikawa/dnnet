@@ -18,7 +18,7 @@ from dnnet.training.loss_function import LossFunction
 from dnnet.layers.activation import Activation, ActivationLayer
 from dnnet.layers.affine import AffineLayer
 from dnnet.layers.batch_norm import BatchNormLayer
-from dnnet.layers.convolution import ConvolutionalLayer
+from dnnet.layers.convolution import ConvolutionLayer
 from dnnet.layers.dropout import DropoutLayer
 from dnnet.layers.pooling import PoolingLayer
 
@@ -29,14 +29,14 @@ dtype = np.float32
 model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
 
 model.add(
-    ConvolutionalLayer(
+    ConvolutionLayer(
         filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1),
         weight_initialization=He()))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
 
 model.add(
-    ConvolutionalLayer(
+    ConvolutionLayer(
         filter_shape=(32, 3, 3), pad=(0, 0), strides=(1, 1),
         weight_initialization=He()))
 model.add(BatchNormLayer())
@@ -44,14 +44,14 @@ model.add(ActivationLayer(activation=Activation.Type.relu))
 model.add(DropoutLayer(drop_ratio=0.25))
 
 model.add(
-    ConvolutionalLayer(
+    ConvolutionLayer(
         filter_shape=(64, 3, 3), pad=(0, 0), strides=(1, 1),
         weight_initialization=He()))
 model.add(BatchNormLayer())
 model.add(ActivationLayer(activation=Activation.Type.relu))
 
 model.add(
-    ConvolutionalLayer(
+    ConvolutionLayer(
         filter_shape=(64, 3, 3), pad=(0, 0), strides=(1, 1),
         weight_initialization=He()))
 model.add(BatchNormLayer())

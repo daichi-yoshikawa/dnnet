@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
+from dnnet.utils.nn_utils import prod
+
 
 def pad_img(img, pad_rows, pad_cols):
     """Returns padded matrix which represents image.
@@ -37,7 +39,7 @@ def pad_img(img, pad_rows, pad_cols):
         msg = '1d array is not supported.'
         raise RuntimeError(msg)
 
-    if np.prod((pad_rows, pad_cols)) == 0:
+    if prod((pad_rows, pad_cols)) == 0:
         return img
 
     npad = ()
@@ -118,8 +120,8 @@ def col2im(
     n_batches, n_channels, n_rows, n_cols = input_shape
     _, n_rows_filter, n_cols_filter = filter_shape
     _, n_rows_out, n_cols_out = output_shape
-    n_rows_img = n_rows + 2*np.prod(pad[0]) + strides[0] - 1
-    n_cols_img = n_cols + 2*np.prod(pad[1]) + strides[1] - 1
+    n_rows_img = n_rows + 2*prod(pad[0]) + strides[0] - 1
+    n_cols_img = n_cols + 2*prod(pad[1]) + strides[1] - 1
 
     y_strd = strides[0]
     x_strd = strides[1]

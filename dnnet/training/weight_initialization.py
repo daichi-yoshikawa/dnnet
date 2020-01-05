@@ -4,6 +4,8 @@
 import numpy as np
 from enum import Enum
 
+from dnnet.utils.nn_utils import prod
+
 
 class WeightInitialization:
     """Base class for random initialization of weight.
@@ -60,7 +62,7 @@ class DefaultInitialization(WeightInitialization):
         return 'default'
 
     def get_var(self, layer):
-        inout_size = np.prod(layer.input_shape) + np.prod(layer.output_shape)
+        inout_size = prod(layer.input_shape) + prod(layer.output_shape)
         var = np.sqrt(6) / np.sqrt(inout_size)
         return var
 
@@ -79,7 +81,7 @@ class Xavier(WeightInitialization):
         return 'xavier'
 
     def get_var(self, layer):
-        in_size = np.prod(layer.input_shape)
+        in_size = prod(layer.input_shape)
         var = 1. / np.sqrt(in_size)
         return var
 
@@ -99,6 +101,6 @@ class He(WeightInitialization):
         return 'he'
 
     def get_var(self, layer):
-        in_size = np.prod(layer.input_shape)
+        in_size = prod(layer.input_shape)
         var = np.sqrt(2.) / np.sqrt(in_size)
         return var

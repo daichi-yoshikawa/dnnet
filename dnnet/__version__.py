@@ -1,7 +1,7 @@
 __title__ = 'dnnet'
 __description__ = 'Deep Neural Network.'
 __url__ = 'https://github.com/daichi-yoshikawa/dnnet'
-__version__ = '0.9.1'
+__version__ = '0.9.2'
 __author__ = 'Daichi Yoshikawa'
 __author_email__ = 'daichi.yoshikawa@gmail.com'
 __license__ = 'BSD-3-Clause'

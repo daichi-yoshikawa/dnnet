@@ -1,7 +1,18 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
+import operator
+from collections.abc import Iterable
+from functools import reduce
+
 import numpy as np
+
+
+def prod(x):
+    if isinstance(x, Iterable):
+        return reduce(operator.mul, x, 1)
+    else:
+        return x
 
 
 def shuffle_data(x, y):
@@ -135,21 +146,21 @@ def w2im(w, shape, layout):
     np.array
         Well-aligned weight matrix in 2d array.
     """
-    if (w.shape[0] - 1) != np.prod(shape):
-        msg = ('(w.shape[0] - 1) != np.prod(shape)\n'
+    if (w.shape[0] - 1) != prod(shape):
+        msg = ('(w.shape[0] - 1) != prod(shape)\n'
                '  w.shape[0] : {}\n'
                '  shape.size : {}'
-               .format(w.shape[0], np.prod(shape)))
+               .format(w.shape[0], prod(shape)))
         raise RuntimeError(msg)
 
-    if w.shape[1] < np.prod(layout):
-        msg = ('w.shape[1] != np.prod(shape)\n'
+    if w.shape[1] < prod(layout):
+        msg = ('w.shape[1] != prod(shape)\n'
                '  w.shape[1] : {}\n'
                '  shape.size : {}'
-               .format(w.shape[1], np.prod(layout)))
+               .format(w.shape[1], prod(layout)))
         raise RuntimeError(msg)
 
-    img = w[1:, :np.prod(layout)].T
+    img = w[1:, :prod(layout)].T
     img = img.reshape(layout[0], layout[1], shape[0], shape[1])
 
     rows, cols = layout[0]*shape[0], layout[1]*shape[1]

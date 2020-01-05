@@ -6,7 +6,7 @@ import numpy as np
 from dnnet.layers.layer import Layer
 from dnnet.training.weight_initialization import DefaultInitialization
 from dnnet.utils.nn_utils import is_multi_channels_image
-from dnnet.utils.nn_utils import flatten, unflatten
+from dnnet.utils.nn_utils import prod, flatten, unflatten
 
 
 class AffineLayer(Layer):
@@ -39,8 +39,8 @@ class AffineLayer(Layer):
     def set_parent(self, parent):
         Layer.set_parent(self, parent)
 
-        w_rows = np.prod(self.input_shape)
-        w_cols = np.prod(self.output_shape)
+        w_rows = prod(self.input_shape)
+        w_cols = prod(self.output_shape)
 
         self.w = self.weight_initialization.get(w_rows, w_cols, self)
         self.w = np.r_[np.zeros((1, w_cols)), self.w]

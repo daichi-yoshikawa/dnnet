@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from dnnet.exception import DNNetIOError, DNNetRuntimeError
-from dnnet.utils.nn_utils import shuffle_data, split_data, w2im
+from dnnet.utils.nn_utils import prod, shuffle_data, split_data, w2im
 from dnnet.utils.nn_utils import is_multi_channels_image, flatten, unflatten
 from dnnet.training.back_propagation import BackPropagation
 from dnnet.layers.layer import Layer, InputLayer, OutputLayer
@@ -348,13 +348,13 @@ class NeuralNetwork:
         """
         w = layer.w
 
-        if (w.shape[0] - 1) != np.prod(shape):
-            msg = '(w.shape[0] - 1) != np.prod(shape)\n'\
+        if (w.shape[0] - 1) != prod(shape):
+            msg = '(w.shape[0] - 1) != prod(shape)\n'\
                 + 'w.shape[0] : %d\n' % w.shape[0]\
-                + 'np.prod(shape) : %d' % np.prod(shape)
+                + 'prod(shape) : %d' % prod(shape)
             raise DNNetRuntimeError(msg)
 
-        #if w.shape[1] < np.prod(layout):
+        #if w.shape[1] < prod(layout):
         #img = w2im(self.layers[tgt_index].w, shape, layout)
         #plt.figure(figsize=figsize)
         #plt.imshow(img)

@@ -4,7 +4,7 @@
 import numpy as np
 from dnnet.layers.layer import Layer
 from dnnet.utils.nn_utils import is_multi_channels_image
-from dnnet.utils.nn_utils import flatten, unflatten
+from dnnet.utils.nn_utils import prod, flatten, unflatten
 
 
 class DropoutLayer(Layer):
@@ -48,7 +48,7 @@ class DropoutLayer(Layer):
         Layer.set_parent(self, parent)
         self.output_shape = self.input_shape
 
-        input_size = np.prod(self.input_shape)
+        input_size = prod(self.input_shape)
         self.mask = np.arange(input_size).reshape(self.input_shape)
 
     def forward(self, x):

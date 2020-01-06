@@ -4,6 +4,7 @@
 from enum import Enum
 
 from dnnet.ext_mathlibs import cp, np
+from dnnet.utils.nn_utils import asnumpy
 
 
 class Optimizer:
@@ -52,8 +53,13 @@ class SGD(Optimizer):
         return 'sgd'
 
     def optimize(self, w, dw):
-        w[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
-        w -= self.learning_rate * dw
+        w_ = cp.array(w)
+        dw_ = cp.array(dw)
+
+        w_[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        w_ -= self.learning_rate * dw_
+
+        w[::] = asnumpy(w_)
 
 
 class Momentum(Optimizer):
@@ -68,13 +74,18 @@ class Momentum(Optimizer):
         return 'momentum'
 
     def optimize(self, w, dw):
-        w[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        w_ = cp.array(w)
+        dw_ = cp.array(dw)
 
-        if self.pre_dw is None:
-            self.pre_dw = np.zeros_like(dw)
+        w_[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
 
-        self.pre_dw = self.learning_rate*dw + self.momentum_rate*self.pre_dw
-        w -= self.pre_dw
+        pre_dw = cp.zeros_like(dw_) if self.pre_dw is None else cp.array(self.pre_dw)
+        pre_dw = self.learning_rate*dw_ + self.momentum_rate*pre_dw
+
+        w_ -= pre_dw
+
+        w[::] = asnumpy(w_)
+        self.pre_dw = asnumpy(pre_dw)
 
 
 class AdaGrad(Optimizer):
@@ -96,18 +107,25 @@ class AdaGrad(Optimizer):
         return 'ada_grad'
 
     def optimize(self, w, dw):
-        w[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        w_ = cp.array(w)
+        dw_ = cp.array(dw)
 
-        if self.h is None:
-            self.h = np.zeros_like(w)
+        w_[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        h = cp.zeros_like(w_) if self.h is None else cp.array(self.h)
 
-        self.h += np.power(dw, 2)
-        dw *= self.dtype(1.) / np.sqrt(self.h + self.ep)
-        w -= self.learning_rate * dw
+        h += cp.power(dw_, 2)
+        w_ -= self.learning_rate * (self.dtype(1.) / cp.sqrt(h + self.ep)) * dw_
+
+        w[::] = asnumpy(w_)
+        self.h = h
 
 
 class Adam(Optimizer):
     """
+    Warnings
+    --------
+    If Overflow exception is raised, try increasing beta.
+
     References
     ----------
     Adam: A Method for Stochastic Optimization
@@ -127,20 +145,22 @@ class Adam(Optimizer):
         return 'adam'
 
     def optimize(self, w, dw):
-        w[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        w_ = cp.array(w)
+        dw_ = cp.array(dw)
 
-        if self.v is None:
-            self.v = np.zeros_like(w)
+        w_[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        v = cp.zeros_like(w_) if self.v is None else cp.array(self.v)
+        r = cp.zeros_like(w_) if self.r is None else cp.array(self.r)
 
-        if self.r is None:
-            self.r = np.zeros_like(w)
+        dw_square = cp.power(dw_, 2)
+        v = self.beta * (v - dw_) + dw_
+        r = self.gamma * (r - dw_square) + dw_square
 
-        dw_square = np.power(dw, 2)
-        self.v = self.beta * (self.v - dw) + dw
-        self.r = self.gamma * (self.r - dw_square) + dw_square
+        w_ -= self.learning_rate / cp.sqrt(r + self.ep) * v
 
-        dw = self.learning_rate / np.sqrt(self.r + self.ep) * self.v
-        w -= dw
+        w[::] = asnumpy(w_)
+        self.v = asnumpy(v)
+        self.r = asnumpy(r)
 
 
 class AdaDelta(Optimizer):
@@ -160,19 +180,25 @@ class AdaDelta(Optimizer):
         self.v = None
 
     def optimize(self, w, dw):
-        w[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        w_ = cp.array(w)
+        dw_ = cp.array(dw)
 
-        if self.r is None:
-            self.r = np.zeros_like(w)
-        if self.s is None:
-            self.s = np.zeros_like(w)
-        if self.v is None:
-            self.v = np.zeros_like(w)
+        w_[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
 
-        self.r = self.gamma * self.r + (1. - self.gamma) * np.power(dw, 2)
-        self.v = np.sqrt(self.s + self.ep) / (np.sqrt(self.r + self.ep)) * dw
-        w -= self.learning_rate * self.v
-        self.s = self.gamma + (1. - self.gamma) * np.power(self.v, 2)
+        r = cp.zeros_like(w_) if self.r is None else cp.array(self.r)
+        s = cp.zeros_like(w_) if self.s is None else cp.array(self.s)
+        v = cp.zeros_like(w_) if self.v is None else cp.array(self.v)
+
+        r = self.gamma * r + (1. - self.gamma) * cp.power(dw_, 2)
+        v = cp.sqrt(s + self.ep) / (cp.sqrt(r + self.ep)) * dw_
+
+        w_ -= self.learning_rate * v
+        s = self.gamma + (1. - self.gamma) * cp.power(v, 2)
+
+        w[::] = asnumpy(w_)
+        self.r = asnumpy(r)
+        self.s = asnumpy(s)
+        self.v = asnumpy(v)
 
 
 class RMSProp(Optimizer):
@@ -188,19 +214,21 @@ class RMSProp(Optimizer):
         self.dtype = dtype
         self.learning_rate = kwargs.pop('learning_rate', 1e-3)
         self.weight_decay = kwargs.pop('weight_decay', 0.)
-        self.gamma = kwargs.pop('gamma', 0.9)
+        self.gamma = kwargs.pop('gamma', 0.99)
         self.ep = kwargs.pop('ep', 1e-5)
         self.h = None
 
     def optimize(self, w, dw):
-        w[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        w_ = cp.array(w)
+        dw_ = cp.array(dw)
 
-        if self.h is None:
-            self.h = np.zeros_like(w)
+        w_[1:, :] *= self.regularization(self.learning_rate, self.weight_decay)
+        h = cp.zeros_like(w_) if self.h is None else cp.array(self.h)
+        h = self.gamma * h + (1. - self.gamma) * cp.power(dw_, 2)
+        w_ -= self.learning_rate * dw_ / (cp.sqrt(h) + self.ep)
 
-        self.h = self.gamma * self.h + (1. - self.gamma) * np.power(dw, 2)
-        dw *= 1. / (np.sqrt(self.h) + self.ep)
-        w -= self.learning_rate * dw
+        w[::] = asnumpy(w_)
+        self.h = asnumpy(h)
 
 
 class SMORMS3(Optimizer):

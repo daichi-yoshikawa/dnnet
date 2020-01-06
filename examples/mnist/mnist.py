@@ -14,7 +14,7 @@ Config.enable_gpu()
 from dnnet.neuralnet import NeuralNetwork
 from dnnet.utils.nn_utils import scale_normalization
 
-from dnnet.training.optimizer import AdaGrad
+from dnnet.training.optimizer import SGD, Momentum, AdaGrad, Adam, AdaDelta, RMSProp, SMORMS3
 from dnnet.training.weight_initialization import DefaultInitialization, He
 from dnnet.training.loss_function import MultinomialCrossEntropy
 from dnnet.training.loss_function import SquaredError
@@ -54,7 +54,12 @@ x, y = get_mnist(data_dir)
 scale_normalization(x)
 x = x.reshape(-1, 1, 28, 28)
 
-optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
+optimizer = SGD(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
+optimizer = Momentum(learning_rate=3e-2, weight_decay=1e-3, momentum_rate=0.99, dtype=dtype)
+#optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
+#optimizer = Adam(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
+#optimizer = AdaDelta(learning_rate=3e-2, weight_decay=1e-3, gamma=0.99, dtype=dtype)
+#optimizer = RMSProp(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
 
 lc = model.fit(
     x=x, y=y, epochs=5, batch_size=100, optimizer=optimizer,

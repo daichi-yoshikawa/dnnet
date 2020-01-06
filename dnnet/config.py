@@ -22,6 +22,8 @@ class Config:
     @classmethod
     def reload_all_modules(cls):
         tgt_modules = [m for m in sys.modules if m.startswith(__title__)]
+        tgt_modules.pop(tgt_modules.index(__name__))
+
         for module in tgt_modules:
             importlib.reload(sys.modules[module])
 

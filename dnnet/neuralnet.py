@@ -119,8 +119,8 @@ class NeuralNetwork:
             whose shape is (num of data, num of feature)
         optimizer : Derived class of Optimizer
             Instance of derived class of Optimizer.
-        loss_function : LossFunction.Type
-            Type of loss function to use.
+        loss_function : Derived class of LossFunction
+            Used to calculate loss.
         epochs : int, default 10
             Number of iterations of training.
             1 iteration scans all batches one time.

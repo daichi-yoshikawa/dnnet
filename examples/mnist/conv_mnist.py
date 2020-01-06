@@ -13,7 +13,7 @@ from dnnet.utils.nn_utils import scale_normalization
 
 from dnnet.training.optimizer import AdaGrad
 from dnnet.training.weight_initialization import DefaultInitialization, He
-from dnnet.training.loss_function import LossFunction
+from dnnet.training.loss_function import MultinomialCrossEntropy
 
 from dnnet.layers.activation import Activation, ActivationLayer
 from dnnet.layers.affine import AffineLayer
@@ -80,7 +80,7 @@ print('Learning Rate :', optimizer.learning_rate)
 
 lc = model.fit(
     x=x, y=y, epochs=5, batch_size=100, optimizer=optimizer,
-    loss_function=LossFunction.Type.multinomial_cross_entropy,
+    loss_function=MultinomialCrossEntropy(),
     learning_curve=True, shuffle=True, shuffle_per_epoch=True,
     test_data_ratio=0.142857, # Use 60,000 for training and 10,000 for test.
     train_data_ratio_for_eval=0.01)

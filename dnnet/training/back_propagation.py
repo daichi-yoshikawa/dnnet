@@ -7,9 +7,6 @@ import random
 from collections import OrderedDict
 
 from dnnet.ext_mathlibs import cp, np
-from dnnet.training.loss_function import LossFunctionFactory
-from dnnet.training.loss_function import MultinomialCrossEntropy
-from dnnet.training.loss_function import BinomialCrossEntropy
 from dnnet.training.loss_function import SquaredError
 from dnnet.training.learning_curve import LearningCurve
 from dnnet.utils.nn_utils import shuffle_data
@@ -52,8 +49,8 @@ class BackPropagation:
             at the same time for one update of weight .
         optimizer : Derived class of Optimizer
             Instance of derived class of Optimizer.
-        loss_function : LossFunction.Type
-            Type of loss function.
+        loss_function : Derived class of LossFunction
+            Used to calculate loss.
             Generally, cross entropy is used for classification and
             squared error is used for regression.
         learning_curve : bool
@@ -66,8 +63,7 @@ class BackPropagation:
         self.batch_size = batch_size
         self.optimizer = optimizer
         self.optimizers = OrderedDict()
-        self.loss_function = LossFunctionFactory.get(
-            loss_function=loss_function)
+        self.loss_function = loss_function
         self.lc = LearningCurve(dtype=dtype) if learning_curve else None
         self.dtype = dtype
 

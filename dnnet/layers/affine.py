@@ -42,9 +42,9 @@ class AffineLayer(Layer):
         w_cols = prod(self.output_shape)
 
         self.w = self.weight_initialization.get(w_rows, w_cols, self)
-        self.w = cp.r_[cp.zeros((1, w_cols)), self.w]
+        self.w = np.r_[np.zeros((1, w_cols)), self.w]
         self.w = self.w.astype(self.dtype)
-        self.dw = cp.zeros_like(self.w, dtype=self.w.dtype)
+        self.dw = np.zeros_like(self.w, dtype=self.w.dtype)
 
     def has_weight(self):
         return True
@@ -73,7 +73,7 @@ class AffineLayer(Layer):
 
         # Add bias terms.
         self.x = cp.c_[cp.ones((x.shape[0], 1), dtype=self.dtype), x]
-        self.fire = cp.dot(self.x, self.w)
+        self.fire = cp.dot(self.x, cp.array(self.w))
 
         if is_multi_channels_image(self.output_shape):
             self.fire = unflatten(self.fire, self.output_shape)
@@ -84,7 +84,7 @@ class AffineLayer(Layer):
 
         batch_size = self.x.shape[0]
         self.dw = asnumpy(self.dtype(1.) / batch_size * cp.dot(self.x.T, dy))
-        self.backfire = cp.dot(dy, self.w[1:, :].T)
+        self.backfire = cp.dot(dy, cp.array(self.w[1:, :]).T)
 
         if is_multi_channels_image(self.input_shape):
             self.backfire = unflatten(self.backfire, self.input_shape)

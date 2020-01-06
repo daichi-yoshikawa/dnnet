@@ -1,3 +1,5 @@
+# Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
+# License: BSD 3 clause
 """This module implements DNN Exceptions."""
 
 

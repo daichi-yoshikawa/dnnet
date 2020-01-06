@@ -1,7 +1,7 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-import numpy as np
+from dnnet.ext_mathlibs import cp, np
 
 
 class Layer:

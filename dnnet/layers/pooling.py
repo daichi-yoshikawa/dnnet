@@ -1,9 +1,8 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-import numpy as np
-
 from dnnet.exception import DNNetRuntimeError
+from dnnet.ext_mathlibs import cp, np
 from dnnet.layers.layer import Layer
 from dnnet.utils.conv_utils import im2col, col2im
 

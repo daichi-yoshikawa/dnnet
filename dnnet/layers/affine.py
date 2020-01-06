@@ -1,12 +1,13 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-import numpy as np
-
 from dnnet.layers.layer import Layer
+from dnnet.ext_mathlibs import cp, np
 from dnnet.training.weight_initialization import DefaultInitialization
 from dnnet.utils.nn_utils import is_multi_channels_image
-from dnnet.utils.nn_utils import prod, flatten, unflatten
+from dnnet.utils.nn_utils import prod, ascupy, asnumpy, flatten, unflatten
+
+print(cp)
 
 
 class AffineLayer(Layer):
@@ -43,32 +44,38 @@ class AffineLayer(Layer):
         w_cols = prod(self.output_shape)
 
         self.w = self.weight_initialization.get(w_rows, w_cols, self)
-        self.w = np.r_[np.zeros((1, w_cols)), self.w]
+        self.w = cp.r_[cp.zeros((1, w_cols)), self.w]
         self.w = self.w.astype(self.dtype)
-        self.dw = np.zeros_like(self.w, dtype=self.w.dtype)
+        self.dw = cp.zeros_like(self.w, dtype=self.w.dtype)
 
     def has_weight(self):
         return True
 
     def forward(self, x):
-        self.__forward(x)
-        self.child.forward(self.fire)
+        #self.__forward(x)
+        #self.child.forward(self.fire)
+        self.__forward(cp.array(x))
+        self.child.forward(asnumpy(self.fire))
 
     def backward(self, dy):
-        self.__backward(dy)
-        self.parent.backward(self.backfire)
+        #self.__backward(dy)
+        #self.parent.backward(self.backfire)
+        self.__backward(cp.array(dy))
+        self.parent.backward(asnumpy(self.backfire))
 
     def predict(self, x):
-        self.__forward(x)
-        return self.child.predict(self.fire)
+        #self.__forward(x)
+        #return self.child.predict(self.fire)
+        self.__forward(ascupy(x))
+        return self.child.predict(asnumpy(self.fire))
 
     def __forward(self, x):
         if is_multi_channels_image(self.input_shape):
             x = flatten(x, self.input_shape)
 
         # Add bias terms.
-        self.x = np.c_[np.ones((x.shape[0], 1), dtype=self.dtype), x]
-        self.fire = np.dot(self.x, self.w)
+        self.x = cp.c_[cp.ones((x.shape[0], 1), dtype=self.dtype), x]
+        self.fire = cp.dot(self.x, self.w)
 
         if is_multi_channels_image(self.output_shape):
             self.fire = unflatten(self.fire, self.output_shape)
@@ -78,8 +85,8 @@ class AffineLayer(Layer):
             dy = flatten(dy, self.output_shape)
 
         batch_size = self.x.shape[0]
-        self.dw = self.dtype(1.) / batch_size * np.dot(self.x.T, dy)
-        self.backfire = np.dot(dy, self.w[1:, :].T)
+        self.dw = asnumpy(self.dtype(1.) / batch_size * cp.dot(self.x.T, dy))
+        self.backfire = cp.dot(dy, self.w[1:, :].T)
 
         if is_multi_channels_image(self.input_shape):
             self.backfire = unflatten(self.backfire, self.input_shape)

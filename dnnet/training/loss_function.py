@@ -1,8 +1,9 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-import numpy as np
 from enum import Enum
+
+from dnnet.ext_mathlibs import cp, np
 
 
 class LossFunction:
@@ -95,4 +96,5 @@ class LossFunctionFactory:
         Derived class of LossFunction
             Instance of selected loss function.
         """
+        print(cls.__loss_function.keys())
         return cls.__loss_function[loss_function]

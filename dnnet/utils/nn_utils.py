@@ -6,6 +6,7 @@ from collections.abc import Iterable
 from functools import reduce
 
 import numpy as np
+import cupy as cp
 
 
 def prod(x):
@@ -13,6 +14,20 @@ def prod(x):
         return reduce(operator.mul, x, 1)
     else:
         return x
+
+
+def ascupy(x):
+    if isinstance(type(x), np.ndarray):
+        return cp.array(x)
+    else:
+        return x
+
+
+def asnumpy(x):
+    if isinstance(type(x), np.ndarray):
+        return x
+    else:
+        return cp.asnumpy(x)
 
 
 def shuffle_data(x, y):

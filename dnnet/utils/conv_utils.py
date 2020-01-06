@@ -2,9 +2,8 @@
 # License: BSD 3 clause
 
 import matplotlib.pyplot as plt
-import numpy as np
-from numpy.lib.stride_tricks import as_strided
 
+from dnnet.ext_mathlibs import cp, np
 from dnnet.utils.nn_utils import prod
 
 
@@ -104,7 +103,7 @@ def im2col(img, filter_shape, strides):
     dst_n_cols = (n_cols - n_cols_filter) // strides[1] + 1
     dst_shape = (n_batches, n_channels, dst_n_rows, dst_n_cols,
                  n_rows_filter, n_cols_filter)
-    dst_img = as_strided(img, shape=dst_shape, strides=dst_strides)
+    dst_img = np.lib.stride_tricks.as_strided(img, shape=dst_shape, strides=dst_strides)
 
     dst_n_rows = n_batches * dst_n_rows * dst_n_cols
     dst_n_cols = n_channels * n_rows_filter * n_cols_filter

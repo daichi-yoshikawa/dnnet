@@ -1,8 +1,9 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-import numpy as np
 from enum import Enum
+
+from dnnet.ext_mathlibs import cp, np
 
 
 class Optimizer:

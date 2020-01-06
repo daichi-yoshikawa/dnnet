@@ -1,7 +1,8 @@
 import sys
 import matplotlib.pyplot as plt
-import numpy as np
 from collections import OrderedDict
+
+from dnnet.ext_mathlibs import cp, np
 
 
 class LearningCurve:

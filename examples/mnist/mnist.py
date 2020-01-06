@@ -6,7 +6,11 @@ sys.path.append('../..')
 
 import pickle
 import numpy as np
+
 import dnnet
+from dnnet.config import Config
+#Config.enable_gpu()
+
 from dnnet.neuralnet import NeuralNetwork
 from dnnet.utils.nn_utils import scale_normalization
 

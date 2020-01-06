@@ -1,9 +1,9 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-import numpy as np
 from enum import Enum
 
+from dnnet.ext_mathlibs import cp, np
 from dnnet.layers.layer import Layer
 from dnnet.utils.nn_utils import is_multi_channels_image
 from dnnet.utils.nn_utils import flatten, unflatten

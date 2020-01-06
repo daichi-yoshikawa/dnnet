@@ -6,10 +6,10 @@ import pickle
 import sys
 import time
 
-import numpy as np
 import matplotlib.pyplot as plt
 
 from dnnet.exception import DNNetIOError, DNNetRuntimeError
+from dnnet.ext_mathlibs import cp, np
 from dnnet.utils.nn_utils import prod, shuffle_data, split_data, w2im
 from dnnet.utils.nn_utils import is_multi_channels_image, flatten, unflatten
 from dnnet.training.back_propagation import BackPropagation

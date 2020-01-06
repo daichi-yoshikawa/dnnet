@@ -3,10 +3,10 @@
 
 import sys
 import copy
-import numpy as np
 import random
 from collections import OrderedDict
 
+from dnnet.ext_mathlibs import cp, np
 from dnnet.training.loss_function import LossFunctionFactory
 from dnnet.training.loss_function import MultinomialCrossEntropy
 from dnnet.training.loss_function import BinomialCrossEntropy

@@ -7,8 +7,6 @@ from dnnet.training.weight_initialization import DefaultInitialization
 from dnnet.utils.nn_utils import is_multi_channels_image
 from dnnet.utils.nn_utils import prod, ascupy, asnumpy, flatten, unflatten
 
-print(cp)
-
 
 class AffineLayer(Layer):
     """Implement affine transform of matrix.

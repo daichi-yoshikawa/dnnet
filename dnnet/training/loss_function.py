@@ -96,5 +96,4 @@ class LossFunctionFactory:
         Derived class of LossFunction
             Instance of selected loss function.
         """
-        print(cls.__loss_function.keys())
         return cls.__loss_function[loss_function]

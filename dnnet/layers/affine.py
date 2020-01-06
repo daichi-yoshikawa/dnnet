@@ -5,7 +5,7 @@ from dnnet.layers.layer import Layer
 from dnnet.ext_mathlibs import cp, np
 from dnnet.training.weight_initialization import DefaultInitialization
 from dnnet.utils.nn_utils import is_multi_channels_image
-from dnnet.utils.nn_utils import prod, ascupy, asnumpy, flatten, unflatten
+from dnnet.utils.nn_utils import prod, asnumpy, flatten, unflatten
 
 
 class AffineLayer(Layer):
@@ -64,7 +64,7 @@ class AffineLayer(Layer):
     def predict(self, x):
         #self.__forward(x)
         #return self.child.predict(self.fire)
-        self.__forward(ascupy(x))
+        self.__forward(cp.array(x))
         return self.child.predict(asnumpy(self.fire))
 
     def __forward(self, x):
@@ -72,8 +72,9 @@ class AffineLayer(Layer):
             x = flatten(x, self.input_shape)
 
         # Add bias terms.
-        self.x = cp.c_[cp.ones((x.shape[0], 1), dtype=self.dtype), x]
-        self.fire = cp.dot(self.x, cp.array(self.w))
+        x = cp.c_[cp.ones((x.shape[0], 1), dtype=self.dtype), x]
+        self.fire = cp.dot(x, cp.array(self.w))
+        self.x = asnumpy(x)
 
         if is_multi_channels_image(self.output_shape):
             self.fire = unflatten(self.fire, self.output_shape)
@@ -83,7 +84,7 @@ class AffineLayer(Layer):
             dy = flatten(dy, self.output_shape)
 
         batch_size = self.x.shape[0]
-        self.dw = asnumpy(self.dtype(1.) / batch_size * cp.dot(self.x.T, dy))
+        self.dw = asnumpy(self.dtype(1.) / batch_size * cp.dot(cp.array(self.x).T, dy))
         self.backfire = cp.dot(dy, cp.array(self.w[1:, :]).T)
 
         if is_multi_channels_image(self.input_shape):

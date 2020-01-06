@@ -16,13 +16,6 @@ def prod(x):
         return x
 
 
-def ascupy(x):
-    if isinstance(type(x), np.ndarray):
-        return cp.array(x)
-    else:
-        return x
-
-
 def asnumpy(x):
     if isinstance(type(x), np.ndarray):
         return x

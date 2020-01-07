@@ -41,4 +41,11 @@ def power(arr, exponents):
         return np.power(arr, exponents)
     else:
         return cp.power(arr, exponents)
+
+
+def exp(arr):
+    if isinstance(arr, np.ndarray):
+        return np.exp(arr)
+    else:
+        return cp.exp(arr)
     

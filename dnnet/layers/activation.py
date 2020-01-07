@@ -3,10 +3,11 @@
 
 from enum import Enum
 
+import dnnet.utils.numcupy as ncp
 from dnnet.ext_mathlibs import cp, np
 from dnnet.layers.layer import Layer
 from dnnet.utils.nn_utils import is_multi_channels_image
-from dnnet.utils.nn_utils import flatten, unflatten
+from dnnet.utils.nn_utils import asnumpy, flatten, unflatten
 
 
 class ActivationLayer(Layer):
@@ -17,7 +18,7 @@ class ActivationLayer(Layer):
     activation : Derived class of Activation
         Activation function to use.
     """
-    def __init__(self, activation):
+    def __init__(self, activation, force_cpu=False):
         """
         Arguments
         ---------
@@ -25,7 +26,7 @@ class ActivationLayer(Layer):
            Name of activation function to use.
         """
         self.layer_index = 0
-        self.activation = ActivationFactory.get(activation)
+        self.activation = ActivationFactory.get(activation, force_cpu)
 
     def get_type(self):
         return 'activation'
@@ -68,6 +69,9 @@ class Activation:
     """
     Type = Enum('Type', 'sigmoid, relu, elu, srrelu, tanh, softmax')
 
+    def __init__(self, force_cpu):
+        self.force_cpu = force_cpu
+
     def get_type(self):
         """Interface to get type of activation in string."""
         raise NotImplementedError('Activation.get_type')
@@ -88,14 +92,18 @@ class Sigmoid(Activation):
     df(x)/dx = (1 - f(x)) * f(x)
     This class implements aboves with a == 1.
     """
+    def __init__(self, force_cpu):
+        super().__init__(force_cpu=force_cpu)
+
     def get_type(self):
         return 'sigmoid'
 
     def activate(self, x):
-        return 1. / (1. + np.exp(-x))
+        return 1. / (1. + ncp.exp(-x))
 
     def grad(self, x):
-        return (1. - x) * x
+        x_ = x if self.force_cpu else cp.array(x)
+        return asnumpy((1. - x_) * x_)
 
 
 class ReLU(Activation):
@@ -110,12 +118,17 @@ class ReLU(Activation):
         2d matrix whose entry(i, j) is
         1 when x(i, j) > 0 and 0 when x(i, j) == 0.
     """
+    def __init__(self, force_cpu):
+        super().__init__(force_cpu=force_cpu)
+
     def get_type(self):
         return 'relu'
 
     def activate(self, x):
-        self.__mask = (x > 0.0).astype(x.dtype)
-        return x * self.__mask
+        x_ = x if self.force_cpu else cp.array(x)
+        mask = (x_ > 0.0).astype(x_.dtype)
+        self.__mask = asnumpy(mask)
+        return asnumpy(x_ * mask)
 
     def grad(self, x):
         return self.__mask
@@ -137,6 +150,9 @@ class ELU(Activation):
     Fast and Accurate Deep Network Learning by Exponential Linear Units (ELUs)
     https://arxiv.org/pdf/1511.07289.pdf
     """
+    def __init__(self, force_cpu):
+        super().__init__(force_cpu=force_cpu)
+
     def get_type(self):
         return 'elu'
 
@@ -151,7 +167,6 @@ class ELU(Activation):
 class SRReLU(Activation):
     """Square Root version of Rectified Linear.
 
-    This is an activation function the author, Daichi Yoshikawa, proposes.
     To reduce bias shift and enhance nonlinearity, use square root of input
     instead of original value.
 
@@ -161,6 +176,9 @@ class SRReLU(Activation):
         2d matrix whose entry(i, j) is
         1 when x(i, j) > 0 and 0 when x(i, j) == 0.
     """
+    def __init__(self, force_cpu):
+        super().__init__(force_cpu=force_cpu)
+
     def get_type(self):
         return 'selu'
 
@@ -178,6 +196,9 @@ class Tanh(Activation):
     f(x) = tanh(x) = (exp(x) - exp(-x)) / (exp(x) + exp(-x))
     df(x)/dx = 1 - f(x)^2
     """
+    def __init__(self, force_cpu):
+        super().__init__(force_cpu=force_cpu)
+
     def get_type(self):
         return 'tanh'
 
@@ -189,6 +210,9 @@ class Tanh(Activation):
 
 
 class Softmax(Activation):
+    def __init__(self, force_cpu):
+        super().__init__(force_cpu=force_cpu)
+
     def get_type(self):
         return 'softmax'
 
@@ -208,7 +232,7 @@ class ActivationFactory:
     Get activation's instance through this class.
     """
     @classmethod
-    def get(cls, activation):
+    def get(cls, activation, force_cpu):
         """Returns instance of selected activation function.
 
         Arguments
@@ -222,14 +246,14 @@ class ActivationFactory:
             Instance of selected activation function.
         """
         if activation is Activation.Type.sigmoid:
-            return Sigmoid()
+            return Sigmoid(force_cpu=force_cpu)
         elif activation is Activation.Type.relu:
-            return ReLU()
+            return ReLU(force_cpu=force_cpu)
         elif activation is Activation.Type.elu:
-            return ELU()
+            return ELU(force_cpu=force_cpu)
         elif activation is Activation.Type.srrelu:
-            return SRReLU()
+            return SRReLU(force_cpu=force_cpu)
         elif activation is Activation.Type.tanh:
-            return Tanh()
+            return Tanh(force_cpu=force_cpu)
         elif activation is Activation.Type.softmax:
-            return Softmax()
+            return Softmax(force_cpu=force_cpu)

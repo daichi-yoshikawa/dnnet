@@ -1,10 +1,11 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
+import dnnet.utils.numcupy as ncp
 from dnnet.ext_mathlibs import cp, np
 from dnnet.layers.layer import Layer
 from dnnet.utils.nn_utils import is_multi_channels_image
-from dnnet.utils.nn_utils import flatten, unflatten
+from dnnet.utils.nn_utils import asnumpy, flatten, unflatten
 
 
 class BatchNormLayer(Layer):
@@ -42,13 +43,14 @@ class BatchNormLayer(Layer):
     by Reducing Internal Covariate Shift
     http://proceedings.mlr.press/v37/ioffe15.pdf
     """
-    def __init__(self, momentum=0.9):
+    def __init__(self, momentum=0.9, force_cpu=False):
         self.gamma = None
         self.beta = None
         self.miu = None
         self.var = None
         self.momentum = momentum
         self.ep = 1e-5
+        self.force_cpu = force_cpu
 
     def set_dtype(self, dtype):
         """Set data type to use.
@@ -85,45 +87,81 @@ class BatchNormLayer(Layer):
         return self.child.predict(self.fire)
 
     def __forward(self, x):
-        miu = np.mean(x, axis=0)
-        self.xmiu = x - miu
+        x = x if self.force_cpu else cp.array(x)
+        miu = ncp.mean(x, axis=0)
+        xmiu = x - miu
 
-        var = np.mean(self.xmiu**2, axis=0)
-        self.std_inv = 1. / (np.sqrt(var + self.ep))
+        var = ncp.mean(xmiu**2, axis=0)
+        std_inv = 1. / (ncp.sqrt(var + self.ep))
 
+        gamma, beta = None, None
+        shape = self.input_shape
         if self.gamma is None:
-            self.gamma = np.ones(self.input_shape, dtype=self.dtype)
+            gamma = ncp.ones(shape, dtype=self.dtype, arr_type=type(x))
+        else:
+            gamma = self.gamma if self.force_cpu else cp.array(self.gamma)
         if self.beta is None:
-            self.beta = np.zeros(self.input_shape, dtype=self.dtype)
+            beta = ncp.zeros(shape, dtype=self.dtype, arr_type=type(x))
+        else:
+            beta = self.beta if self.force_cpu else cp.array(self.beta)
 
-        self.xhat = self.xmiu * self.std_inv
-        self.fire = self.gamma * self.xhat + self.beta
+        xhat = xmiu * std_inv
+        fire = gamma * xhat + beta
 
+        pre_miu, pre_var = None, None
         if self.miu is None:
-            self.miu = miu
+            pre_miu = miu
+        else:
+            pre_miu = self.miu if self.force_cpu else cp.array(self.miu)
         if self.var is None:
-            self.var = var
+            pre_var = var
+        else:
+            pre_var = self.var if self.force_cpu else cp.array(self.var)
+        miu = pre_miu * self.momentum + (1. - self.momentum) * miu
+        var = pre_var * self.momentum + (1. - self.momentum) * var
 
-        self.miu *= self.momentum
-        self.miu += (1. - self.momentum) * miu
-        self.var *= self.momentum
-        self.var += (1. - self.momentum) * var
+        self.xmiu = asnumpy(xmiu)
+        self.var = asnumpy(var)
+        self.std_inv = asnumpy(std_inv)
+        self.gamma = asnumpy(gamma)
+        self.beta = asnumpy(beta)
+        self.xhat = asnumpy(xhat)
+        self.fire = asnumpy(fire)
+        self.miu = asnumpy(miu)
+        self.var = asnumpy(var)
 
     def __backward(self, dy):
+        dy = dy if self.force_cpu else cp.array(dy)
+        xhat = self.xhat if self.force_cpu else cp.array(self.xhat)
+        xmiu = self.xmiu if self.force_cpu else cp.array(self.xmiu)
+        std_inv = self.std_inv if self.force_cpu else cp.array(self.std_inv)
+        beta = self.beta if self.force_cpu else cp.array(self.beta)
+        gamma = self.gamma if self.force_cpu else cp.array(self.gamma)
+
         batch_size = dy.shape[0]
-
         dbeta = dy.sum(axis=0)
-        dgamma = (self.xhat * dy).sum(axis=0)
+        dgamma = (xhat * dy).sum(axis=0)
 
-        tmp1 = (self.gamma * self.xmiu * dy).sum(axis=0)
-        tmp2 = -np.power(self.std_inv, 3) * tmp1 / batch_size
-        tmp3 = self.xmiu * tmp2 + self.gamma * self.std_inv * dy
+        tmp1 = (gamma * xmiu * dy).sum(axis=0)
+        tmp2 = -ncp.power(std_inv, 3) * tmp1 / batch_size
+        tmp3 = xmiu*tmp2 + gamma*std_inv*dy
         tmp4 = tmp3.sum(axis=0)
 
-        self.backfire = tmp3 - tmp4 / batch_size
-        self.beta = self.beta - dbeta / batch_size
-        self.gamma = self.gamma - dgamma / batch_size
+        backfire = tmp3 - tmp4/batch_size
+        beta = beta - dbeta/batch_size
+        gamma = gamma - dgamma/batch_size
+
+        self.backfire = asnumpy(backfire)
+        self.beta = asnumpy(beta)
+        self.gamma = asnumpy(gamma)
 
     def __predict(self, x):
-        self.fire = self.gamma * (x - self.miu) / np.sqrt(self.var + self.ep)
-        self.fire = self.fire + self.beta
+        x = x if self.force_cpu else cp.array(x)
+        gamma = self.gamma if self.force_cpu else cp.array(self.gamma)
+        beta = self.beta if self.force_cpu else cp.array(self.beta)
+        miu = self.miu if self.force_cpu else cp.array(self.miu)
+        var = self.var if self.force_cpu else cp.array(self.var)
+
+        fire = gamma * (x - miu) / ncp.sqrt(var + self.ep) + beta
+
+        self.fire = asnumpy(fire)

@@ -9,5 +9,5 @@ from .layers import activation, affine, batch_norm, convolution, dropout
 from .layers import layer, pooling
 from .training import back_propagation, learning_curve, loss_function
 from .training import optimizer, weight_initialization
-from .utils import conv_utils, nn_utils
+from .utils import conv_utils, nn_utils, numcupy
 from .exception import DNNetIOError, DNNetRuntimeError

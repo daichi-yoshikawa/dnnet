@@ -28,21 +28,24 @@ from data import get_mnist
 
 
 dtype = np.float32
+force_cpu = {'dropout': True, 'batch_norm': False}
+
+
 model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
 #model = NeuralNetwork(input_shape=784, dtype=dtype)
-model.add(DropoutLayer(drop_ratio=0.2))
+model.add(DropoutLayer(drop_ratio=0.2, force_cpu=force_cpu['dropout']))
 
 model.add(AffineLayer(output_shape=400, weight_initialization=He()))
-model.add(BatchNormLayer())
+model.add(BatchNormLayer(force_cpu=force_cpu['batch_norm']))
 model.add(ActivationLayer(activation=Activation.Type.srrelu))
-model.add(DropoutLayer(drop_ratio=0.2))
+model.add(DropoutLayer(drop_ratio=0.2, force_cpu=force_cpu['dropout']))
 
 model.add(AffineLayer(output_shape=400, weight_initialization=He()))
-model.add(BatchNormLayer())
+model.add(BatchNormLayer(force_cpu=force_cpu['batch_norm']))
 model.add(ActivationLayer(activation=Activation.Type.srrelu))
 
 model.add(AffineLayer(output_shape=10, weight_initialization=DefaultInitialization()))
-model.add(BatchNormLayer())
+model.add(BatchNormLayer(force_cpu=force_cpu['batch_norm']))
 model.add(ActivationLayer(activation=Activation.Type.softmax))
 model.compile()
 
@@ -54,9 +57,9 @@ x, y = get_mnist(data_dir)
 scale_normalization(x)
 x = x.reshape(-1, 1, 28, 28)
 
-optimizer = SGD(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
-optimizer = Momentum(learning_rate=3e-2, weight_decay=1e-3, momentum_rate=0.99, dtype=dtype)
-#optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
+#optimizer = SGD(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
+#optimizer = Momentum(learning_rate=3e-2, weight_decay=1e-3, momentum_rate=0.99, dtype=dtype)
+optimizer = AdaGrad(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
 #optimizer = Adam(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
 #optimizer = AdaDelta(learning_rate=3e-2, weight_decay=1e-3, gamma=0.99, dtype=dtype)
 #optimizer = RMSProp(learning_rate=3e-2, weight_decay=1e-3, dtype=dtype)
@@ -67,8 +70,10 @@ lc = model.fit(
     learning_curve=True, shuffle=True, shuffle_per_epoch=True,
     test_data_ratio=0.142857, # Use 60,000 for training and 10,000 for test.
     train_data_ratio_for_eval=0.01)
+exit(0)
 lc.plot(figsize=(8,10), fontsize=12)
 model.show_filters(0, shape=(28, 28), layout=(10, 10), figsize=(12, 12))
+
 
 # Auto Encoder
 ae = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)

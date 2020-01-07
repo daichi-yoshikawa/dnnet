@@ -36,11 +36,11 @@ def zeros(shape, dtype, arr_type):
         return cp.zeros(shape, dtype=dtype)
 
 
-def power(arr, exponents):
+def power(arr, exponents, dtype=None):
     if isinstance(arr, np.ndarray):
-        return np.power(arr, exponents)
+        return np.power(arr, exponents, dtype=dtype)
     else:
-        return cp.power(arr, exponents)
+        return cp.power(arr, exponents, dtype=dtype)
 
 
 def exp(arr):
@@ -48,4 +48,11 @@ def exp(arr):
         return np.exp(arr)
     else:
         return cp.exp(arr)
+
+
+def tanh(arr):
+    if isinstance(arr, np.ndarray):
+        return np.tanh(arr)
+    else:
+        return cp.tanh(arr)
     

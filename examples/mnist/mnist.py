@@ -28,7 +28,7 @@ from data import get_mnist
 
 
 dtype = np.float32
-force_cpu = {'dropout': True, 'batch_norm': False}
+force_cpu = {'activation': True, 'dropout': True, 'batch_norm': True}
 
 
 model = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
@@ -37,16 +37,19 @@ model.add(DropoutLayer(drop_ratio=0.2, force_cpu=force_cpu['dropout']))
 
 model.add(AffineLayer(output_shape=400, weight_initialization=He()))
 model.add(BatchNormLayer(force_cpu=force_cpu['batch_norm']))
-model.add(ActivationLayer(activation=Activation.Type.srrelu))
+model.add(ActivationLayer(activation=Activation.Type.relu,
+                          force_cpu=force_cpu['activation']))
 model.add(DropoutLayer(drop_ratio=0.2, force_cpu=force_cpu['dropout']))
 
 model.add(AffineLayer(output_shape=400, weight_initialization=He()))
 model.add(BatchNormLayer(force_cpu=force_cpu['batch_norm']))
-model.add(ActivationLayer(activation=Activation.Type.srrelu))
+model.add(ActivationLayer(activation=Activation.Type.relu,
+                          force_cpu=force_cpu['activation']))
 
 model.add(AffineLayer(output_shape=10, weight_initialization=DefaultInitialization()))
 model.add(BatchNormLayer(force_cpu=force_cpu['batch_norm']))
-model.add(ActivationLayer(activation=Activation.Type.softmax))
+model.add(ActivationLayer(activation=Activation.Type.softmax,
+                          force_cpu=force_cpu['activation']))
 model.compile()
 
 config_str = model.get_config_str()
@@ -81,12 +84,12 @@ ae = NeuralNetwork(input_shape=(1, 28, 28), dtype=dtype)
 
 ae.add(AffineLayer(output_shape=100, weight_initialization=He()))
 #ae.add(BatchNormLayer())
-ae.add(ActivationLayer(activation=Activation.Type.srrelu))
+ae.add(ActivationLayer(activation=Activation.Type.relu))
 #ae.add(DropoutLayer(drop_ratio=0.5))
 
 ae.add(AffineLayer(output_shape=784, weight_initialization=He()))
 #ae.add(BatchNormLayer())
-#ae.add(ActivationLayer(activation=Activation.Type.srrelu))
+#ae.add(ActivationLayer(activation=Activation.Type.relu))
 ae.compile()
 
 config_str = ae.get_config_str()

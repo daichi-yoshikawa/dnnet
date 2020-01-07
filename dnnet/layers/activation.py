@@ -102,8 +102,8 @@ class Sigmoid(Activation):
         return 1. / (1. + ncp.exp(-x))
 
     def grad(self, x):
-        x_ = x if self.force_cpu else cp.array(x)
-        return asnumpy((1. - x_) * x_)
+        x = x if self.force_cpu else cp.array(x)
+        return asnumpy((1. - x) * x)
 
 
 class ReLU(Activation):
@@ -125,13 +125,13 @@ class ReLU(Activation):
         return 'relu'
 
     def activate(self, x):
-        x_ = x if self.force_cpu else cp.array(x)
-        mask = (x_ > 0.0).astype(x_.dtype)
-        self.__mask = asnumpy(mask)
-        return asnumpy(x_ * mask)
+        x = x if self.force_cpu else cp.array(x)
+        mask = (x > 0.0).astype(x.dtype)
+        self.mask = asnumpy(mask)
+        return asnumpy(x * mask)
 
     def grad(self, x):
-        return self.__mask
+        return self.mask
 
 
 class ELU(Activation):
@@ -157,11 +157,20 @@ class ELU(Activation):
         return 'elu'
 
     def activate(self, x):
-        self.__mask = (x > 0.0).astype(x.dtype)
-        return self.__mask * x + ~(self.__mask) * (np.exp(x) - 1)
+        x = x if self.force_cpu else cp.array(x)
+        mask = (x > 0.0).astype(x.dtype)
+        mask_inv = (x <= 0.0).astype(x.dtype)
+
+        self.mask = asnumpy(mask)
+        self.mask_inv = asnumpy(mask_inv)
+
+        return asnumpy(mask*x + mask_inv*(ncp.exp(x)-1))
 
     def grad(self, x):
-        return self.__mask + ~(self.__mask) * (x + 1)
+        x = x if self.force_cpu else cp.array(x)
+        mask = self.mask if self.force_cpu else cp.array(self.mask)
+        mask_inv = self.mask_inv if self.force_cpu else cp.array(self.mask_inv)
+        return asnumpy(mask + mask_inv*(x+1))
 
 
 class SRReLU(Activation):
@@ -183,11 +192,15 @@ class SRReLU(Activation):
         return 'selu'
 
     def activate(self, x):
-        self.__mask = (x > 0.0).astype(x.dtype)
-        return (np.sqrt(self.__mask * x + 1) - 1)
+        x = x if self.force_cpu else cp.array(x)
+        mask = (x > 0.0).astype(x.dtype)
+        self.mask = asnumpy(mask)
+        return asnumpy(ncp.sqrt(mask*x + 1) - 1)
 
     def grad(self, x):
-        return self.__mask * 0.5 / (x + 1)
+        x = x if self.force_cpu else cp.array(x)
+        mask = self.mask if self.force_cpu else cp.array(self.mask)
+        return asnumpy(0.5*mask / (x + 1))
 
 
 class Tanh(Activation):
@@ -203,10 +216,12 @@ class Tanh(Activation):
         return 'tanh'
 
     def activate(self, x):
-        return np.tanh(x).astype(x.dtype)
+        x = x if self.force_cpu else cp.array(x)
+        return asnumpy(ncp.tanh(x).astype(x.dtype))
 
     def grad(self, x):
-        return 1. - np.power(x, 2, dtype=x.dtype)
+        x = x if self.force_cpu else cp.array(x)
+        return asnumpy(1. - ncp.power(x, 2, dtype=x.dtype))
 
 
 class Softmax(Activation):
@@ -217,8 +232,9 @@ class Softmax(Activation):
         return 'softmax'
 
     def activate(self, x):
-        var = np.exp(x - x.max())
-        return var / var.sum(axis=1).reshape(var.shape[0], 1)
+        x = x if self.force_cpu else cp.array(x)
+        var = ncp.exp(x - x.max())
+        return asnumpy(var / var.sum(axis=1).reshape(var.shape[0], 1))
 
     def grad(self, x):
         return 1.

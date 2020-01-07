@@ -50,22 +50,16 @@ class AffineLayer(Layer):
         return True
 
     def forward(self, x):
-        #self.__forward(x)
-        #self.child.forward(self.fire)
         self.__forward(cp.array(x))
-        self.child.forward(asnumpy(self.fire))
+        self.child.forward(self.fire)
 
     def backward(self, dy):
-        #self.__backward(dy)
-        #self.parent.backward(self.backfire)
         self.__backward(cp.array(dy))
-        self.parent.backward(asnumpy(self.backfire))
+        self.parent.backward(self.backfire)
 
     def predict(self, x):
-        #self.__forward(x)
-        #return self.child.predict(self.fire)
         self.__forward(cp.array(x))
-        return self.child.predict(asnumpy(self.fire))
+        return self.child.predict(self.fire)
 
     def __forward(self, x):
         if is_multi_channels_image(self.input_shape):
@@ -73,11 +67,13 @@ class AffineLayer(Layer):
 
         # Add bias terms.
         x = cp.c_[cp.ones((x.shape[0], 1), dtype=self.dtype), x]
-        self.fire = cp.dot(x, cp.array(self.w))
-        self.x = asnumpy(x)
+        fire = cp.dot(x, cp.array(self.w))
 
         if is_multi_channels_image(self.output_shape):
-            self.fire = unflatten(self.fire, self.output_shape)
+            fire = unflatten(fire, self.output_shape)
+
+        self.x = asnumpy(x)
+        self.fire = asnumpy(fire)
 
     def __backward(self, dy):
         if is_multi_channels_image(self.output_shape):
@@ -85,7 +81,9 @@ class AffineLayer(Layer):
 
         batch_size = self.x.shape[0]
         self.dw = asnumpy(self.dtype(1.) / batch_size * cp.dot(cp.array(self.x).T, dy))
-        self.backfire = cp.dot(dy, cp.array(self.w[1:, :]).T)
+        backfire = cp.dot(dy, cp.array(self.w[1:, :]).T)
 
         if is_multi_channels_image(self.input_shape):
-            self.backfire = unflatten(self.backfire, self.input_shape)
+            backfire = unflatten(backfire, self.input_shape)
+
+        self.backfire = asnumpy(backfire)

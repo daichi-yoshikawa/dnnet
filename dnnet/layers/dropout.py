@@ -1,10 +1,11 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
+import dnnet.utils.numcupy as ncp
 from dnnet.ext_mathlibs import cp, np
 from dnnet.layers.layer import Layer
 from dnnet.utils.nn_utils import is_multi_channels_image
-from dnnet.utils.nn_utils import prod, flatten, unflatten
+from dnnet.utils.nn_utils import asnumpy, prod, flatten, unflatten
 
 
 class DropoutLayer(Layer):
@@ -29,9 +30,10 @@ class DropoutLayer(Layer):
     Dropout: A Simple Way to Prevent Neural Networks from Overfitting
     https://www.cs.toronto.edu/~hinton/absps/JMLRdropout.pdf
     """
-    def __init__(self, drop_ratio):
+    def __init__(self, drop_ratio, force_cpu=False):
         self.drop_ratio = drop_ratio
         self.mask = np.array([])
+        self.force_cpu = force_cpu
 
     def set_dtype(self, dtype):
         self.dtype = dtype
@@ -50,6 +52,7 @@ class DropoutLayer(Layer):
 
         input_size = prod(self.input_shape)
         self.mask = np.arange(input_size).reshape(self.input_shape)
+        self.thresh = int(self.drop_ratio * self.mask.size)
 
     def forward(self, x):
         self.__forward(x)
@@ -64,11 +67,22 @@ class DropoutLayer(Layer):
         return self.child.predict(self.fire)
 
     def __forward(self, x):
-        np.random.shuffle(self.mask.reshape(self.mask.size))
-        self.fire = (self.mask >= int(self.drop_ratio*self.mask.size)) * x
+        mask = self.mask if self.force_cpu else cp.array(self.mask)
+        x = x if self.force_cpu else cp.array(x)
+
+        ncp.random_shuffle(mask.reshape(mask.size))
+        mask_dropped = mask >= self.thresh
+        fire = mask_dropped * x
+
+        self.fire = asnumpy(fire)
+        self.mask = asnumpy(mask)
+        self.mask_dropped = asnumpy(mask_dropped)
 
     def __backward(self, dy):
-        self.backfire = (self.mask >= int(self.drop_ratio*self.mask.size)) * dy
+        mask_dropped = self.mask_dropped if self.force_cpu else cp.array(self.mask_dropped)
+        dy = dy if self.force_cpu else cp.array(dy)
+        self.backfire = asnumpy(mask_dropped*dy)
 
     def __predict(self, x):
-        self.fire = (1. - self.drop_ratio) * x
+        x = x if self.force_cpu else cp.array(x)
+        self.fire = asnumpy((1. - self.drop_ratio) * x)

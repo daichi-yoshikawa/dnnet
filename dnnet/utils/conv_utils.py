@@ -3,6 +3,7 @@
 
 import matplotlib.pyplot as plt
 
+import dnnet.utils.numcupy as ncp
 from dnnet.ext_mathlibs import cp, np
 from dnnet.utils.nn_utils import prod
 
@@ -55,7 +56,7 @@ def pad_img(img, pad_rows, pad_cols):
     elif pad_cols:
         npad = npad + ((pad_cols, pad_cols),)
 
-    return np.pad(img, pad_width=npad, mode='constant', constant_values=0)
+    return ncp.pad(img, pad_width=npad, mode='constant', constant_values=0)
 
 
 def im2col(img, filter_shape, strides):
@@ -103,7 +104,7 @@ def im2col(img, filter_shape, strides):
     dst_n_cols = (n_cols - n_cols_filter) // strides[1] + 1
     dst_shape = (n_batches, n_channels, dst_n_rows, dst_n_cols,
                  n_rows_filter, n_cols_filter)
-    dst_img = np.lib.stride_tricks.as_strided(img, shape=dst_shape, strides=dst_strides)
+    dst_img = ncp.as_strided(img, shape=dst_shape, strides=dst_strides)
 
     dst_n_rows = n_batches * dst_n_rows * dst_n_cols
     dst_n_cols = n_channels * n_rows_filter * n_cols_filter
@@ -130,8 +131,8 @@ def col2im(
     col_ = col.reshape(
             n_batches, n_rows_out, n_cols_out, n_channels,
             n_rows_filter, n_cols_filter).transpose(0, 3, 4, 5, 1, 2)
-    img = np.zeros((n_batches, n_channels, n_rows_img, n_cols_img),
-                   dtype=col.dtype)
+    img = ncp.zeros((n_batches, n_channels, n_rows_img, n_cols_img),
+                    dtype=col.dtype, arr_type=type(col_))
 
     if aggregate:
         for y in range(n_rows_filter):

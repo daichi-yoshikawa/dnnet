@@ -1,22 +1,26 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
+import dnnet.utils.numcupy as ncp
 from dnnet.ext_mathlibs import cp, np
 from dnnet.exception import DNNetRuntimeError
 from dnnet.layers.layer import Layer
 from dnnet.training.weight_initialization import DefaultInitialization
+from dnnet.utils.nn_utils import asnumpy
 from dnnet.utils.conv_utils import pad_img, im2col, col2im
 
 
 class ConvolutionLayer(Layer):
     def __init__(
             self, filter_shape, pad=(0, 0), strides=(1, 1),
-            weight_initialization=DefaultInitialization()):
+            weight_initialization=DefaultInitialization(),
+            force_cpu=False):
         self.filter_shape = filter_shape
         self.pad = pad
         self.strides = strides
         self.weight_initialization = weight_initialization
         self.x = None
+        self.force_cpu = force_cpu
 
     def set_dtype(self, dtype):
         self.dtype = dtype
@@ -54,6 +58,9 @@ class ConvolutionLayer(Layer):
         return self.child.predict(self.fire)
 
     def __forward(self, x):
+        x = x if self.force_cpu else cp.array(x)
+        w = self.w if self.force_cpu else cp.array(self.w)
+
         if len(x.shape) != 4:
             msg = 'Convolution layer assumes that input is 4-d array.\n'\
                 + '    shape : %s' % str(x.shape)
@@ -63,31 +70,43 @@ class ConvolutionLayer(Layer):
         n_channels, n_rows, n_cols = self.output_shape
 
         x_pad = pad_img(x, self.pad[0], self.pad[1])
-        self.x = im2col(x_pad, self.filter_shape, self.strides)
-        self.x = np.c_[np.ones((self.x.shape[0], 1), dtype=self.dtype), self.x]
+        x = im2col(x_pad, self.filter_shape, self.strides)
+        x = ncp.concat_by_index_trick(
+            ncp.ones((x.shape[0], 1), dtype=self.dtype, arr_type=type(x)),
+            x, as_new_row=False)
 
-        self.fire = np.dot(self.x, self.w)
-        self.fire = self.fire.reshape(n_batches, n_rows, n_cols, n_channels)
-        self.fire = self.fire.transpose(0, 3, 1, 2)
+        fire = ncp.dot(x, w)
+        fire = fire.reshape(n_batches, n_rows, n_cols, n_channels)
+        fire = fire.transpose(0, 3, 1, 2)
+
+        self.x = asnumpy(x)
+        self.fire = asnumpy(fire)
 
     def __backward(self, dy):
+        dy = dy if self.force_cpu else cp.array(dy)
+        x = self.x if self.force_cpu else cp.array(self.x)
+        w = self.w if self.force_cpu else cp.array(self.w)
+
         n_batches, _, _, _ = self.fire.shape
         n_channels, n_rows, n_cols = self.input_shape
         n_filters, n_rows_filter, n_cols_filter = self.filter_shape
         dy = dy.transpose(0, 2, 3, 1).reshape(-1, n_filters)
-        self.dw = self.dtype(1.) / n_batches * np.dot(self.x.T, dy)
+        dw = self.dtype(1.) / n_batches * ncp.dot(x.T, dy)
 
         input_shape = (n_batches, n_channels, n_rows, n_cols)
-        self.backfire = np.dot(dy, self.w[1:, :].T)
+        backfire = np.dot(dy, w[1:, :].T)
 
-        self.backfire = col2im(
-            self.backfire, input_shape, self.output_shape,
+        backfire = col2im(
+            backfire, input_shape, self.output_shape,
             self.filter_shape, self.pad, self.strides, aggregate=True)
 
         if self.pad[0] > 0:
-            self.backfire = self.backfire[:, :, self.pad[0]:-self.pad[0], :]
+            backfire = backfire[:, :, self.pad[0]:-self.pad[0], :]
         if self.pad[1] > 0:
-            self.backfire = self.backfire[:, :, :, self.pad[1]:-self.pad[1]]
+            backfire = backfire[:, :, :, self.pad[1]:-self.pad[1]]
+
+        self.backfire = asnumpy(backfire)
+        self.dw = asnumpy(dw)
 
     def __check_shape(self, shape):
         if not isinstance(shape, tuple):

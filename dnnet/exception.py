@@ -13,3 +13,9 @@ class DNNetRuntimeError(RuntimeError):
     """Raised when runtime error occurs."""
     def __init__(self, msg):
         super().__init__(msg)
+
+
+class DNNetValueError(ValueError):
+    """Raised when value error occurs."""
+    def __init__(self, msg):
+        super().__init__(msg)

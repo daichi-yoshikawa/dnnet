@@ -1,6 +1,7 @@
 dnnet
 =====
-Implementation of Deep Neural Network with the least amount of dependencies. dnnet will work with numpy, and if GPU is available, with cupy.
+Implementation of Deep Neural Network with numpy.
+**Now dnnet can run with GPU through cupy.**
 
 dnnet provides high-level API to define and run neural network model.
 User can turn on/off GPU layer-wise, that is, you can compute convolution layer with GPU, activation layer with CPU, and dropout layer with CPU, for example.
@@ -76,6 +77,7 @@ model.add(AffineLayer(output=512, weight_initialization=He()))
 model.add(BatchNormLayer(force_cpu=True))
 ```
 
+
 ## Supported Methods
 ### Layers
 * Affine
@@ -109,6 +111,7 @@ model.add(BatchNormLayer(force_cpu=True))
 * MultinomialCrossEntropy for multinomial classification.
 * BinomialCrossEntropy for binary classification.
 * SquaredError for regression.
+
 
 # Installation
 ## Requisites
@@ -158,16 +161,19 @@ you will partially execute the following steps.
 ```
 $ sudo apt-get install git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev
 ```
+
 * Install tkinter(This is required to use matplotlib in virtualenv)
 ```
 $ sudo apt-get install python3-tk python-tk tk-dev
 ```
+
 * Install pyenv
 ```
    $ cd ~
    $ git clone git://github.com/yyuu/pyenv.git ./pyenv
    $ mkdir -p ./pyenv/versions ./pyenv/shims
 ```
+
 * Set paths
 Add the following description in ~/.bashrc
 ```
@@ -177,20 +183,24 @@ if [ -d "${PYENV_ROOT}" ]; then
   eval "$(pyenv init -)"
 fi
 ```
+
 And then execute the follows.
 ```
    $ exec $SHELL -l
    $ . ~/.bashrc
 ```
+
 * Install pyenv-virtualenv
 ```
    $ cd $PYENV_ROOT/plugins
    $ git clone git://github.com/yyuu/pyenv-virtualenv.git
 ```
+
 * Install python 3.5.2
 ```
    $ pyenv install 3.5.2
 ```
+
 * Setup local pyenv
 ```
    $ mkdir -p ~/Work/py352_ws
@@ -204,6 +214,7 @@ Here, it's assumed that you named the environment as "py352_env".
    $ pip install --upgrade pip
 ```
 
+
 # Example
 ## MNIST
 * Run neural network for mnist.
@@ -211,6 +222,7 @@ Here, it's assumed that you named the environment as "py352_env".
 cd <path-to-dnnet>/examples/mnist
 python mnist.py
 ```
+
 If you get an error "ImportError: Python is not installed as a framework.",
 it might be because of matplotlib issue.(This happened to me when working with MacOS.)
 
@@ -220,7 +232,8 @@ cd ~/.matplotlib
 echo "backend: TkAgg" >> matplotlibrc
 ```
 
-# Use in your project
+
+# Usage in your project
 ## If you pip installed dnnet
 ```
 from dnnet.neuralnet import NeuralNetwork

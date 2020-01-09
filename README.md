@@ -1,13 +1,16 @@
 dnnet
 =====
-Implementation of Deep Neural Network with numpy.
-Less dependencies, easier to use.
+Implementation of Deep Neural Network with the least amount of dependencies. dnnet will work with numpy, and if GPU is available, with cupy.
+
+dnnet provides high-level API to define and run neural network model.
+User can turn on/off GPU layer-wise, that is, you can compute convolution layer with GPU, activation layer with CPU, and dropout layer with CPU, for example.
 
 # Table of Contents
 * Brief tour of dnnet; Introduce small examples, supported methodologies
 * Installation
 * Example; Run sample scripts
 * Use in your project
+
 
 # Brief tour of dnnet
 ## Quick glance of usage
@@ -17,6 +20,19 @@ finalize model, set optimizer, execute model fitting, and save model.
 
 In the below, some arguments are not specified to simplify the example.
 ```
+from dnnet.neuralnet import NeuralNetwork
+from dnnet.training.optimizer import AdaGrad
+from dnnet.training.weight_initialization import DefaultInitialization, He
+from dnnet.training.loss_function import MultinomialCrossEntropy
+from dnnet.layers.activation import Activation, ActivationLayer
+from dnnet.layers.affine import AffineLayer
+from dnnet.layers.batch_norm import BatchNormLayer
+from dnnet.layers.convolution import ConvolutionLayer
+from dnnet.layers.dropout import DropoutLayer
+
+
+# Load x, y here
+
 model = NeuralNetwork(input_shape=(1, 28, 28), dtype=np.float32)
 
 model.add(ConvolutionLayer(filter_shape=(32, 3, 3))
@@ -31,14 +47,33 @@ model.compile()
 optimizer = AdaGrad(learning_rate=1e-3, weight_decay=1e-3)
 learning_curve = model.fit(
     x=x, y=y, epochs=5, batch=size=100, optimizer=optimizer,
-    loss_function=LossFunction.Type.multinomial_cross_entropy)
-model.save(path='./data/output', name='conv_net.dat')
+    loss_function=MultinomialCrossEntropy())
+model.save(path='./data/output', name='my_cnn.dat')
 ```
 
 User can also load model, and predict output.
 ```
-model.load(path='./data/output', name='conv_net.dat')
+model.load(path='./data/output', name='my_cnn.dat')
 y = model.predict(x)
+```
+
+GPU is easily enabled. Do the follows at the top of your script.
+```
+from dnnet.config import Config
+Config.enable_gpu()
+```
+
+If GPU is enabled but you'd like to turn it off for some specific layers, you can use force_cpu flag. Here, ConvolutionLayer and AffineLayer don't have the flag.
+```
+from dnnet.config import Config
+Config.enable_gpu()
+
+# Do something here.
+
+# AffineLayer uses GPU.
+model.add(AffineLayer(output=512, weight_initialization=He()))
+# BatchNormLayer uses CPU regardless of Config.enable_gpu().
+model.add(BatchNormLayer(force_cpu=True))
 ```
 
 ## Supported Methods
@@ -64,7 +99,6 @@ y = model.predict(x)
 * Adam
 * AdaDelta
 * RMSProp
-* SMORMS3
 
 ### Weight Initialization Methods
 * Xavier's method
@@ -81,6 +115,11 @@ y = model.predict(x)
 * python 3.4 or later
 * numpy 1.12.0 or later
 * matplotlib
+
+If you'd like to use GPU, you need to install the follows additionally.
+* CUDA (eg. CUDA 10.0)
+* CuDNN (eg. CuDNN7.6.5)
+* cupy (eg. cupy-cuda100==7.0.0)
 
 ## Install dnnet by pip.
 ```
@@ -149,12 +188,6 @@ And then execute the follows.
    $ git clone git://github.com/yyuu/pyenv-virtualenv.git
 ```
 * Install python 3.5.2
-
-If you're going to use theano in the resulting env,
-```
-env PYTHON_CONFIGURE_OPTS=--enable-shared pyenv install 3.5.2
-```
-else ...
 ```
    $ pyenv install 3.5.2
 ```

@@ -4,7 +4,7 @@
 from dnnet.exception import DNNetRuntimeError
 from dnnet.ext_mathlibs import cp, np
 from dnnet.layers.layer import Layer
-from dnnet.utils.conv_utils import im2col, col2im
+from dnnet.utils.cnn_utils import im2col, col2im
 
 
 class PoolingLayer(Layer):

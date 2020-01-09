@@ -7,7 +7,7 @@ from dnnet.exception import DNNetRuntimeError
 from dnnet.layers.layer import Layer
 from dnnet.training.weight_initialization import DefaultInitialization
 from dnnet.utils.nn_utils import asnumpy
-from dnnet.utils.conv_utils import pad_img, im2col, col2im
+from dnnet.utils.cnn_utils import pad_img, im2col, col2im
 
 
 class ConvolutionLayer(Layer):

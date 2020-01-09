@@ -50,18 +50,19 @@ class AffineLayer(Layer):
         return True
 
     def forward(self, x):
-        self.__forward(cp.array(x))
+        self.__forward(x)
         self.child.forward(self.fire)
 
     def backward(self, dy):
-        self.__backward(cp.array(dy))
+        self.__backward(dy)
         self.parent.backward(self.backfire)
 
     def predict(self, x):
-        self.__forward(cp.array(x))
+        self.__forward(x)
         return self.child.predict(self.fire)
 
     def __forward(self, x):
+        x = cp.array(x)
         if is_multi_channels_image(self.input_shape):
             x = flatten(x, self.input_shape)
 
@@ -76,6 +77,7 @@ class AffineLayer(Layer):
         self.fire = asnumpy(fire)
 
     def __backward(self, dy):
+        dy = cp.array(dy)
         if is_multi_channels_image(self.output_shape):
             dy = flatten(dy, self.output_shape)
 

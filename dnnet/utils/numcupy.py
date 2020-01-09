@@ -9,11 +9,32 @@ def random_shuffle(arr):
         cp.random.shuffle(arr)
 
 
+def arange(shape, dtype, arr_type):
+    if arr_type == type(np.array([])):
+        return np.arange(shape, dtype=dtype)
+    else:
+        return cp.arange(shape, dtype=dtype)
+
+
 def mean(arr, axis):
     if isinstance(arr, np.ndarray):
         return np.mean(arr, axis=axis)
     else:
         return cp.mean(arr, axis=axis)
+
+
+def max(arr, axis):
+    if isinstance(arr, np.ndarray):
+        return np.max(arr, axis=axis)
+    else:
+        return cp.max(arr, axis=axis)
+
+
+def argmax(arr, axis):
+    if isinstance(arr, np.ndarray):
+        return np.argmax(arr, axis=axis)
+    else:
+        return cp.argmax(arr, axis=axis)
 
 
 def sqrt(arr):
@@ -35,6 +56,13 @@ def zeros(shape, dtype, arr_type):
         return np.zeros(shape, dtype=dtype)
     else:
         return cp.zeros(shape, dtype=dtype)
+
+
+def zeros_like(arr, dtype):
+    if isinstance(arr, np.ndarray):
+        return np.zeros_like(arr, dtype=dtype)
+    else:
+        return cp.zeros_like(arr, dtype=dtype)
 
 
 def power(arr, exponents, dtype=None):

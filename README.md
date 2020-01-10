@@ -16,7 +16,7 @@ User can turn on/off GPU layer-wise, that is, you can compute convolution layer 
 # Brief tour of dnnet
 ## Quick glance of usage
 
-User can creates instance of NeuralNetwork, add layer one by one,<br>
+User can create a instance of NeuralNetwork, add layers one by one,<br>
 finalize model, set optimizer, execute model fitting, and save model.
 
 In the below, some arguments are not specified to simplify the example.
@@ -55,7 +55,7 @@ model.save(path='./data/output', name='my_cnn.dat')
 User can also load model, and predict output.
 ```
 model.load(path='./data/output', name='my_cnn.dat')
-y = model.predict(x)
+y_pred = model.predict(x_unknown)
 ```
 
 GPU is easily enabled. Do the follows at the top of your script.

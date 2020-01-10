@@ -7,7 +7,7 @@ sys.path.append('../..')
 import json
 import numpy as np
 
-"""Make sure configure log before importing dnnet."""
+"""Configure logger before importing dnnet."""
 import logging.config
 with open('../common/logging.json') as f:
     data = json.load(f)

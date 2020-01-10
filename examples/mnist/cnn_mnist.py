@@ -4,9 +4,14 @@
 import sys
 sys.path.append('../..')
 
-import matplotlib.pyplot as plt
-import pickle
+import json
 import numpy as np
+
+"""Configure logger before importing dnnet."""
+import logging.config
+with open('../common/logging.json') as f:
+    data = json.load(f)
+    logging.config.dictConfig(data)
 
 import dnnet
 from dnnet.config import Config

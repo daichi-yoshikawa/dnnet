@@ -1,13 +1,15 @@
 # Authors: Daichi Yoshikawa <daichi.yoshikawa@gmail.com>
 # License: BSD 3 clause
 
-import os
+import os, sys
+import matplotlib.pyplot as plt
 import pickle
-import sys
 import time
 
-import matplotlib.pyplot as plt
+import logging
+logger = logging.getLogger('dnnet.log')
 
+import dnnet
 from dnnet.exception import DNNetIOError, DNNetRuntimeError
 from dnnet.ext_mathlibs import cp, np
 from dnnet.utils.nn_utils import prod, shuffle_data, split_data, w2im
@@ -92,19 +94,21 @@ class NeuralNetwork:
         This method must be called after adding all required layers
         and before starting training.
         """
+        logger.info('Define network with dnnet of version : %s'\
+                    % dnnet.__version__)
         if self.layers.size == 0:
             msg = 'NeuralNetwork has no layer.\n Add layers before compiling.'
             raise DNNetRuntimeError(msg)
 
         parent = self.layers[0]
+        self.add(OutputLayer())
 
         for i, layer in enumerate(self.layers, 1):
+            logger.debug('Add %s layer.' % layer.get_type())
             layer.set_parent(parent)
             parent = layer
 
-        output_layer = OutputLayer()
-        output_layer.set_parent(self.layers[-1])
-        self.add(output_layer)
+        logger.debug('Defined network.')
 
     def fit(self, x, y, optimizer, loss_function, **kwargs):
         """Train model.
@@ -162,10 +166,25 @@ class NeuralNetwork:
         train_data_ratio_for_eval = kwargs.pop(
                 'train_data_ratio_for_eval', 1.0)
 
+        logger.info('\n--- Parameters ---\nepochs: %d\nbatch_size: %d\n'
+                    'learning_curve: %r\nshuffle: %r\nshuffle_per_epoch: %r\n'
+                    'test_data_ratio: %f\ntest_data_ratio_for_eval: %f\n'
+                    'optimizer: %s\nloss_function: %s'
+                    
+                    % (epochs, batch_size, learning_curve, shuffle,
+                       shuffle_per_epoch, test_data_ratio,
+                       train_data_ratio_for_eval, optimizer.get_type(),
+                       loss_function.get_type()))
+
         if shuffle:
+            logger.debug('shuffle data.')
             x, y = shuffle_data(x, y)
         x, y = self.__convert_dtype(x, y)
         x_train, y_train, x_test, y_test = split_data(x, y, test_data_ratio)
+        logger.info('Train data input, output : %s, %s'
+                    % (x_train.shape, y_train.shape))
+        logger.info('Test data input, output : %s, %s'
+                    % (x_test.shape, y_test.shape))
 
         back_prop = BackPropagation(
             epochs, batch_size, optimizer, loss_function,
@@ -173,6 +192,7 @@ class NeuralNetwork:
 
         np_err_config = np.seterr('raise')
         try:
+            logger.info('Fitting model starts.')
             lc = back_prop.fit(
                 self.layers, x_train, y_train, x_test, y_test,
                 shuffle_per_epoch, batch_size, train_data_ratio_for_eval)
@@ -192,7 +212,8 @@ class NeuralNetwork:
             )
 
         end = time.time()
-        sys.stdout.write('Calculation time : %.2f[s]\n' % (end - start))
+        logger.info('Fitting model is done. '
+                    'Processing time : %.2f[s]\n' % (end - start))
 
         return lc
 

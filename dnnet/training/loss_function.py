@@ -19,6 +19,9 @@ class LossFunction:
     """
     ep = 1e-5
 
+    def get_type(self):
+        raise NotImplementedError('LossFunction.get_type is called.')
+
     def get(self, y, t):
         """Returns loss.
 
@@ -36,17 +39,23 @@ class LossFunction:
         float
             Resulting loss value.
         """
-        raise NotImplementedError('LossFunction.get')
+        raise NotImplementedError('LossFunction.get is called.')
 
 
 class MultinomialCrossEntropy(LossFunction):
     """Loss function which is used for multi-class classification."""
+    def get_type(self):
+        return 'multinomial cross entropy'
+
     def get(self, y, t):
         return (-t * np.log(y + self.ep)).sum() / y.shape[0]
 
 
 class BinomialCrossEntropy(LossFunction):
     """Loss function which is used for binary-class classification."""
+    def get_type(self):
+        return 'binomial cross entropy'
+
     def get(self, y, t):
         error = -t * np.log(y + self.ep) - (1 - t) * np.log(1 - y + self.ep)
         return error.sum() / y.shape[0]
@@ -54,5 +63,8 @@ class BinomialCrossEntropy(LossFunction):
 
 class SquaredError(LossFunction):
     """Loss function which is used for regression."""
+    def get_type(self):
+        return 'squared error'
+
     def get(self, y, t):
         return 0.5 * np.power(y - t, 2, dtype=y.dtype).sum() / y.shape[0]

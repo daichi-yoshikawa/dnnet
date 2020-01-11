@@ -116,7 +116,7 @@ class BackPropagation:
 
             if self.lc is not None:
                 self.lc.add(loss_train, loss_test, acc_train, acc_test)
-                self.lc.stdout(epoch)
+                self.lc.info(epoch)
 
         return self.lc
 
@@ -146,8 +146,8 @@ class BackPropagation:
                 end = data_num
 
             self.__train_one_batch(layers, x_train[i:end], y_train[i:end])
-            sys.stdout.write('\r%2.2f%% ' % (100. * i / data_num))
-        sys.stdout.write('\r100.00% ')
+            sys.stdout.write('\r%2.2f%%' % (100. * i / data_num))
+        sys.stdout.write('\r100.00%\n')
 
     def __train_one_batch(self, layers, x_train, y_train):
         """Implements one update of weights of neural network.

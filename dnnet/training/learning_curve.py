@@ -1,6 +1,9 @@
-import sys
 import matplotlib.pyplot as plt
+import sys
 from collections import OrderedDict
+
+import logging
+logger = logging.getLogger('dnnet.log')
 
 from dnnet.ext_mathlibs import cp, np
 
@@ -81,7 +84,7 @@ class LearningCurve:
         self.__add('acc_train', acc_train)
         self.__add('acc_test', acc_test)
 
-    def stdout(self, epoch):
+    def info(self, epoch):
         """Prints out losses and accuracies which are recorded at last.
 
         Arguments
@@ -89,14 +92,18 @@ class LearningCurve:
         epoch : int
             Number of epoch.
         """
-        sys.stdout.write('epoch:%2d' % (epoch+1))
-
+        msg = 'epoch:%2d ' % (epoch + 1)
         for key, val in self.vals.items():
-            self.__stdout(key, val)
+            if val is None:
+                continue
+            if val is None:
+                continue
 
-        sys.stdout.write('\n')
+            format_ = self.label[key] + ': ' + self.digits[key] + ' '
+            msg += format_ % self.vals[key][-1]
 
-################################################################################
+        logger.info(msg)
+
     def plot(
             self, loss_range=None, acc_range=None, figsize=(8, 10),
             fontsize=12):
@@ -129,7 +136,7 @@ class LearningCurve:
             raise RuntimeError(msg)
 
         if not self.__recorded_loss_or_acc():
-            sys.stdout.write('No recorded loss and accuracy.\n')
+            logger.info('No recorded loss and accuracy.')
             return
 
         plt.figure(figsize=figsize)
@@ -182,14 +189,6 @@ class LearningCurve:
         if self.vals[key] is None:
             self.vals[key] = np.array([], dtype=self.dtype)
         self.vals[key] = np.append(self.vals[key], val)
-
-    def __stdout(self, key, val):
-        """Print out selected value."""
-        if val is None:
-            return
-
-        msg = ' ' + self.label[key] + ': ' + self.digits[key]
-        sys.stdout.write(msg % (self.vals[key][-1]))
 
     def __recorded_loss(self):
         """Returns true if at least one loss has been recorded."""

@@ -159,7 +159,7 @@ you will partially execute the following steps.
 #### Setup procedure
 * Install required packages
 ```
-$ sudo apt-get install git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev
+$ sudo apt-get install git gcc make openssl libssl-dev libbz2-dev libreadline-dev libsqlite3-dev zlib1g-dev libffi-dev
 ```
 
 * Install tkinter(This is required to use matplotlib in virtualenv)
